@@ -1,5 +1,6 @@
 package model
 
+import dto.BookDTO
 import java.time.LocalDate
 
 enum class Gender {
@@ -43,7 +44,7 @@ abstract class Book (
     override var id = 0
 
     // Template Method Primitiva
-    fun calculateBibliokarmas(reservation: Reservation) : Int = 5 * reservation.diasDeReserva() + typeBibliokarmas()
+    fun calculateBibliokarmas(reservation: Reservation) : Int = 5 * reservation.reservationDays() + typeBibliokarmas()
 
     // different for every type of book
     abstract fun typeBibliokarmas() : Int
@@ -52,6 +53,10 @@ abstract class Book (
         reservations.add(reservation)
     }
 
+    fun canReserve(reservation: Reservation): Boolean =
+        !reservations.any { it.dateOverlaps(reservation) }
+
+
     override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO()
     }
@@ -59,6 +64,8 @@ abstract class Book (
     override fun meetsCreationCriteria(): Boolean {
         TODO()
     }
+
+    fun toDTO() = BookDTO(title= "")
 }
 
 class Common : Book() {
@@ -70,5 +77,5 @@ class WithDedication : Book() {
 }
 
 class Collectable : Book() {
-    override fun typeBibliokarmas(): Int = this.owner.bibliokarmas / 2 + this.numPages
+    override fun typeBibliokarmas(): Int = this.owner.bibliokarmas / 5 + this.numPages
 }

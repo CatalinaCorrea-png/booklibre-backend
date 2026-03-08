@@ -1,5 +1,7 @@
 package model
 
+import errors.BusinessException
+
 class User(
     val name: String = "",
     val description: String = "",
@@ -16,6 +18,7 @@ class User(
     override var id = 0
 
     fun reserveBook(book: Book, reservation: Reservation) {
+        if(!book.canReserve(reservation)) throw BusinessException("Reserva no disponible en esas fechas")
         book.addReservation(reservation)
         this.bibliokarmas += book.calculateBibliokarmas(reservation)
     }
