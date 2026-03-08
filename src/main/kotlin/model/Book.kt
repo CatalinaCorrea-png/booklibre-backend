@@ -3,28 +3,28 @@ package model
 import dto.BookDTO
 import java.time.LocalDate
 
-enum class Gender {
-    DRAMA,
-    CIENCIA_FICCION,
-    ROMANCE,
-    AUTOAYUDA,
-    DISEÑO,
-    LITERATURA_CLASICA
+enum class Gender(val value: String) {
+    DRAMA("DRAMA"),
+    SCIENCE_FICTION("SCIENCIA FICCION"),
+    ROMANCE("ROMANCE"),
+    SELF_HELP("AUTO AYUDA"),
+    DESIGN("DISEÑO"),
+    CLASSIC_LITERATURE("LITERATURA_CLASICA")
 }
 
-enum class Language {
-    ESPAÑOL,
-    INGLES,
-    FRANCES,
-    PORTUGUES
+enum class Language(val value: String) {
+    SPANISH("ESPAÑOL"),
+    ENGLISH("INGLES"),
+    FRENCH("FRANCES"),
+    PORTUGUESE("PORTUGUES")
 }
 
-enum class BookCondition {
-    EXCELENTE,
-    MUY_BUENO,
-    BUENO,
-    MALO,
-    REGULAR
+enum class BookCondition(val value: String) {
+    EXCELLENT("EXCELENTE"),
+    VERY_GOOD("MUY BUENO"),
+    GOOD("BUENO"),
+    BAD("MALO"),
+    REGULAR("REGULAR")
 }
 
 abstract class Book (
@@ -34,10 +34,10 @@ abstract class Book (
     var author: String = "",
     var numPages: Int = 0,
     val ISBN: String = "978-3-16-148410-0",
-    var language: Language = Language.ESPAÑOL,
+    var language: Language = Language.SPANISH,
     var editorial: String = "",
     var publishDate: LocalDate = LocalDate.now(),
-    var condition: BookCondition = BookCondition.EXCELENTE,
+    var condition: BookCondition = BookCondition.EXCELLENT,
     var owner: User = User(userType = Reader),
     var reservations: MutableList<Reservation> = mutableListOf()
 ): RepositoryElement {
