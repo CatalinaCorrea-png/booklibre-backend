@@ -29,7 +29,7 @@ class BookSpec : DescribeSpec ({
 
         it("Una reserva de libro con Dedicatoria por 4 dias de usuario nuevo") {
             // Arrange
-            val dedicationBook = WithDedication()
+            val dedicationBook = WithADedication()
 
             // Act
             newUser.reserveBook(book = dedicationBook, reservation = reservation)

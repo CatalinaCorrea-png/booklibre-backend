@@ -72,7 +72,7 @@ class Common : Book() {
     override fun typeBibliokarmas() : Int = if (this.owner.bibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
 }
 
-class WithDedication : Book() {
+class WithADedication : Book() {
     override fun typeBibliokarmas(): Int = 200 + 10 * (this.reservations.size)
 }
 
