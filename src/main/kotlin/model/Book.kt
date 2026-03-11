@@ -44,10 +44,10 @@ abstract class Book (
     override var id = 0
 
     // Template Method Primitiva
-    fun calculateBibliokarmas(reservation: Reservation) : Int = 5 * reservation.reservationDays() + typeBibliokarmas()
+    fun calculateBibliokarmas(reservation: Reservation) : Int = 5 * reservation.reservationDays() + typeBibliokarmas(reservation)
 
     // different for every type of book
-    abstract fun typeBibliokarmas() : Int
+    abstract fun typeBibliokarmas(reservation: Reservation) : Int
 
     fun addReservation(reservation: Reservation) {
         reservations.add(reservation)
@@ -69,13 +69,13 @@ abstract class Book (
 }
 
 class Common : Book() {
-    override fun typeBibliokarmas() : Int = if (this.owner.bibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
+    override fun typeBibliokarmas(reservation: Reservation) : Int = if (reservation.user.bibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
 }
 
 class WithADedication : Book() {
-    override fun typeBibliokarmas(): Int = 200 + 10 * (this.reservations.size)
+    override fun typeBibliokarmas(reservation: Reservation): Int = 200 + 10 * (this.reservations.size)
 }
 
 class Collectable : Book() {
-    override fun typeBibliokarmas(): Int = this.owner.bibliokarmas / 5 + this.numPages
+    override fun typeBibliokarmas(reservation: Reservation): Int = reservation.user.bibliokarmas / 5 + this.numPages
 }
