@@ -8,7 +8,7 @@ class User(
     val email: String = "",
     val cel: String = "",
     val location: String = "",
-    var userType: UserType,
+    var userType: UserType = Combined(),
     val timestamp: String = "",
     var bibliokarmas: Int = 0,
     val ownBooks: MutableList<Book> = mutableListOf(),
@@ -18,8 +18,7 @@ class User(
     override var id = 0
 
     fun reserveBook(book: Book, reservation: Reservation) {
-        if(!book.canReserve(reservation)) throw BusinessException("Reserva no disponible en esas fechas")
-        book.addReservation(reservation)
+        book.reserve(reservation)
         this.bibliokarmas += book.calculateBibliokarmas(reservation)
     }
 

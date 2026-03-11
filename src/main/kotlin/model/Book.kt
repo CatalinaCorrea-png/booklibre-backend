@@ -1,6 +1,7 @@
 package model
 
 import dto.BookDTO
+import errors.BusinessException
 import java.time.LocalDate
 
 enum class Gender(val value: String) {
@@ -49,13 +50,17 @@ abstract class Book (
     // different for every type of book
     abstract fun typeBibliokarmas(reservation: Reservation) : Int
 
+    fun reserve(reservation: Reservation) {
+        if(!this.isAvailable(reservation)) throw BusinessException("Reserva no disponible en esas fechas")
+        this.addReservation(reservation)
+    }
+
     fun addReservation(reservation: Reservation) {
         reservations.add(reservation)
     }
 
-    fun canReserve(reservation: Reservation): Boolean =
+    fun isAvailable(reservation: Reservation): Boolean =
         !reservations.any { it.dateOverlaps(reservation) }
-
 
     override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO()
