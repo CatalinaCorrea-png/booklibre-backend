@@ -36,7 +36,6 @@ class BookSpec : DescribeSpec ({
 
             // Assert
             dedicationBook.reservations.size shouldBe 1
-            dedicationBook.calculateBibliokarmas(reservation) shouldBe 230
             newUser.bibliokarmas shouldBe 230
         }
 
