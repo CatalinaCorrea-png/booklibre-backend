@@ -1,7 +1,7 @@
-package model
+package ar.edu.unsam.phm.repository
 
-import errors.ConflictException
-import errors.NotFoundException
+import ar.edu.unsam.phm.errors.ConflictException
+import ar.edu.unsam.phm.errors.NotFoundException
 
 open class Repository <Type: RepositoryElement> {
     private var idCounter: Int = 1
@@ -17,14 +17,15 @@ open class Repository <Type: RepositoryElement> {
         if (!repositoryObject.meetsNewCriteria()) {
             throw ConflictException("El objeto no puede generarse en el repositorio ya que no es nuevo. ID del objeto: ${repositoryObject.id}")
         }
-            repositoryObject.id = generateID()
+        repositoryObject.id = generateID()
+        collection.add(repositoryObject)
     }
 
     fun removeFromCollection(id: Int): Unit {
         collection.remove(this.getObject(id))
     }
 
-    private fun findIndexInCollection(id: Int): Int {
+     fun findIndexInCollection(id: Int): Int {
         val index = this.collection.indexOfFirst { item -> item.id == id }
         if (index == -1) {
             throw NotFoundException("No existe un indice donde exista este elemento en el repositorio. ID: ${id}")

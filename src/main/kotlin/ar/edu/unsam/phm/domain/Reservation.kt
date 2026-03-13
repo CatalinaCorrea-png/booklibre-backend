@@ -1,7 +1,13 @@
-package model
+package ar.edu.unsam.phm.domain
 
+import ar.edu.unsam.phm.repository.RepositoryElement
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+
+enum class State(val value: String){
+    AVAILABLE("Available"),
+    BORROWED("Borrowed")
+}
 
 data class Reservation (
     var user: User,
@@ -9,7 +15,7 @@ data class Reservation (
     var review: Review,
     var pickUpDate: LocalDate = LocalDate.now(),
     var dropOffDate: LocalDate = LocalDate.now(),
-
+    var state: State = State.AVAILABLE
 ): RepositoryElement {
     override var id = 0
 

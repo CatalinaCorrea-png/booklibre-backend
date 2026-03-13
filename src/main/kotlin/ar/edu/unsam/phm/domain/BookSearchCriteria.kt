@@ -1,4 +1,4 @@
-package model
+package ar.edu.unsam.phm.domain
 
 import java.time.LocalDate
 

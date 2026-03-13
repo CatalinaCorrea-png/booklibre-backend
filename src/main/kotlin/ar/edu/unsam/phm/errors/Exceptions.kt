@@ -1,4 +1,4 @@
-package errors
+package ar.edu.unsam.phm.errors
 
 // La petición no pudo procesarse porque contiene datos inválidos o no cumple
 // con las reglas de negocio definidas.

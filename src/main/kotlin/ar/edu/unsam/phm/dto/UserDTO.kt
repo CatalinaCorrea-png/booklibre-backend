@@ -1,7 +1,7 @@
-package dto
+package ar.edu.unsam.phm.dto
 
-import model.UserType
-import model.User
+import ar.edu.unsam.phm.domain.User
+import ar.edu.unsam.phm.domain.UserType
 
 data class UserDTO(
     val id: Int,

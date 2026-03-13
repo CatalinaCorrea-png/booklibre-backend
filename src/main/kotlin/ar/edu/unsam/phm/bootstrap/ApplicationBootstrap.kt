@@ -1,6 +1,18 @@
-package bootstrap
+package ar.edu.unsam.phm.bootstrap
 
-import model.*
+import ar.edu.unsam.phm.domain.Author
+import ar.edu.unsam.phm.domain.Book
+import ar.edu.unsam.phm.domain.BookCondition
+import ar.edu.unsam.phm.domain.Collectable
+import ar.edu.unsam.phm.domain.Common
+import ar.edu.unsam.phm.domain.Gender
+import ar.edu.unsam.phm.domain.Language
+import ar.edu.unsam.phm.repository.Repository
+import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.Review
+import ar.edu.unsam.phm.domain.User
+import ar.edu.unsam.phm.domain.WithADedication
+import ar.edu.unsam.phm.domain.*
 import java.time.LocalDate
 
 object ApplicationBootstrap {
@@ -35,42 +47,42 @@ object ApplicationBootstrap {
     // ─── Usuarios ─────────────────────────────────────────────────────────────
 
     val emiliaRomero = User(
-        name         = "Emilia Romero",
-        description  = "Lectora ávida & coleccionista",
-        email        = "emilia@example.com",
-        cel          = "+54 11 1234-5678",
-        location     = "Buenos Aires, AR",
-        userType     = Combined(),
+        name = "Emilia Romero",
+        description = "Lectora ávida & coleccionista",
+        email = "emilia@example.com",
+        cel = "+54 11 1234-5678",
+        location = "Buenos Aires, AR",
+        userType = UserType.COMBINED,
         bibliokarmas = 2345
     )
 
     val lucianoVega = User(
-        name         = "Luciano Vega",
-        description  = "Fanático de la ciencia ficción",
-        email        = "luciano@example.com",
-        cel          = "+54 11 8765-4321",
-        location     = "Rosario, AR",
-        userType     = Reader,
+        name = "Luciano Vega",
+        description = "Fanático de la ciencia ficción",
+        email = "luciano@example.com",
+        cel = "+54 11 8765-4321",
+        location = "Rosario, AR",
+        userType = UserType.READER,
         bibliokarmas = 980
     )
 
     val valentinaSosa = User(
-        name         = "Valentina Sosa",
-        description  = "Escritora y lectora compulsiva",
-        email        = "valentina@example.com",
-        cel          = "+54 11 5555-0000",
-        location     = "Córdoba, AR",
-        userType     = Publisher,
+        name = "Valentina Sosa",
+        description = "Escritora y lectora compulsiva",
+        email = "valentina@example.com",
+        cel = "+54 11 5555-0000",
+        location = "Córdoba, AR",
+        userType = UserType.PUBLISHER,
         bibliokarmas = 1500
     )
 
     val mateoLopez = User(
-        name         = "Mateo López",
-        description  = "Lector ocasional, coleccionista serio",
-        email        = "mateo@example.com",
-        cel          = "+54 11 3333-7777",
-        location     = "Mendoza, AR",
-        userType     = Combined(),
+        name = "Mateo López",
+        description = "Lector ocasional, coleccionista serio",
+        email = "mateo@example.com",
+        cel = "+54 11 3333-7777",
+        location = "Mendoza, AR",
+        userType = UserType.COMBINED,
         bibliokarmas = 420
     )
 
@@ -395,89 +407,90 @@ object ApplicationBootstrap {
     // ─── Reservas (2 por usuario) ─────────────────────────────────────────────
 
     val reservaEmilia1 = Reservation(
-        user        = emiliaRomero,
-        book        = n1984,
-        review      = Review(),
-        pickUpDate  = LocalDate.of(2026, 3, 15),
+        user = emiliaRomero,
+        book = n1984,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 3, 15),
         dropOffDate = LocalDate.of(2026, 3, 29)
     )
 
     val reservaEmilia2 = Reservation(
-        user        = emiliaRomero,
-        book        = ficciones,
-        review      = Review(),
-        pickUpDate  = LocalDate.of(2026, 4, 1),
+        user = emiliaRomero,
+        book = ficciones,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 4, 1),
         dropOffDate = LocalDate.of(2026, 4, 14)
     )
 
     val reservaLuciano1 = Reservation(
-        user        = lucianoVega,
-        book        = fundacion,
-        review      = Review(),
-        pickUpDate  = LocalDate.of(2026, 3, 20),
+        user = lucianoVega,
+        book = fundacion,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 3, 20),
         dropOffDate = LocalDate.of(2026, 4, 3)
     )
 
     val reservaLuciano2 = Reservation(
-        user        = lucianoVega,
-        book        = rayuela,
-        review      = Review(),
-        pickUpDate  = LocalDate.of(2026, 4, 5),
+        user = lucianoVega,
+        book = rayuela,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 4, 5),
         dropOffDate = LocalDate.of(2026, 4, 19)
     )
 
     val reservaValentina1 = Reservation(
-        user        = valentinaSosa,
-        book        = granGatsby,
-        review      = Review(),
-        pickUpDate  = LocalDate.of(2026, 3, 10),
+        user = valentinaSosa,
+        book = granGatsby,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 3, 10),
         dropOffDate = LocalDate.of(2026, 3, 24)
     )
 
     val reservaValentina2 = Reservation(
-        user        = valentinaSosa,
-        book        = harryPotter,
-        review      = Review(),
-        pickUpDate  = LocalDate.of(2026, 4, 2),
+        user = valentinaSosa,
+        book = harryPotter,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 4, 2),
         dropOffDate = LocalDate.of(2026, 4, 16)
     )
 
     val reservaMateo1 = Reservation(
-        user        = mateoLopez,
-        book        = cienAnios,
-        review      = Review(),
-        pickUpDate  = LocalDate.of(2026, 3, 18),
+        user = mateoLopez,
+        book = cienAnios,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 3, 18),
         dropOffDate = LocalDate.of(2026, 4, 1)
     )
 
     val reservaMateo2 = Reservation(
-        user        = mateoLopez,
-        book        = ensayoCeguera,
-        review      = Review(),
-        pickUpDate  = LocalDate.of(2026, 4, 7),
+        user = mateoLopez,
+        book = ensayoCeguera,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 4, 7),
         dropOffDate = LocalDate.of(2026, 4, 21)
     )
 
     // ─── Función de inicialización ────────────────────────────────────────────
 
     fun init(
-        userRepo: Repository<User>,
-        bookRepo: Repository<Book>,
-        reservationRepo: Repository<Reservation>
+        userRepository: Repository<User>,
+        bookRepository: Repository<Book>,
+        reservationRepository: Repository<Reservation>,
+        authorRepository: Repository<Author>
     ) {
         listOf(emiliaRomero, lucianoVega, valentinaSosa, mateoLopez)
-            .forEach { userRepo.create(it) }
+            .forEach { userRepository.create(it) }
 
         listOf(n1984, elProceso, crimen, orgullo, guerraPaz, losMiserables, alquimista, extranjero)
-            .forEach { bookRepo.create(it) }
+            .forEach { bookRepository.create(it) }
 
         listOf(granGatsby, adiosArmas, monteCristo, vueltaMundo, senoraDalloway, cuentosMisterio, fundacion, cienAnios)
-            .forEach { bookRepo.create(it) }
+            .forEach { bookRepository.create(it) }
 
         listOf(huckFinn, ficciones, rayuela, ensayoCeguera, montagnaMagica, caminoSwann, jardinCerezos, harryPotter)
-            .forEach { bookRepo.create(it) }
+            .forEach { bookRepository.create(it) }
 
         listOf(reservaEmilia1, reservaEmilia2, reservaLuciano1, reservaLuciano2, reservaValentina1, reservaValentina2, reservaMateo1, reservaMateo2)
-            .forEach { reservationRepo.create(it) }
+            .forEach { reservationRepository.create(it) }
     }
 }

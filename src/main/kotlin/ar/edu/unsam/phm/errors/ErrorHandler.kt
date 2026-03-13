@@ -1,4 +1,4 @@
-package errors
+package ar.edu.unsam.phm.errors
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

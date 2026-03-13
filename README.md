@@ -72,7 +72,7 @@ src/
     └── kotlin/
             ├── controller/    # Endpoints REST
             ├── service/       # Lógica de negocio
-            ├── model/         # Entidades del dominio
+            ├── domain/         # Entidades del dominio
             ├── errorrs/       # Errores
             ├── repository/    # Repositorio
             └── dto/           # Objetos de transferencia

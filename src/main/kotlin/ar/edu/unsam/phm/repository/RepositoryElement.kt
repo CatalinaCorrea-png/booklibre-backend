@@ -1,4 +1,4 @@
-package model
+package ar.edu.unsam.phm.repository
 
 interface RepositoryElement {
     var id: Int

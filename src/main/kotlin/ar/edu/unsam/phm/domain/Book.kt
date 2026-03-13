@@ -1,6 +1,7 @@
-package model
+package ar.edu.unsam.phm.domain
 
-import dto.BookDTO
+import ar.edu.unsam.phm.dto.BookDTO
+import ar.edu.unsam.phm.repository.RepositoryElement
 import java.time.LocalDate
 
 enum class Gender(val value: String) {
@@ -38,9 +39,9 @@ abstract class Book (
     var editorial: String = "",
     var publishDate: LocalDate = LocalDate.now(),
     var condition: BookCondition = BookCondition.EXCELLENT,
-    var owner: User = User(userType = Reader),
-
-): RepositoryElement {
+    var reservations: MutableList<Reservation> = mutableListOf<Reservation>(),
+    var owner: User = User()
+    ): RepositoryElement {
     override var id = 0
 
     // Template Method Primitiva
@@ -57,7 +58,7 @@ abstract class Book (
         TODO()
     }
 
-    fun toDTO() = BookDTO(title= "")
+    fun toDTO() = BookDTO(title = "")
 }
 
 class Common : Book() {
@@ -65,7 +66,7 @@ class Common : Book() {
 }
 
 class WithADedication : Book() {
-    override fun typeBibliokarmas(reservation: Reservation): Int = TODO(" 200 * 10 * cantidadDeReservasDelLibro ")
+    override fun typeBibliokarmas(reservation: Reservation): Int = 200 * 10 * this.reservations.size
 }
 
 class Collectable : Book() {
