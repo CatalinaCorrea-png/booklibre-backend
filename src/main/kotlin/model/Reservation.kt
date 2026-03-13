@@ -5,8 +5,11 @@ import java.time.temporal.ChronoUnit
 
 data class Reservation (
     var user: User,
+    var book: Book,
+    var review: Review,
     var pickUpDate: LocalDate,
     var dropOffDate: LocalDate
+
 ): RepositoryElement {
     override var id = 0
 

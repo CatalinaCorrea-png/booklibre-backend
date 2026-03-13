@@ -39,7 +39,7 @@ abstract class Book (
     var publishDate: LocalDate = LocalDate.now(),
     var condition: BookCondition = BookCondition.EXCELLENT,
     var owner: User = User(userType = Reader),
-    var reservations: MutableList<Reservation> = mutableListOf()
+
 ): RepositoryElement {
     override var id = 0
 
@@ -48,14 +48,6 @@ abstract class Book (
 
     // different for every type of book
     abstract fun typeBibliokarmas(reservation: Reservation) : Int
-
-    fun addReservation(reservation: Reservation) {
-        reservations.add(reservation)
-    }
-
-    fun canReserve(reservation: Reservation): Boolean =
-        !reservations.any { it.dateOverlaps(reservation) }
-
 
     override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO()
@@ -73,7 +65,7 @@ class Common : Book() {
 }
 
 class WithADedication : Book() {
-    override fun typeBibliokarmas(reservation: Reservation): Int = 200 + 10 * (this.reservations.size)
+    override fun typeBibliokarmas(reservation: Reservation): Int = TODO(" 200 * 10 * cantidadDeReservasDelLibro ")
 }
 
 class Collectable : Book() {

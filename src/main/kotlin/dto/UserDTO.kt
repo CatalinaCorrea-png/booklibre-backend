@@ -12,8 +12,6 @@ data class UserDTO(
     val location: String,
     val timestamp: String,
     val bibliokarmas: Int,
-    val ownBooks: List<BookDTO>,
-    val readBooks: Int,
     val userType: UserType
 )
 
@@ -27,8 +25,6 @@ fun User.toUserDTO(): UserDTO {
         location = this.location,
         timestamp = this.timestamp,
         bibliokarmas = this.bibliokarmas,
-        ownBooks = this.ownBooks.map { it.toDTO() },
-        readBooks = this.readBooks,
         userType = this.userType
     )
 }
