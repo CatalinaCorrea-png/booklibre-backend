@@ -8,7 +8,7 @@ class User(
     val email: String = "",
     val cel: String = "",
     val location: String = "",
-    var userType: UserType,
+    var userType: UserType = Combined(),
     val timestamp: String = "",
     var bibliokarmas: Int = 0,
 

@@ -13,7 +13,7 @@ open class Repository <Type: RepositoryElement> {
 
     fun repositoryObjects(): List<Type> = this.collection
 
-    fun generate(repositoryObject: Type): Unit {
+    fun create(repositoryObject: Type): Unit {
         if (!repositoryObject.meetsNewCriteria()) {
             throw ConflictException("El objeto no puede generarse en el repositorio ya que no es nuevo. ID del objeto: ${repositoryObject.id}")
         }
