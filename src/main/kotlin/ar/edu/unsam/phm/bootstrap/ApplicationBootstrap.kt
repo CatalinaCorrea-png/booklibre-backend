@@ -476,7 +476,7 @@ object ApplicationBootstrap {
         userRepository: Repository<User>,
         bookRepository: Repository<Book>,
         reservationRepository: Repository<Reservation>,
-        authorRepository: Repository<Author>
+        //authorRepository: Repository<Author>
     ) {
         listOf(emiliaRomero, lucianoVega, valentinaSosa, mateoLopez)
             .forEach { userRepository.create(it) }
