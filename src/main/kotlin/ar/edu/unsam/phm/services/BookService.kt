@@ -44,7 +44,7 @@ class BookService (
                     matchesAvailability(book, criteria)
         }
 
-        val ordered = criteria.sortedBy.sort(filtered)
+        val ordered = criteria.sortedBy.sort(filtered, criteria.ascending)
 
         // PAGINACION
         // Cuantas paginas son
