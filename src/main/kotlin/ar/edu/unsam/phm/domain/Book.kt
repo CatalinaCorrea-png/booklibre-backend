@@ -40,8 +40,9 @@ abstract class Book (
     var publishDate: LocalDate = LocalDate.now(),
     var condition: BookCondition = BookCondition.EXCELLENT,
     var reservations: MutableList<Reservation> = mutableListOf<Reservation>(),
-    var owner: User = User()
-    ): RepositoryElement {
+    var owner: User = User(),
+    var imageSrc: String = ""
+): RepositoryElement {
     override var id = 0
 
     // Template Method Primitiva
