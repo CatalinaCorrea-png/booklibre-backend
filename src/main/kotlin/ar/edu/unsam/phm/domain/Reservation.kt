@@ -5,16 +5,17 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 enum class State(val value: String){
-    AVAILABLE("Available"),
-    BORROWED("Borrowed")
+    AVAILABLE("Disponible"),
+    BORROWED("Prestado"),
+    ENDED("Devuelto"),
 }
 
 data class Reservation (
-    var user: User,
-    var book: Book,
-    var review: Review,
+    var user: User = User(),
+    var book: Book = Common(),
+    var review: Review = Review(),
     var pickUpDate: LocalDate = LocalDate.now(),
-    var dropOffDate: LocalDate = LocalDate.now(),
+    var dropOffDate: LocalDate = LocalDate.now().plusDays(1),
     var state: State = State.AVAILABLE
 ): RepositoryElement {
     override var id = 0

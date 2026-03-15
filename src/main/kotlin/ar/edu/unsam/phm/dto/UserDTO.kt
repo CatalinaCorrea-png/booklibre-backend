@@ -13,7 +13,20 @@ data class UserDTO(
     val timestamp: String,
     val bibliokarmas: Int,
     val userType: UserType
-)
+) {
+    fun fromDTO(): User {
+        return User(
+            name= this.name,
+            description= this.description,
+            email= this.email,
+            cel= this.cel,
+            location= this.location,
+            userType= this.userType,
+            timestamp= this.timestamp,
+            bibliokarmas= this.bibliokarmas,
+        )
+    }
+}
 
 fun User.toUserDTO(): UserDTO {
     return UserDTO(

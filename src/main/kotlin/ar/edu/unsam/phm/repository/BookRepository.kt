@@ -1,11 +1,6 @@
 package ar.edu.unsam.phm.repository
 
-import ar.edu.unsam.phm.domain.Book
-import ar.edu.unsam.phm.domain.BookSearchCriteria
-import ar.edu.unsam.phm.domain.Common
-import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.Review
-import ar.edu.unsam.phm.domain.User
+import ar.edu.unsam.phm.domain.*
 
 @org.springframework.stereotype.Repository
 class BookRepository: Repository<Book>() {
@@ -13,7 +8,7 @@ class BookRepository: Repository<Book>() {
     fun availableBooks(criteria: BookSearchCriteria): MutableList<Book> {
         val reservation = Reservation(
             user = User(),
-            book = Common(),
+            book = Common(this.title, this.desc, Gender.DRAMA, Author(this.authorName, this.authorAvatarUrl), 0),
             review = Review(),
             pickUpDate = criteria.from,
             dropOffDate = criteria.to
