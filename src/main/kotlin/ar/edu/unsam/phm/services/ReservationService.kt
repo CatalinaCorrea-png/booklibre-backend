@@ -26,11 +26,20 @@ class ReservationService(
 
     fun canReserve(reservation: Reservation) : Boolean = reservationRepository.repositoryObjects().any { it.dateOverlaps(reservation) }
 
-    // GET DE RESERVAS (con sus libros) FILTRADOS! Y PAGINADO!
-    // Ahora uso metodos, luego creamos una query dinamica para pedirle a la bbdd TODO filtrado.
+    /* GET DE RESERVAS (con sus libros) FILTRADOS! Y PAGINADO!
+     Ahora uso metodos, luego creamos una query dinamica para pedirle a la bbdd TODO filtrado.
+     SE OCUPA EL BOOK SERVICE
     fun getAvailableReservationsBy(criteria: BookSearchCriteria) : PageResponse<ReservationDTO> {
         val allReservations = reservationRepository.repositoryObjects()
         val allBooks = bookRepository.repositoryObjects()
+
+        /* TODO: Necesito hacerlo devuelta pero enfocandome en los libros, y
+             comparando las reservas de ese libro en especifico (id) con
+             las reservas simuladas. Porque esas reservas simuladas aparecen siempre sino.
+             Y esta mal.
+        */
+
+        // println(criteria.toString())
 
         val filtered = allReservations.filter { reservation ->
             matchesTitle(reservation, criteria) &&
@@ -90,6 +99,7 @@ class ReservationService(
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
         return !reservation.dateOverlaps(reservationTemp)
     }
+     */
 
 
 }

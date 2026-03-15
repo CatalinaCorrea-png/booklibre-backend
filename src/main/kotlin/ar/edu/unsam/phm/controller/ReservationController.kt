@@ -25,10 +25,12 @@ class ReservationController(
 //        return reservationService.createReservation(reservation)
 //    }
 
+    /* SE OCUPA EL BOOK CONTROLLER
     @PostMapping("/filtered-reservations")
     fun getFilteredReservations(@RequestBody bookSearchCriteria: BookSearchCriteria): PageResponse<ReservationDTO> {
         return reservationService.getAvailableReservationsBy(bookSearchCriteria)
     }
+     */
 
 
 }
