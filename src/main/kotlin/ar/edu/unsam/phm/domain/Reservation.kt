@@ -5,8 +5,10 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 enum class State(val value: String){
-    AVAILABLE("Available"),
-    BORROWED("Borrowed")
+    AVAILABLE("ACTIVO"),
+    BORROWED("PRESTADO"),
+    SOON_TO_END("PROXIMO A VENCER"),
+    RETURNED("DEVUELTO")
 }
 
 data class Reservation (
