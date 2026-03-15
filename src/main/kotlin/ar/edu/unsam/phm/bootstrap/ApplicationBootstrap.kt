@@ -7,15 +7,23 @@ import ar.edu.unsam.phm.domain.Collectable
 import ar.edu.unsam.phm.domain.Common
 import ar.edu.unsam.phm.domain.Gender
 import ar.edu.unsam.phm.domain.Language
-import ar.edu.unsam.phm.repository.Repository
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.WithADedication
 import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.repository.*
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.stereotype.Service
 import java.time.LocalDate
 
-object ApplicationBootstrap {
+@Service
+class ApplicationBootstrap(
+    val userRepository: UserRepository,
+    val bookRepository: BookRepository,
+    val reservationRepository: ReservationRepository,
+    val authorRepository: AuthorRepository
+) : InitializingBean {
 
     // ─── Autores ──────────────────────────────────────────────────────────────
 
@@ -99,6 +107,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1949, 6, 8)
         condition   = BookCondition.GOOD
         owner       = emiliaRomero
+        imageSrc    = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz9gIAgf5hTagXaQZl8ayY6FF26n2qirXQMg&s"
     }
 
     val elProceso = Common().apply {
@@ -112,6 +121,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1925, 4, 26)
         condition   = BookCondition.VERY_GOOD
         owner       = lucianoVega
+        imageSrc    = "https://acdn-us.mitiendanube.com/stores/001/168/109/products/el-proceso1-d60e6b26de70d743d015882612962062-1024-1024.webp?w=1920"
     }
 
     val crimen = Common().apply {
@@ -125,6 +135,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1866, 1, 1)
         condition   = BookCondition.REGULAR
         owner       = valentinaSosa
+        imageSrc    = "https://acdn-us.mitiendanube.com/stores/004/008/965/products/img_8468-dfbcfc91acd4498ad217537263442873-480-0.webp"
     }
 
     val orgullo = Common().apply {
@@ -138,6 +149,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1813, 1, 28)
         condition   = BookCondition.EXCELLENT
         owner       = mateoLopez
+        imageSrc    = "https://images.cdn2.buscalibre.com/fit-in/360x360/5f/b0/5fb0cb647320eede167a469ee4b648bf.jpg"
     }
 
     val guerraPaz = Common().apply {
@@ -151,6 +163,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1869, 1, 1)
         condition   = BookCondition.GOOD
         owner       = emiliaRomero
+        imageSrc    = "https://http2.mlstatic.com/D_NQ_NP_689496-MLA78230208406_082024-O.webp"
     }
 
     val losMiserables = Common().apply {
@@ -164,6 +177,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1862, 1, 1)
         condition   = BookCondition.VERY_GOOD
         owner       = lucianoVega
+        imageSrc    = "https://http2.mlstatic.com/D_NQ_NP_762363-MLM49917565139_052022-O.webp"
     }
 
     val alquimista = Common().apply {
@@ -177,6 +191,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1988, 1, 1)
         condition   = BookCondition.EXCELLENT
         owner       = valentinaSosa
+        imageSrc    = "https://tienda.planetadelibros.com.ar/cdn/shop/files/ElalquimistaBK_Fte.jpg?v=1730985825"
     }
 
     val extranjero = Common().apply {
@@ -190,6 +205,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1942, 1, 1)
         condition   = BookCondition.GOOD
         owner       = mateoLopez
+        imageSrc    = "https://m.media-amazon.com/images/I/71mLWMj0sQL._AC_UF1000,1000_QL80_.jpg"
     }
 
     // ─── Libros Con Dedicatoria (8) ───────────────────────────────────────────
@@ -205,6 +221,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1925, 4, 10)
         condition   = BookCondition.GOOD
         owner       = emiliaRomero
+        imageSrc    = "https://http2.mlstatic.com/D_NQ_NP_980687-MLU78007366453_072024-O.webp"
     }
 
     val adiosArmas = WithADedication().apply {
@@ -218,6 +235,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1929, 9, 27)
         condition   = BookCondition.VERY_GOOD
         owner       = lucianoVega
+        imageSrc    = "https://www.penguinlibros.com/ar/1595223/adios-a-las-armas.jpg"
     }
 
     val monteCristo = WithADedication().apply {
@@ -231,6 +249,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1844, 1, 1)
         condition   = BookCondition.REGULAR
         owner       = valentinaSosa
+        imageSrc    = "https://www.penguinlibros.com/ar/6234239-large_default/el-conde-de-montecristo.webp"
     }
 
     val vueltaMundo = WithADedication().apply {
@@ -244,6 +263,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1872, 1, 1)
         condition   = BookCondition.EXCELLENT
         owner       = mateoLopez
+        imageSrc    = "https://images.cdn2.buscalibre.com/fit-in/360x360/1f/cb/1fcbcd4165d3c7eababb3e92dff6972c.jpg"
     }
 
     val senoraDalloway = WithADedication().apply {
@@ -257,6 +277,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1925, 5, 14)
         condition   = BookCondition.VERY_GOOD
         owner       = emiliaRomero
+        imageSrc    = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnPl2enENU9OdvIh58PC0QuIJ_g0-wYbc3XQ&s"
     }
 
     val cuentosMisterio = WithADedication().apply {
@@ -270,6 +291,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1840, 1, 1)
         condition   = BookCondition.GOOD
         owner       = lucianoVega
+        imageSrc    = "https://panamericana.vtexassets.com/arquivos/ids/525902/cuentos-de-misterio-e-imaginacion-2-9788418211997.jpg?v=638407572538400000"
     }
 
     val fundacion = WithADedication().apply {
@@ -283,6 +305,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1951, 5, 1)
         condition   = BookCondition.EXCELLENT
         owner       = valentinaSosa
+        imageSrc    = "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1170429948i/53687.jpg"
     }
 
     val cienAnios = WithADedication().apply {
@@ -296,6 +319,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1967, 5, 30)
         condition   = BookCondition.VERY_GOOD
         owner       = mateoLopez
+        imageSrc    = "https://assets.lectulandia.co/b/ab/Gabriel%20Garcia%20Marquez/Cien%20anos%20de%20soledad%20Edicion%20conmemorativa%20(1)/big.jpg"
     }
 
     // ─── Libros Coleccionables (8) ────────────────────────────────────────────
@@ -311,6 +335,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1884, 12, 10)
         condition   = BookCondition.EXCELLENT
         owner       = emiliaRomero
+        imageSrc    = "https://www.edicontinente.com.ar/image/titulos/9788426141057.jpg"
     }
 
     val ficciones = Collectable().apply {
@@ -324,6 +349,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1944, 1, 1)
         condition   = BookCondition.VERY_GOOD
         owner       = lucianoVega
+        imageSrc    = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm6k93G1ce4FkEE8FYXOsApKJfGO-_xD5-tQ&s"
     }
 
     val rayuela = Collectable().apply {
@@ -337,6 +363,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1963, 6, 28)
         condition   = BookCondition.GOOD
         owner       = valentinaSosa
+        imageSrc    = "https://images.cdn3.buscalibre.com/fit-in/360x360/90/53/905322d10841b36aa311dbd5c90d92ed.jpg"
     }
 
     val ensayoCeguera = Collectable().apply {
@@ -350,6 +377,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1995, 1, 1)
         condition   = BookCondition.REGULAR
         owner       = mateoLopez
+        imageSrc    = "https://www.penguinlibros.com/ar/3537745-large_default/ensayo-sobre-la-ceguera.webp"
     }
 
     val montagnaMagica = Collectable().apply {
@@ -363,6 +391,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1924, 11, 1)
         condition   = BookCondition.VERY_GOOD
         owner       = emiliaRomero
+        imageSrc    = "https://images.cdn3.buscalibre.com/fit-in/360x360/75/56/7556ee308c4a24d1a4ea1be13b9ee928.jpg"
     }
 
     val caminoSwann = Collectable().apply {
@@ -376,6 +405,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1913, 11, 14)
         condition   = BookCondition.EXCELLENT
         owner       = lucianoVega
+        imageSrc    = "https://upload.wikimedia.org/wikipedia/commons/e/ee/Por_el_camino_de_Swann-Espasa-Calpe1920-01.jpg"
     }
 
     val jardinCerezos = Collectable().apply {
@@ -389,6 +419,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1904, 1, 17)
         condition   = BookCondition.GOOD
         owner       = valentinaSosa
+        imageSrc    = "https://images.cdn2.buscalibre.com/fit-in/360x360/4b/33/4b3304f77876c25cd3e8babde159401d.jpg"
     }
 
     val harryPotter = Collectable().apply {
@@ -402,6 +433,7 @@ object ApplicationBootstrap {
         publishDate = LocalDate.of(1997, 6, 26)
         condition   = BookCondition.VERY_GOOD
         owner       = mateoLopez
+        imageSrc    = "https://images.cdn2.buscalibre.com/fit-in/360x360/e6/5f/e65f54742ad7bbc41903d17f75b77d78.jpg"
     }
 
     // ─── Reservas (2 por usuario) ─────────────────────────────────────────────
@@ -470,14 +502,154 @@ object ApplicationBootstrap {
         dropOffDate = LocalDate.of(2026, 4, 21)
     )
 
+    // ─── Reservas vacías (simuladas) ─────────────────────────────────────────────
+    val reservaUno = Reservation(
+        book = n1984,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaDos = Reservation(
+        book = elProceso,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaTres = Reservation(
+        book = crimen,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaCuatro = Reservation(
+        book = orgullo,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaCinco = Reservation(
+        book = guerraPaz,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaSeis = Reservation(
+        book = losMiserables,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaSiete = Reservation(
+        book = alquimista,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaOcho = Reservation(
+        book = extranjero,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaNueve = Reservation(
+        book = granGatsby,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaDiez = Reservation(
+        book = adiosArmas,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaOnce = Reservation(
+        book = monteCristo,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaDoce = Reservation(
+        book = vueltaMundo,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaTrece = Reservation(
+        book = senoraDalloway,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaCatorce = Reservation(
+        book = cuentosMisterio,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaQuince = Reservation(
+        book = fundacion,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaDieciseis = Reservation(
+        book = cienAnios,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaDiecisiete = Reservation(
+        book = huckFinn,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaDieciocho = Reservation(
+        book = ficciones,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaDiecinueve = Reservation(
+        book = rayuela,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaVeinte = Reservation(
+        book = ensayoCeguera,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaVeintiuno = Reservation(
+        book = montagnaMagica,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaVeintidos = Reservation(
+        book = caminoSwann,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaVeintitres = Reservation(
+        book = jardinCerezos,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
+    val reservaVeinticuatro = Reservation(
+        book = harryPotter,
+        pickUpDate = LocalDate.of(1800, 1, 1),
+        dropOffDate = LocalDate.of(1800, 1, 2),
+    )
+
     // ─── Función de inicialización ────────────────────────────────────────────
 
-    fun init(
-        userRepository: Repository<User>,
-        bookRepository: Repository<Book>,
-        reservationRepository: Repository<Reservation>,
-        authorRepository: Repository<Author>
-    ) {
+    override fun afterPropertiesSet() {
         listOf(emiliaRomero, lucianoVega, valentinaSosa, mateoLopez)
             .forEach { userRepository.create(it) }
 
@@ -491,6 +663,14 @@ object ApplicationBootstrap {
             .forEach { bookRepository.create(it) }
 
         listOf(reservaEmilia1, reservaEmilia2, reservaLuciano1, reservaLuciano2, reservaValentina1, reservaValentina2, reservaMateo1, reservaMateo2)
+            .forEach { reservationRepository.create(it) }
+        // reservas simuladas (libros sin reservas)
+        listOf(reservaUno, reservaDos, reservaTres, reservaCuatro, reservaCinco,
+            reservaSeis, reservaSiete, reservaOcho, reservaNueve, reservaDiez,
+            reservaOnce, reservaDoce, reservaTrece, reservaCatorce, reservaQuince,
+            reservaDieciseis, reservaDiecisiete, reservaDieciocho, reservaDiecinueve,
+            reservaVeinte, reservaVeintiuno, reservaVeintidos, reservaVeintitres,
+            reservaVeinticuatro)
             .forEach { reservationRepository.create(it) }
     }
 }
