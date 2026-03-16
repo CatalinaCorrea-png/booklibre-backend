@@ -1,8 +1,9 @@
 package ar.edu.unsam.phm.dto
 import ar.edu.unsam.phm.domain.*
+import java.time.LocalDate
+import ar.edu.unsam.phm.domain.*
 import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters
 import org.springframework.format.datetime.DateFormatter
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 data class BookDTO(
@@ -22,7 +23,7 @@ data class BookDTO(
     var reservationsIds: MutableList<Int>,
     var owner: UserDTO,
     var imageSrc: String,
-) {
+    ) {
 
     fun fromDTO(): Book {
         if (this.bookType == "COMUN") {
@@ -77,6 +78,7 @@ fun Book.toDTO(): BookDTO{
     )
     return bookDTO
 }
+
 
 data class ProfileBookDTO(
     var id: Int,

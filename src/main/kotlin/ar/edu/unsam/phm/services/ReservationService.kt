@@ -19,6 +19,10 @@ class ReservationService(
     fun createReservation(reservation: Reservation) {
         if (!canReserve(reservation)) throw BusinessException("Reserva no disponible en esa fecha")
         reservationRepository.create(reservation)
+
+        // Acá sumo la reserva al libro?????
+        val book = bookRepository.getObject(reservation.book.id)
+        book.addReservation(reservation.id)
     }
 
     // esto tiene que estar negado asi devuelve true si no hay solapamiento
