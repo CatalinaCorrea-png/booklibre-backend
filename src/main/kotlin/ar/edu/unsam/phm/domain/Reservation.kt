@@ -5,16 +5,16 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 enum class State(val value: String){
-    AVAILABLE("ACTIVO"),
-    BORROWED("PRESTADO"),
-    SOON_TO_END("PROXIMO A VENCER"),
-    RETURNED("DEVUELTO")
+    AVAILABLE("Disponible"),
+    BORROWED("Prestado"),
+    SOON_TO_END("Proximo a vencer"),
+    RETURNED("Devuelto")
 }
 
 data class Reservation (
-    var user: User,
-    var book: Book,
-    var review: Review,
+    var user: User = User(),
+    var book: Book = Common(),
+    var review: Review = Review(),
     var pickUpDate: LocalDate = LocalDate.now(),
     var dropOffDate: LocalDate = LocalDate.now(),
     var state: State = State.AVAILABLE
@@ -31,6 +31,9 @@ data class Reservation (
 
     fun isSoonToEnd() = this.dropOffDate.minusDays(2) == LocalDate.now()
 
+    fun bookOwnerId(): Int = this.book.owner.id
+
+    fun holderId(): Int = this.user.id
 
     override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO("Not yet implemented")

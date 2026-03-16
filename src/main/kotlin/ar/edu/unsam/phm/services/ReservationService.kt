@@ -1,10 +1,15 @@
 package ar.edu.unsam.phm.services
 
+import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.State
+import ar.edu.unsam.phm.dto.ReservationProfileDTO
+import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class ReservationService(
@@ -49,4 +54,25 @@ class ReservationService(
         //! acordate de actualizarlo bobo
         reservationRepository.update(reservation)
     }
+
+    fun getUserOwnBooks(userId: Int): List<ReservationProfileDTO> {
+
+        val everyUserOwnBook: List<Book> =
+            bookRepository.repositoryObjects().filter { book -> book.owner.id == userId }
+
+        val reservationsWithBooksOwnByUser =
+            reservationRepository.repositoryObjects().filter { reserve -> reserve.bookOwnerId() == userId }
+
+        val userNotReservedBooks = everyUserOwnBook.filter { book -> reservationsWithBooksOwnByUser.none { reservation -> reservation.book.id == book.id} }
+
+        val emptyReservationsForNotReservedBooks = userNotReservedBooks.map { book -> Reservation(book = book, pickUpDate = LocalDate.of(1000, 1, 1), dropOffDate = LocalDate.of(1000, 2, 1)) }
+
+        val reservationsDTOs = reservationsWithBooksOwnByUser.map { it.toReservationProfileDTO() } + emptyReservationsForNotReservedBooks.map { it.toReservationProfileDTO() }
+
+        return reservationsDTOs
+    }
+
+    fun getUserReservationsNumber(userId: Int): Int =
+        reservationRepository.repositoryObjects().filter { reservation ->
+            reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
 }
