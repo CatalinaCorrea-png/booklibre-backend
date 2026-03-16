@@ -1,9 +1,6 @@
 package ar.edu.unsam.phm.dto
 import ar.edu.unsam.phm.domain.*
 import java.time.LocalDate
-import ar.edu.unsam.phm.domain.*
-import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters
-import org.springframework.format.datetime.DateFormatter
 import java.time.format.DateTimeFormatter
 
 data class BookDTO(
@@ -15,7 +12,7 @@ data class BookDTO(
     var authorName: String,
     var authorAvatarUrl: String,
     var numPages: Int,
-    val ISBN: String,
+    val isbn: String,
     var language: String,
     var editorial: String,
     var publishDate: LocalDate,
@@ -42,7 +39,7 @@ data class BookDTO(
             gender= Gender.DRAMA,
             author= Author(this.authorName, this.authorAvatarUrl),
             numPages = this.numPages,
-            ISBN=  this.ISBN,
+            isbn=  this.isbn,
             language = Language.valueOf(this.language),
             editorial= this.editorial,
             publishDate = this.publishDate,
@@ -67,7 +64,7 @@ fun Book.toDTO(): BookDTO{
         authorAvatarUrl = this.author.avatar,
         bookType = "COMUN",
         numPages = this.numPages,
-        ISBN=  this.ISBN,
+        isbn=  this.isbn,
         language = this.language.value,
         editorial = this.editorial,
         publishDate = this.publishDate,

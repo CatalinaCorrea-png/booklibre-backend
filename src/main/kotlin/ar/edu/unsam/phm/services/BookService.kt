@@ -82,8 +82,8 @@ class BookService (
     }
 
     private fun matchesISBN(book: Book, criteria: BookSearchCriteria): Boolean {
-        val isbn = criteria.ISBN?.trim()
-        return isbn.isNullOrBlank() || book.ISBN.contains(isbn, ignoreCase = true)
+        val isbn = criteria.isbn?.trim()
+        return isbn.isNullOrBlank() || book.isbn.contains(isbn, ignoreCase = true)
     }
 
     private fun matchesOwner(book: Book, criteria: BookSearchCriteria): Boolean {

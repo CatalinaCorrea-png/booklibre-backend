@@ -9,7 +9,7 @@ data class BookSearchCriteria (
     val pagesRangeMax: Int? = null,
     val pickUpDate: LocalDate = LocalDate.now(),
     val dropOffDate: LocalDate = LocalDate.now(),
-    val ISBN: String? = null,
+    val isbn: String? = null,
     val ownersName: String? = null,
     val sortedBy: BookSortCriteria = SortByTitle,
     val ascending: Boolean = true,
