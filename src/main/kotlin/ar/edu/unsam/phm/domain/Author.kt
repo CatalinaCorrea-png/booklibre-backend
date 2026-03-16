@@ -9,11 +9,11 @@ data class Author(
 
     override var id: Int = 0
 
-    override fun meetsCreationCriteria(): Boolean {
+    override fun meetsCreationCriteria() {
         TODO("Not yet implemented")
     }
 
-    override fun meetsSearchCriteria(criteria: String): Boolean {
+    override fun meetsSearchCriteria(criteria: String) : Boolean {
         TODO("Not yet implemented")
     }
 }

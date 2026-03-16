@@ -53,7 +53,8 @@ object ApplicationBootstrap {
         cel = "+54 11 1234-5678",
         location = "Buenos Aires, AR",
         userType = UserType.COMBINED,
-        bibliokarmas = 2345
+        bibliokarmas = 2345,
+        password = "1234"
     )
 
     val lucianoVega = User(
@@ -63,7 +64,8 @@ object ApplicationBootstrap {
         cel = "+54 11 8765-4321",
         location = "Rosario, AR",
         userType = UserType.READER,
-        bibliokarmas = 980
+        bibliokarmas = 980,
+        password = "1234"
     )
 
     val valentinaSosa = User(
@@ -73,7 +75,8 @@ object ApplicationBootstrap {
         cel = "+54 11 5555-0000",
         location = "Córdoba, AR",
         userType = UserType.PUBLISHER,
-        bibliokarmas = 1500
+        bibliokarmas = 1500,
+        password = "1234"
     )
 
     val mateoLopez = User(
@@ -83,7 +86,8 @@ object ApplicationBootstrap {
         cel = "+54 11 3333-7777",
         location = "Mendoza, AR",
         userType = UserType.COMBINED,
-        bibliokarmas = 420
+        bibliokarmas = 420,
+        password = "1234"
     )
 
     // ─── Libros Comunes (8) ───────────────────────────────────────────────────
