@@ -24,7 +24,7 @@ class ReservationService(
         book.addReservation(reservation.id)
     }
 
-    fun canReserve(reservation: Reservation) : Boolean = reservationRepository.repositoryObjects().any { it.dateOverlaps(reservation) }
+    fun canReserve(reservation: Reservation) : Boolean = reservationRepository.repositoryObjects().none { it.dateOverlaps(reservation) }
 
     /* GET DE RESERVAS (con sus libros) FILTRADOS! Y PAGINADO!
      Ahora uso metodos, luego creamos una query dinamica para pedirle a la bbdd TODO filtrado.
