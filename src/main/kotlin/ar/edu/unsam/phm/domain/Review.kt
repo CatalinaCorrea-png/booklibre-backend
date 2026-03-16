@@ -11,7 +11,7 @@ data class Review(
     var comment: String = "",
     var timestamp: LocalDate = LocalDate.now(),
 
-): RepositoryElement {
+    ): RepositoryElement {
     override var id: Int = 0
 
     override fun meetsSearchCriteria(criteria: String): Boolean {

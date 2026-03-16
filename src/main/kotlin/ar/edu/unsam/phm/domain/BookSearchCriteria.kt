@@ -11,6 +11,8 @@ data class BookSearchCriteria (
     val dropOffDate: LocalDate = LocalDate.now(),
     val ISBN: String? = null,
     val ownersName: String? = null,
+    val sortedBy: BookSortCriteria = SortByTitle,
+    val ascending: Boolean = true,
     val page: Int = 0,
     val pageSize: Int = 6
 )

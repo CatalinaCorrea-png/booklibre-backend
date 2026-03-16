@@ -34,15 +34,17 @@ abstract class Book (
     var gender: Gender = Gender.DRAMA,
     var author: Author = Author("", ""),
     var numPages: Int = 0,
-    val ISBN: String = "978-3-16-148410-0",
+    var ISBN: String = "978-3-16-148410-0",
     var language: Language = Language.SPANISH,
     var editorial: String = "",
     var publishDate: LocalDate = LocalDate.now(),
     var condition: BookCondition = BookCondition.EXCELLENT,
     var reservationsIds: MutableList<Int> = mutableListOf(),
     var owner: User = User(),
-    var imageSrc: String = ""
-    ): RepositoryElement {
+    var imageSrc: String = "",
+    var timestamp: LocalDate = LocalDate.now()
+
+): RepositoryElement {
     override var id = 0
 
     fun addReservation(reservationId: Int) {

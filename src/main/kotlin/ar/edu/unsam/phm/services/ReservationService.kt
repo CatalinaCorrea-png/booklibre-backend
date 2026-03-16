@@ -1,14 +1,15 @@
 package ar.edu.unsam.phm.services
 
-import ar.edu.unsam.phm.domain.BookSearchCriteria
+import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.dto.PageResponse
-import ar.edu.unsam.phm.dto.ReservationDTO
-import ar.edu.unsam.phm.dto.toDTO
+import ar.edu.unsam.phm.domain.State
+import ar.edu.unsam.phm.dto.ReservationProfileDTO
+import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class ReservationService(
@@ -24,82 +25,58 @@ class ReservationService(
         book.addReservation(reservation.id)
     }
 
-    fun canReserve(reservation: Reservation) : Boolean = reservationRepository.repositoryObjects().none { it.dateOverlaps(reservation) }
+    // esto tiene que estar negado asi devuelve true si no hay solapamiento
+    fun canReserve(reservation: Reservation) : Boolean = reservationRepository.repositoryObjects().any { !it.dateOverlaps(reservation) }
 
-    /* GET DE RESERVAS (con sus libros) FILTRADOS! Y PAGINADO!
-     Ahora uso metodos, luego creamos una query dinamica para pedirle a la bbdd TODO filtrado.
-     SE OCUPA EL BOOK SERVICE
-    fun getAvailableReservationsBy(criteria: BookSearchCriteria) : PageResponse<ReservationDTO> {
-        val allReservations = reservationRepository.repositoryObjects()
-        val allBooks = bookRepository.repositoryObjects()
+    fun getAvailableReservations(reservation: Reservation) : MutableList<Reservation> {
+        return reservationRepository.repositoryObjects().filter { it.dateOverlaps(reservation) }.toMutableList()
+    }
 
-        /* TODO: Necesito hacerlo devuelta pero enfocandome en los libros, y
-             comparando las reservas de ese libro en especifico (id) con
-             las reservas simuladas. Porque esas reservas simuladas aparecen siempre sino.
-             Y esta mal.
-        */
+    fun getReservesByUserId(userId: Int, search: String): List<Reservation> {
+        return reservationRepository.findByLectorId(userId).filter { res ->
+            res.book.title.contains(search, ignoreCase = true) ||
+                    res.book.author.name.contains(search, ignoreCase = true)
+        }
+    }
 
-        // println(criteria.toString())
+    fun getLoansMadeByUserId(userId: Int, search: String): List<Reservation> {
+        return reservationRepository.findByOwnerId(userId).filter { res ->
+            res.book.title.contains(search, ignoreCase = true) ||
+                    res.book.author.name.contains(search, ignoreCase = true)
+        }
+    }
 
-        val filtered = allReservations.filter { reservation ->
-            matchesTitle(reservation, criteria) &&
-            matchesGender(reservation, criteria) &&
-            matchesPages(reservation, criteria) &&
-            matchesISBN(reservation, criteria) &&
-            matchesOwner(reservation, criteria) &&
-            matchesAvailability(reservation, criteria)
+    fun rateLoan(reservationId: Int, puntuacion: Int, comentario: String) {
+        val reservation = reservationRepository.getObject(reservationId)
+
+        // le pongo la review desde aca, no se si esta bien
+        reservation.review.apply {
+            this.rating = puntuacion
+            this.comment = comentario
         }
 
-        // PAGINACION
-        // Cuantas paginas son
-        val totalElements = filtered.size
-        val totalPages = if (totalElements == 0) 0 else Math.ceil(totalElements.toDouble() / criteria.pageSize).toInt()
-        // Qué pagina devuelvo
-        val fromIndex = (criteria.page * criteria.pageSize).coerceAtMost(totalElements) // primer libro de la pagina
-        val toIndex = (fromIndex + criteria.pageSize).coerceAtMost(totalElements) // ultimo libro de la pagina
-        // Creo la lista de libros por pagina
-        val paged = filtered.subList(fromIndex, toIndex)
-
-        return PageResponse(
-            content = paged.map { it.toDTO() },
-            page = criteria.page,
-            pageSize = criteria.pageSize,
-            totalElements = totalElements,
-            totalPages = totalPages
-        )
+        //! acordate de actualizarlo bobo
+        reservationRepository.update(reservation)
     }
 
-    // FILTROS DE BUSQUEDA >.<
-    private fun matchesTitle(reservation: Reservation, criteria: BookSearchCriteria): Boolean {
-        val title = criteria.title?.trim()
-        return title.isNullOrBlank() || reservation.book.title.contains(title, ignoreCase = true)
+    fun getUserOwnBooks(userId: Int): List<ReservationProfileDTO> {
+
+        val everyUserOwnBook: List<Book> =
+            bookRepository.repositoryObjects().filter { book -> book.owner.id == userId }
+
+        val reservationsWithBooksOwnByUser =
+            reservationRepository.repositoryObjects().filter { reserve -> reserve.bookOwnerId() == userId }
+
+        val userNotReservedBooks = everyUserOwnBook.filter { book -> reservationsWithBooksOwnByUser.none { reservation -> reservation.book.id == book.id} }
+
+        val emptyReservationsForNotReservedBooks = userNotReservedBooks.map { book -> Reservation(book = book, pickUpDate = LocalDate.of(1000, 1, 1), dropOffDate = LocalDate.of(1000, 2, 1)) }
+
+        val reservationsDTOs = reservationsWithBooksOwnByUser.map { it.toReservationProfileDTO() } + emptyReservationsForNotReservedBooks.map { it.toReservationProfileDTO() }
+
+        return reservationsDTOs
     }
 
-    private fun matchesGender(reservation: Reservation, criteria: BookSearchCriteria): Boolean {
-        return criteria.genders.isEmpty() || criteria.genders.contains(reservation.book.gender)
-    }
-
-    private fun matchesPages(reservation: Reservation, criteria: BookSearchCriteria): Boolean {
-        val min = criteria.pagesRangeMin ?: 0
-        val max = criteria.pagesRangeMax ?: 1500 // Regla de negocio (Por ahora)
-        return reservation.book.numPages in min..max
-    }
-
-    private fun matchesISBN(reservation: Reservation, criteria: BookSearchCriteria): Boolean {
-        val isbn = criteria.ISBN?.trim()
-        return isbn.isNullOrBlank() || reservation.book.ISBN.contains(isbn, ignoreCase = true)
-    }
-
-    private fun matchesOwner(reservation: Reservation, criteria: BookSearchCriteria): Boolean {
-        val ownerName = criteria.ownersName?.trim()
-        return ownerName.isNullOrBlank() || reservation.book.owner.name.contains(ownerName, ignoreCase = true)
-    }
-
-    private fun matchesAvailability(reservation: Reservation, criteria: BookSearchCriteria): Boolean {
-        val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
-        return !reservation.dateOverlaps(reservationTemp)
-    }
-     */
-
-
+    fun getUserReservationsNumber(userId: Int): Int =
+        reservationRepository.repositoryObjects().filter { reservation ->
+            reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
 }

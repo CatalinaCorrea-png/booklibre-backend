@@ -1,6 +1,10 @@
 package ar.edu.unsam.phm.dto
 import ar.edu.unsam.phm.domain.*
 import java.time.LocalDate
+import ar.edu.unsam.phm.domain.*
+import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters
+import org.springframework.format.datetime.DateFormatter
+import java.time.format.DateTimeFormatter
 
 data class BookDTO(
     var id: Int,
@@ -76,5 +80,26 @@ fun Book.toDTO(): BookDTO{
 }
 
 
+data class ProfileBookDTO(
+    var id: Int,
+    var title: String,
+    var authorName: String,
+    var gender: String,
+    var timestamp: String,
+    var imageSrc: String
+)
+
+fun Book.toProfileBookDTO(): ProfileBookDTO {
+    val formatter = DateTimeFormatter.ofPattern("d MMM, yyyy")
+    val profileBookDTO = ProfileBookDTO(
+        id = this.id,
+        title = this.title,
+        authorName = this.author.name,
+        gender = this.gender.value,
+        timestamp = this.timestamp.format(formatter),
+        imageSrc = this.imageSrc
+    )
+    return profileBookDTO
+}
 
 

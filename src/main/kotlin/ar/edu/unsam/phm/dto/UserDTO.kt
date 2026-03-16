@@ -12,7 +12,8 @@ data class UserDTO(
     val location: String,
     val timestamp: String,
     val bibliokarmas: Int,
-    val userType: UserType
+    val userType: String,
+    val img: String
 ) {
     fun fromDTO(): User {
         return User(
@@ -21,9 +22,10 @@ data class UserDTO(
             email= this.email,
             cel= this.cel,
             location= this.location,
-            userType= this.userType,
+            userType= UserType.fromValue(this.userType),
             timestamp= this.timestamp,
             bibliokarmas= this.bibliokarmas,
+            img = this.img
         )
     }
 }
@@ -38,6 +40,7 @@ fun User.toUserDTO(): UserDTO {
         location = this.location,
         timestamp = this.timestamp,
         bibliokarmas = this.bibliokarmas,
-        userType = this.userType
+        userType = this.userType.value,
+        img = this.img
     )
 }

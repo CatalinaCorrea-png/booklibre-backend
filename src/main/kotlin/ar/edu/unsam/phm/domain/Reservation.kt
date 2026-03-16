@@ -7,7 +7,8 @@ import java.time.temporal.ChronoUnit
 enum class State(val value: String){
     AVAILABLE("Disponible"),
     BORROWED("Prestado"),
-    ENDED("Devuelto"),
+    SOON_TO_END("Proximo a vencer"),
+    RETURNED("Devuelto")
 }
 
 data class Reservation (
@@ -15,7 +16,7 @@ data class Reservation (
     var book: Book = Common(),
     var review: Review = Review(),
     var pickUpDate: LocalDate = LocalDate.now(),
-    var dropOffDate: LocalDate = LocalDate.now().plusDays(1),
+    var dropOffDate: LocalDate = LocalDate.now(),
     var state: State = State.AVAILABLE
 ): RepositoryElement {
     override var id = 0
@@ -30,6 +31,9 @@ data class Reservation (
 
     fun isSoonToEnd() = this.dropOffDate.minusDays(2) == LocalDate.now()
 
+    fun bookOwnerId(): Int = this.book.owner.id
+
+    fun holderId(): Int = this.user.id
 
     override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO("Not yet implemented")

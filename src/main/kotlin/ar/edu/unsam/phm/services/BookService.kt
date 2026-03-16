@@ -45,15 +45,17 @@ class BookService (
                     matchesAvailability(book, criteria)
         }
 
+        val ordered = criteria.sortedBy.sort(filtered, criteria.ascending)
+
         // PAGINACION
         // Cuantas paginas son
-        val totalElements = filtered.size
+        val totalElements = ordered.size
         val totalPages = if (totalElements == 0) 0 else Math.ceil(totalElements.toDouble() / criteria.pageSize).toInt()
         // Qué pagina devuelvo
         val fromIndex = (criteria.page * criteria.pageSize).coerceAtMost(totalElements) // primer libro de la pagina
         val toIndex = (fromIndex + criteria.pageSize).coerceAtMost(totalElements) // ultimo libro de la pagina
         // Creo la lista de libros por pagina
-        val paged = filtered.subList(fromIndex, toIndex)
+        val paged = ordered.subList(fromIndex, toIndex)
 
         return PageResponse(
             content = paged.map { it.toDTO() },
