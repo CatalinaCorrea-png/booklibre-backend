@@ -34,7 +34,7 @@ abstract class Book (
     var gender: Gender = Gender.DRAMA,
     var author: Author = Author("", ""),
     var numPages: Int = 0,
-    val ISBN: String = "978-3-16-148410-0",
+    var ISBN: String = "978-3-16-148410-0",
     var language: Language = Language.SPANISH,
     var editorial: String = "",
     var publishDate: LocalDate = LocalDate.now(),

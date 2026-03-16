@@ -100,6 +100,7 @@ object ApplicationBootstrap {
 
     val n1984 = Common().apply {
         title       = "1984"
+        ISBN        = "978-0-452-28423-4"
         desc        = "En un futuro opresivo, Winston Smith vive bajo la mirada del Gran Hermano. El Partido controla la verdad, la memoria y el pensamiento. Una historia sobre la resistencia y la fragilidad de la libertad."
         gender      = Gender.SCIENCE_FICTION
         author      = orwell
@@ -114,6 +115,7 @@ object ApplicationBootstrap {
 
     val elProceso = Common().apply {
         title       = "El Proceso"
+        ISBN        = "978-84-206-3667-2"
         desc        = "Josef K. se despierta un día arrestado sin cargos. Navega una burocracia kafkiana sin salida, donde la culpa parece inevitable y la justicia, inalcanzable. Una pesadilla absurda y profundamente humana."
         gender      = Gender.DRAMA
         author      = kafka
@@ -128,6 +130,7 @@ object ApplicationBootstrap {
 
     val crimen = Common().apply {
         title       = "Crimen y Castigo"
+        ISBN        = "978-84-376-0494-7"
         desc        = "Raskolnikov, un estudiante en la miseria, asesina a una usurera creyéndose superior a la moral común. La culpa lo consume lentamente. Una exploración magistral de la psicología criminal y la redención."
         gender      = Gender.DRAMA
         author      = dostoevsky
@@ -142,6 +145,7 @@ object ApplicationBootstrap {
 
     val orgullo = Common().apply {
         title       = "Orgullo y Prejuicio"
+        ISBN        = "978-0-439-70818-8"
         desc        = "Elizabeth Bennet, inteligente y sin fortuna, choca con el arrogante Sr. Darcy. Entre malentendidos y presiones sociales, ambos deben superar sus propios prejuicios para encontrar el amor verdadero."
         gender      = Gender.ROMANCE
         author      = austen
@@ -156,6 +160,7 @@ object ApplicationBootstrap {
 
     val guerraPaz = Common().apply {
         title       = "Guerra y Paz"
+        ISBN        = "978-84-9107-186-3"
         desc        = "A través de varias familias nobles rusas, Tolstói retrata la invasión napoleónica de 1812. Una épica sobre el amor, la guerra y la búsqueda de sentido que abarca toda la condición humana."
         gender      = Gender.CLASSIC_LITERATURE
         author      = tolstoy
@@ -170,6 +175,7 @@ object ApplicationBootstrap {
 
     val losMiserables = Common().apply {
         title       = "Los Miserables"
+        ISBN        = "978-84-8428-019-7"
         desc        = "Jean Valjean, ex convicto, busca redimirse en una Francia desigual. Perseguido por el implacable inspector Javert, su historia entrelaza justicia, misericordia y revolución en el París del siglo XIX."
         gender      = Gender.CLASSIC_LITERATURE
         author      = hugo
@@ -184,6 +190,7 @@ object ApplicationBootstrap {
 
     val alquimista = Common().apply {
         title       = "El Alquimista"
+        ISBN        = "978-84-08-04325-6"
         desc        = "Santiago, un joven pastor andaluz, sueña con un tesoro escondido en Egipto. Su viaje se convierte en una búsqueda espiritual donde aprende a escuchar al universo y seguir su leyenda personal."
         gender      = Gender.SELF_HELP
         author      = coelho
@@ -198,6 +205,7 @@ object ApplicationBootstrap {
 
     val extranjero = Common().apply {
         title       = "El Extranjero"
+        ISBN        = "978-84-08-04999-9"
         desc        = "Meursault no llora en el funeral de su madre y días después mata a un hombre bajo el sol argelino. Su indiferencia ante la vida y la muerte lo convierte en símbolo del absurdo existencial de Camus."
         gender      = Gender.DRAMA
         author      = camus
@@ -216,6 +224,7 @@ object ApplicationBootstrap {
 
     val granGatsby = WithADedication().apply {
         title       = "El Gran Gatsby"
+        ISBN        = "978-84-206-8256-3"
         desc        = "Jay Gatsby organiza fiestas opulentas en los años 20 esperando reconquistar a Daisy, su amor perdido. A través de Nick Carraway, Fitzgerald retrata la decadencia detrás del sueño americano."
         gender      = Gender.CLASSIC_LITERATURE
         author      = fitzgerald
@@ -230,6 +239,7 @@ object ApplicationBootstrap {
 
     val adiosArmas = WithADedication().apply {
         title       = "Adiós a las Armas"
+        ISBN        = "978-0-7432-7356-5"
         desc        = "El teniente Henry se enamora de la enfermera Catherine Barkley en el frente italiano de la Primera Guerra Mundial. Una historia de amor y pérdida narrada con la prosa desnuda y poderosa de Hemingway."
         gender      = Gender.DRAMA
         author      = hemingway
@@ -244,6 +254,7 @@ object ApplicationBootstrap {
 
     val monteCristo = WithADedication().apply {
         title       = "El Conde de Montecristo"
+        ISBN        = "978-0-684-80146-2"
         desc        = "Edmond Dantès es encarcelado injustamente. Tras escapar y hallar un tesoro, regresa transformado en el Conde de Montecristo para ejecutar una venganza meticulosa contra quienes arruinaron su vida."
         gender      = Gender.CLASSIC_LITERATURE
         author      = dumas
@@ -258,6 +269,7 @@ object ApplicationBootstrap {
 
     val vueltaMundo = WithADedication().apply {
         title       = "La Vuelta al Mundo en 80 Días"
+        ISBN        = "978-84-206-9942-4"
         desc        = "El excéntrico Phileas Fogg apuesta su fortuna a que puede circunnavegar el globo en ochenta días. Con su fiel criado Passepartout, vive aventuras en Asia, América y Europa contra el tiempo."
         gender      = Gender.SCIENCE_FICTION
         author      = verne
@@ -272,6 +284,7 @@ object ApplicationBootstrap {
 
     val senoraDalloway = WithADedication().apply {
         title       = "La Señora Dalloway"
+        ISBN        = "978-84-670-2347-8"
         desc        = "En un solo día londinense, Clarissa Dalloway prepara una fiesta mientras sus recuerdos y los de un veterano de guerra se entrelazan. Woolf explora la memoria, la identidad y el peso invisible del tiempo."
         gender      = Gender.DRAMA
         author      = woolf
@@ -286,6 +299,7 @@ object ApplicationBootstrap {
 
     val cuentosMisterio = WithADedication().apply {
         title       = "Cuentos de Misterio e Imaginación"
+        ISBN        = "978-0-156-62870-9"
         desc        = "Poe construye atmósferas de terror y locura en relatos donde la culpa acecha, los muertos regresan y la mente humana se desintegra. Una colección esencial del gótico americano que definió el género."
         gender      = Gender.DRAMA
         author      = poe
@@ -300,6 +314,7 @@ object ApplicationBootstrap {
 
     val fundacion = WithADedication().apply {
         title       = "Fundación"
+        ISBN        = "978-84-206-1326-4"
         desc        = "El matemático Hari Seldon usa la psicohistoria para predecir la caída del Imperio Galáctico. Funda una colonia en el fin del universo con el objetivo de reducir milenios de barbarie a tan solo uno."
         gender      = Gender.SCIENCE_FICTION
         author      = asimov
@@ -314,6 +329,7 @@ object ApplicationBootstrap {
 
     val cienAnios = WithADedication().apply {
         title       = "Cien Años de Soledad"
+        ISBN        = "978-0-553-29335-7"
         desc        = "Siete generaciones de la familia Buendía habitan Macondo, un pueblo fundado en la selva colombiana. García Márquez mezcla lo real y lo mágico en una saga sobre el amor, la guerra y la soledad inevitable."
         gender      = Gender.CLASSIC_LITERATURE
         author      = garcia
@@ -332,6 +348,7 @@ object ApplicationBootstrap {
 
     val huckFinn = Collectable().apply {
         title       = "Las Aventuras de Huckleberry Finn"
+        ISBN        = "978-84-397-2077-5"
         desc        = "Huck Finn huye de su padre alcohólico y navega el Mississippi junto a Jim, un esclavo fugitivo. Una aventura que cuestiona con humor y ternura la moral y el racismo de la sociedad norteamericana del siglo XIX."
         gender      = Gender.CLASSIC_LITERATURE
         author      = twain
@@ -346,6 +363,7 @@ object ApplicationBootstrap {
 
     val ficciones = Collectable().apply {
         title       = "Ficciones"
+        ISBN        = "978-0-486-28061-3"
         desc        = "Borges construye mundos imposibles: una biblioteca infinita, un mapa del tamaño del territorio, un hombre que recuerda cada detalle. Cuentos que desafían la percepción de la realidad, el tiempo y la identidad."
         gender      = Gender.SCIENCE_FICTION
         author      = borges
@@ -360,6 +378,7 @@ object ApplicationBootstrap {
 
     val rayuela = Collectable().apply {
         title       = "Rayuela"
+        ISBN        = "978-84-206-9550-1"
         desc        = "Horacio Oliveira vaga por París buscando a la Maga y un sentido esquivo. Cortázar propone una novela que puede leerse en múltiples órdenes, rompiendo las convenciones del relato tradicional."
         gender      = Gender.DRAMA
         author      = cortazar
@@ -374,6 +393,7 @@ object ApplicationBootstrap {
 
     val ensayoCeguera = Collectable().apply {
         title       = "Ensayo sobre la Ceguera"
+        ISBN        = "978-84-322-3802-6"
         desc        = "Una epidemia de ceguera blanca se propaga sin control. Saramago retrata cómo el orden social colapsa y emerge lo peor del ser humano, en una alegoría brutal sobre la fragilidad de la civilización."
         gender      = Gender.DRAMA
         author      = saramago
@@ -388,6 +408,7 @@ object ApplicationBootstrap {
 
     val montagnaMagica = Collectable().apply {
         title       = "La Montaña Mágica"
+        ISBN        = "978-84-306-0360-9"
         desc        = "Hans Castorp visita a un primo en un sanatorio suizo y termina quedándose siete años. Rodeado de enfermos y pensadores, reflexiona sobre el tiempo, la muerte y las ideas que sacuden a Europa antes de la guerra."
         gender      = Gender.CLASSIC_LITERATURE
         author      = mann
@@ -402,6 +423,7 @@ object ApplicationBootstrap {
 
     val caminoSwann = Collectable().apply {
         title       = "Por el Camino de Swann"
+        ISBN        = "978-84-350-0185-4"
         desc        = "El narrador rememora su infancia en Combray, evocada por el sabor de una magdalena. También sigue el amor obsesivo de Swann por Odette. El inicio de una obra monumental sobre la memoria y el tiempo perdido."
         gender      = Gender.CLASSIC_LITERATURE
         author      = proust
@@ -416,6 +438,7 @@ object ApplicationBootstrap {
 
     val jardinCerezos = Collectable().apply {
         title       = "El Jardín de los Cerezos"
+        ISBN        = "978-84-663-0012-7"
         desc        = "La familia Ranevskaya regresa a su hacienda rusa para descubrir que deberán venderla para saldar deudas, incluido el amado jardín de cerezos. Chéjov retrata el fin de una época con melancolía y humor sutil."
         gender      = Gender.DRAMA
         author      = chekhov
@@ -430,6 +453,7 @@ object ApplicationBootstrap {
 
     val harryPotter = Collectable().apply {
         title       = "Harry Potter y la Piedra Filosofal"
+        ISBN        = "978-84-376-0233-2"
         desc        = "Harry Potter descubre en su undécimo cumpleaños que es un mago y que el mundo mágico lo espera en Hogwarts. Allí hará amigos, enfrentará enemigos y comenzará a desentrañar el misterio de su propio pasado."
         gender      = Gender.SCIENCE_FICTION
         author      = rowling
