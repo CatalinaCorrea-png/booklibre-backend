@@ -54,7 +54,7 @@ object ApplicationBootstrap {
         location = "Buenos Aires, AR",
         timestamp = "27/10/2021",
         userType = UserType.COMBINED,
-        password = "1234",
+        password = "123456",
         bibliokarmas = 110,
         img = "/assets/emilia_romero_avatar.png"
     )
@@ -67,7 +67,7 @@ object ApplicationBootstrap {
         location = "Rosario, AR",
         userType = UserType.READER,
         bibliokarmas = 980,
-        password = "1234",
+        password = "123456",
         timestamp = "14/02/2016",
         img = "/assets/luciano_vega_avatar.png"
     )
@@ -82,7 +82,7 @@ object ApplicationBootstrap {
         bibliokarmas = 1500,
         timestamp = "10/01/2023",
         img = "/assets/valentina_sosa_avatar.png",
-        password = "1234",
+        password = "123456",
     )
 
     val mateoLopez = User(
@@ -93,7 +93,7 @@ object ApplicationBootstrap {
         location = "Mendoza, AR",
         userType = UserType.COMBINED,
         bibliokarmas = 420,
-        password = "1234",
+        password = "123456",
         timestamp = "01/02/2024",
         img = "/assets/mateo_lopez_avatar.png"
     )
