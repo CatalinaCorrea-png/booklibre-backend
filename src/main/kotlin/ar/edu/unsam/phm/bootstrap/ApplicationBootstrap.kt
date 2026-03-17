@@ -111,6 +111,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.GOOD
         owner       = emiliaRomero
         imageSrc    = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz9gIAgf5hTagXaQZl8ayY6FF26n2qirXQMg&s"
+        timestamp   = LocalDate.of(2026, 1, 21)
     }
 
     val elProceso = Common().apply {
@@ -126,6 +127,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.VERY_GOOD
         owner       = lucianoVega
         imageSrc    = "https://acdn-us.mitiendanube.com/stores/001/168/109/products/el-proceso1-d60e6b26de70d743d015882612962062-1024-1024.webp?w=1920"
+        timestamp   = LocalDate.of(2024, 3, 1)
     }
 
     val crimen = Common().apply {
@@ -141,6 +143,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.REGULAR
         owner       = valentinaSosa
         imageSrc    = "https://acdn-us.mitiendanube.com/stores/004/008/965/products/img_8468-dfbcfc91acd4498ad217537263442873-480-0.webp"
+        timestamp   = LocalDate.of(2021, 2, 9)
     }
 
     val orgullo = Common().apply {
@@ -156,6 +159,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.EXCELLENT
         owner       = mateoLopez
         imageSrc    = "https://images.cdn2.buscalibre.com/fit-in/360x360/5f/b0/5fb0cb647320eede167a469ee4b648bf.jpg"
+        timestamp   = LocalDate.of(2019, 6, 1)
     }
 
     val guerraPaz = Common().apply {
@@ -171,6 +175,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.GOOD
         owner       = emiliaRomero
         imageSrc    = "https://http2.mlstatic.com/D_NQ_NP_689496-MLA78230208406_082024-O.webp"
+        timestamp   = LocalDate.of(2024, 12, 1)
     }
 
     val losMiserables = Common().apply {
@@ -186,6 +191,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.VERY_GOOD
         owner       = lucianoVega
         imageSrc    = "https://http2.mlstatic.com/D_NQ_NP_762363-MLM49917565139_052022-O.webp"
+        timestamp   = LocalDate.of(2025, 10, 21)
     }
 
     val alquimista = Common().apply {
@@ -201,6 +207,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.EXCELLENT
         owner       = valentinaSosa
         imageSrc    = "https://tienda.planetadelibros.com.ar/cdn/shop/files/ElalquimistaBK_Fte.jpg?v=1730985825"
+        timestamp   = LocalDate.of(2016, 6, 6)
     }
 
     val extranjero = Common().apply {
@@ -216,6 +223,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.GOOD
         owner       = mateoLopez
         imageSrc    = "https://m.media-amazon.com/images/I/71mLWMj0sQL._AC_UF1000,1000_QL80_.jpg"
+        timestamp   = LocalDate.of(2025, 7, 8)
     }
 
     // ─── Libros Con Dedicatoria (8) ───────────────────────────────────────────
@@ -235,6 +243,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.GOOD
         owner       = emiliaRomero
         imageSrc    = "https://http2.mlstatic.com/D_NQ_NP_980687-MLU78007366453_072024-O.webp"
+        timestamp   = LocalDate.of(2026, 3, 17)
     }
 
     val adiosArmas = WithADedication().apply {
@@ -250,6 +259,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.VERY_GOOD
         owner       = lucianoVega
         imageSrc    = "https://www.penguinlibros.com/ar/1595223/adios-a-las-armas.jpg"
+        timestamp   = LocalDate.of(2024, 10, 9)
     }
 
     val monteCristo = WithADedication().apply {
@@ -265,6 +275,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.REGULAR
         owner       = valentinaSosa
         imageSrc    = "https://www.penguinlibros.com/ar/6234239-large_default/el-conde-de-montecristo.webp"
+        timestamp   = LocalDate.of(2022, 1, 6)
     }
 
     val vueltaMundo = WithADedication().apply {
@@ -280,6 +291,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.EXCELLENT
         owner       = mateoLopez
         imageSrc    = "https://images.cdn2.buscalibre.com/fit-in/360x360/1f/cb/1fcbcd4165d3c7eababb3e92dff6972c.jpg"
+        timestamp   = LocalDate.of(2022, 1, 1)
     }
 
     val senoraDalloway = WithADedication().apply {
@@ -295,6 +307,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.VERY_GOOD
         owner       = emiliaRomero
         imageSrc    = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnPl2enENU9OdvIh58PC0QuIJ_g0-wYbc3XQ&s"
+        timestamp   = LocalDate.of(2018, 2, 12)
     }
 
     val cuentosMisterio = WithADedication().apply {
@@ -310,6 +323,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.GOOD
         owner       = lucianoVega
         imageSrc    = "https://panamericana.vtexassets.com/arquivos/ids/525902/cuentos-de-misterio-e-imaginacion-2-9788418211997.jpg?v=638407572538400000"
+        timestamp   = LocalDate.of(2025, 5, 14)
     }
 
     val fundacion = WithADedication().apply {
@@ -325,6 +339,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.EXCELLENT
         owner       = valentinaSosa
         imageSrc    = "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1170429948i/53687.jpg"
+        timestamp   = LocalDate.of(2023, 7, 25)
     }
 
     val cienAnios = WithADedication().apply {
@@ -340,6 +355,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.VERY_GOOD
         owner       = mateoLopez
         imageSrc    = "https://assets.lectulandia.co/b/ab/Gabriel%20Garcia%20Marquez/Cien%20anos%20de%20soledad%20Edicion%20conmemorativa%20(1)/big.jpg"
+        timestamp   = LocalDate.of(2025, 10, 3)
     }
 
     // ─── Libros Coleccionables (8) ────────────────────────────────────────────
@@ -359,6 +375,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.EXCELLENT
         owner       = emiliaRomero
         imageSrc    = "https://www.edicontinente.com.ar/image/titulos/9788426141057.jpg"
+        timestamp   = LocalDate.of(2025, 3, 30)
     }
 
     val ficciones = Collectable().apply {
@@ -374,6 +391,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.VERY_GOOD
         owner       = lucianoVega
         imageSrc    = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm6k93G1ce4FkEE8FYXOsApKJfGO-_xD5-tQ&s"
+        timestamp   = LocalDate.of(2025, 2, 3)
     }
 
     val rayuela = Collectable().apply {
@@ -389,6 +407,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.GOOD
         owner       = valentinaSosa
         imageSrc    = "https://images.cdn3.buscalibre.com/fit-in/360x360/90/53/905322d10841b36aa311dbd5c90d92ed.jpg"
+        timestamp   = LocalDate.of(2025, 5, 29)
     }
 
     val ensayoCeguera = Collectable().apply {
@@ -404,6 +423,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.REGULAR
         owner       = mateoLopez
         imageSrc    = "https://www.penguinlibros.com/ar/3537745-large_default/ensayo-sobre-la-ceguera.webp"
+        timestamp   = LocalDate.of(2023, 1, 12)
     }
 
     val montagnaMagica = Collectable().apply {
@@ -419,6 +439,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.VERY_GOOD
         owner       = emiliaRomero
         imageSrc    = "https://images.cdn3.buscalibre.com/fit-in/360x360/75/56/7556ee308c4a24d1a4ea1be13b9ee928.jpg"
+        timestamp   = LocalDate.of(2023, 2, 1)
     }
 
     val caminoSwann = Collectable().apply {
@@ -434,6 +455,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.EXCELLENT
         owner       = lucianoVega
         imageSrc    = "https://upload.wikimedia.org/wikipedia/commons/e/ee/Por_el_camino_de_Swann-Espasa-Calpe1920-01.jpg"
+        timestamp   = LocalDate.of(2023, 5, 21)
     }
 
     val jardinCerezos = Collectable().apply {
@@ -449,6 +471,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.GOOD
         owner       = valentinaSosa
         imageSrc    = "https://images.cdn2.buscalibre.com/fit-in/360x360/4b/33/4b3304f77876c25cd3e8babde159401d.jpg"
+        timestamp   = LocalDate.of(2024, 1, 10)
     }
 
     val harryPotter = Collectable().apply {
@@ -464,6 +487,7 @@ object ApplicationBootstrap {
         condition   = BookCondition.VERY_GOOD
         owner       = mateoLopez
         imageSrc    = "https://images.cdn2.buscalibre.com/fit-in/360x360/e6/5f/e65f54742ad7bbc41903d17f75b77d78.jpg"
+        timestamp   = LocalDate.of(2026, 1, 10)
     }
 
     // ─── Reservas pasadas (finalizadas — libros leídos) ───────────────────────

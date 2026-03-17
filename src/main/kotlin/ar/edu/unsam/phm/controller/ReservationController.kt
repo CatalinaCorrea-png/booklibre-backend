@@ -30,14 +30,19 @@ class ReservationController(private val reservationService: ReservationService) 
         reservationService.rateLoan(reservationId, body.rate, body.comment)
     }
 
-    @GetMapping("/userOwnBooks/{userId}?filterBy={filter}&sortBy={sort}")
-    fun getUserOwnBooks(@PathVariable userId: Int): List<ReservationProfileDTO> {
+    @GetMapping("/userOwnBooks/{userId}")
+    fun getUserOwnBooks(@PathVariable userId: Int, @RequestParam filterCriteria: String, @RequestParam sortCriteria: String): List<ReservationProfileDTO> {
         val userOwnBooks: List<Reservation> = reservationService.getUserOwnBooks(userId)
-// ->       val filteredAndSortedBooks: List<Reservation> = reservationService.filterAndSortUserBooks(userOwnBooks, filterCriteria, sortCriteria)
-        return userOwnBooks.map { it.toReservationProfileDTO() }
+        val userOwnBooksDTOs: List<ReservationProfileDTO> = userOwnBooks.map { it.toReservationProfileDTO() }
+        val filteredAndSortedBooks: List<ReservationProfileDTO> = reservationService.filterAndSortUserBooks(userOwnBooksDTOs, filterCriteria, sortCriteria)
+        return filteredAndSortedBooks
     }
 
     @GetMapping("/userReadBooks/{userId}")
     fun getUserReadBooks(@PathVariable userId: Int): Int =
         reservationService.getUserReservationsNumber(userId)
+
+    @GetMapping("/userLentBooks/{userId}")
+    fun getUserLentBooks(@PathVariable userId: Int): Int =
+        reservationService.getUserLentBooksNumber(userId)
 }
