@@ -2,8 +2,9 @@ package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.State
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
+import ar.edu.unsam.phm.dto.ReviewDTO
+import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
@@ -52,7 +53,7 @@ class ReservationService(
         // le pongo la review desde aca, no se si esta bien
         reservation.review.apply {
             this.rating = puntuacion
-            this.comment = comentario
+            this.review = comentario
         }
 
         //! acordate de actualizarlo bobo
@@ -79,4 +80,22 @@ class ReservationService(
     fun getUserReservationsNumber(userId: Int): Int =
         reservationRepository.repositoryObjects().filter { reservation ->
             reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
+
+    fun getBookReviews(bookId: Int): List<ReviewDTO> {
+        return reservationRepository.repositoryObjects()
+            .filter { it.book.id == bookId }
+//            .filter { it.review.comment.isNotBlank() && it.review.rating > 0 }
+            .sortedByDescending { it.review.timestamp }
+            .map { it.review.toDTO() }
+    }
+
+    fun getBookAverageRating(bookId: Int): Double {
+        val reviews = reservationRepository.repositoryObjects()
+            .filter { it.book.id == bookId }
+            .filter { it.review.rating > 0 }
+            .map { it.review.rating }
+
+        return if (reviews.isEmpty()) 0.0 else reviews.average()
+    }
+
 }

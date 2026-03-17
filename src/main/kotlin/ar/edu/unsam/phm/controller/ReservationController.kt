@@ -25,8 +25,9 @@ class ReservationController(
     // Esto lo hace dana seguro
     @PostMapping("/create-reservation")
     fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
+        println(reservationDTO.toString())
         val book = bookService.getBookById(reservationDTO.bookId)
-        val user = userService.getUserById(reservationDTO.userId)
+        val user = userService.getUserById(reservationDTO.sessionId)
         val reservation = Reservation(
             book = book,
             user = user,
@@ -47,7 +48,7 @@ class ReservationController(
 
     @PatchMapping("/{reservationId}/calificar")
     fun rateLoan(@PathVariable reservationId: Int, @RequestBody body: ReviewDTO) {
-        reservationService.rateLoan(reservationId, body.rate, body.comment)
+        reservationService.rateLoan(reservationId, body.rating, body.comment)
     }
 
     @GetMapping("/userOwnBooks/{userId}")
@@ -57,4 +58,12 @@ class ReservationController(
     @GetMapping("/userReadBooks/{userId}")
     fun getUserReadBooks(@PathVariable userId: Int): Int =
         reservationService.getUserReservationsNumber(userId)
+
+    @GetMapping("/book-review/{bookId}")
+    fun getBookReviews(@PathVariable bookId: Int): List<ReviewDTO> =
+        reservationService.getBookReviews(bookId)
+
+    @GetMapping("/book-review/{bookId}/average")
+    fun getBookAverageRating(@PathVariable bookId: Int): Double =
+        reservationService.getBookAverageRating(bookId)
 }

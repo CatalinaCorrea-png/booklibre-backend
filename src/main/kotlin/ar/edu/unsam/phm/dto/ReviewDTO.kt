@@ -1,6 +1,34 @@
 package ar.edu.unsam.phm.dto
 
-class ReviewDTO (
-    val rate: Int,
-    val comment: String
-)
+import ar.edu.unsam.phm.domain.Review
+import java.time.LocalDate
+
+data class ReviewDTO(
+    var id: Int,
+    var reviewerName: String,
+    var rating: Int,
+    var comment: String,
+    var timestamp: String
+){
+
+    fun fromDTO(): Review {
+        return Review(
+            reviewerName = this.reviewerName,
+            rating = this.rating,
+            review = this.comment,
+            timestamp= LocalDate.parse(this.timestamp),
+        ).apply {
+            id = this@ReviewDTO.id
+        }
+    }
+}
+
+fun Review.toDTO(): ReviewDTO {
+    return ReviewDTO(
+        id = this.id,
+        reviewerName = this.reviewerName,
+        rating = this.rating,
+        comment = this.review,
+        timestamp = this.timestamp.toString()
+    )
+}

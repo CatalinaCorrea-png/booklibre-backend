@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 data class CreateReservationDTO(
     val bookId: Int,
-    val userId: Int,
+    val sessionId: Int,
     val pickUpDate: LocalDate,
     val dropOffDate: LocalDate
 ){}
