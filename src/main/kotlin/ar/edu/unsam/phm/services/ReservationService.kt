@@ -8,6 +8,7 @@ import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
+import ch.qos.logback.core.status.Status
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -59,24 +60,60 @@ class ReservationService(
         reservationRepository.update(reservation)
     }
 
-    fun getUserOwnBooks(userId: Int): List<ReservationProfileDTO> {
-
-        val everyUserOwnBook: List<Book> =
-            bookRepository.repositoryObjects().filter { book -> book.owner.id == userId }
-
-        val reservationsWithBooksOwnByUser =
-            reservationRepository.repositoryObjects().filter { reserve -> reserve.bookOwnerId() == userId }
-
-        val userNotReservedBooks = everyUserOwnBook.filter { book -> reservationsWithBooksOwnByUser.none { reservation -> reservation.book.id == book.id} }
-
-        val emptyReservationsForNotReservedBooks = userNotReservedBooks.map { book -> Reservation(book = book, pickUpDate = LocalDate.of(1000, 1, 1), dropOffDate = LocalDate.of(1000, 2, 1)) }
-
-        val reservationsDTOs = reservationsWithBooksOwnByUser.map { it.toReservationProfileDTO() } + emptyReservationsForNotReservedBooks.map { it.toReservationProfileDTO() }
-
-        return reservationsDTOs
-    }
-
     fun getUserReservationsNumber(userId: Int): Int =
         reservationRepository.repositoryObjects().filter { reservation ->
             reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
+
+    private fun generateEmptyReservationsForNotReservedBooks(booksList: List<Book>): List<Reservation> = booksList.map { book -> Reservation(book = book, pickUpDate = LocalDate.of(1000, 1, 1), dropOffDate = LocalDate.of(1000, 2, 1)) }
+
+    private fun getEveryUserBook(userId: Int): List<Book> =
+        bookRepository.repositoryObjects().filter { book -> book.owner.id == userId }
+
+    private fun getEveryReservationWithUserBook(userId: Int): List<Reservation> =
+        reservationRepository.repositoryObjects().filter { reserve -> reserve.bookOwnerId() == userId }
+
+    private fun filterNoReservedBooks(books: List<Book>, reservations: List<Reservation>): List<Book> =
+        books.filter { book -> reservations.none { reservation -> reservation.book.id == book.id} }
+
+
+    fun getUserOwnBooks(userId: Int): List<Reservation> {
+
+        val everyUserOwnBook: List<Book> = this.getEveryUserBook(userId)
+
+        val reservationsWithBooksOwnByUser: List<Reservation> = this.getEveryReservationWithUserBook(userId)
+
+        val userNotReservedBooks = this.filterNoReservedBooks(everyUserOwnBook, reservationsWithBooksOwnByUser)
+
+        val userNotReservedBooksInReservation = generateEmptyReservationsForNotReservedBooks(userNotReservedBooks)
+
+        val everyUserBookInReservation = (reservationsWithBooksOwnByUser + userNotReservedBooksInReservation)
+
+        return everyUserBookInReservation
+    }
+
+    private fun filterBooksInReservationListBy(filterCrit: String, bookList: List<Reservation>): List<Reservation> =
+        bookList.filter { reserve ->
+//            tengo que hacer esto xq hay mas estados de los que tengo que manejar
+            if (reserve.state.value == "Proximo a vencer") reserve.state = State.BORROWED
+            if (reserve.state.value == "Devuelto") reserve.state = State.AVAILABLE
+
+            reserve.state.value == filterCrit
+        }
+
+//  ->  private sortByAscTitle
+//
+//  ->  private sortByDescTitle
+//
+//  ->  private sortByAscDate
+//
+//  ->  private sortByDescDate
+
+
+// ->   fun filterAndSortUserBooks(bookList: List<Reservation>, filterCrit: String, sortCrit: String): List<Reservation> {
+//
+//        val filteredBooks = this.filterBooksInReservationListBy(filterCrit, bookList)
+//
+//        val sortedBooks: List<Reservation> = filteredBooks.sortedBy {  }
+//    }
+
 }

@@ -1,7 +1,9 @@
 package ar.edu.unsam.phm.controller
 
+import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
 import ar.edu.unsam.phm.dto.ReviewDTO
+import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.services.ReservationService
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
@@ -28,9 +30,12 @@ class ReservationController(private val reservationService: ReservationService) 
         reservationService.rateLoan(reservationId, body.rate, body.comment)
     }
 
-    @GetMapping("/userOwnBooks/{userId}")
-    fun getUserOwnBooks(@PathVariable userId: Int): List<ReservationProfileDTO> =
-        reservationService.getUserOwnBooks(userId)
+    @GetMapping("/userOwnBooks/{userId}?filterBy={filter}&sortBy={sort}")
+    fun getUserOwnBooks(@PathVariable userId: Int): List<ReservationProfileDTO> {
+        val userOwnBooks: List<Reservation> = reservationService.getUserOwnBooks(userId)
+// ->       val filteredAndSortedBooks: List<Reservation> = reservationService.filterAndSortUserBooks(userOwnBooks, filterCriteria, sortCriteria)
+        return userOwnBooks.map { it.toReservationProfileDTO() }
+    }
 
     @GetMapping("/userReadBooks/{userId}")
     fun getUserReadBooks(@PathVariable userId: Int): Int =
