@@ -82,7 +82,7 @@ data class ProfileBookDTO(
     var title: String,
     var authorName: String,
     var gender: String,
-    var timestamp: String,
+    var timestamp: LocalDate,
     var imageSrc: String
 )
 
@@ -93,7 +93,7 @@ fun Book.toProfileBookDTO(): ProfileBookDTO {
         title = this.title,
         authorName = this.author.name,
         gender = this.gender.value,
-        timestamp = this.timestamp.format(formatter),
+        timestamp = this.timestamp,
         imageSrc = this.imageSrc
     )
     return profileBookDTO

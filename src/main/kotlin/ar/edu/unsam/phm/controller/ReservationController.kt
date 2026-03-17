@@ -5,6 +5,7 @@ import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.services.BookService
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
 import ar.edu.unsam.phm.dto.ReviewDTO
+import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.services.ReservationService
 import ar.edu.unsam.phm.services.UserService
@@ -53,12 +54,20 @@ class ReservationController(
     }
 
     @GetMapping("/userOwnBooks/{userId}")
-    fun getUserOwnBooks(@PathVariable userId: Int): List<ReservationProfileDTO> =
-        reservationService.getUserOwnBooks(userId)
+    fun getUserOwnBooks(@PathVariable userId: Int, @RequestParam filterCriteria: String, @RequestParam sortCriteria: String): List<ReservationProfileDTO> {
+        val userOwnBooks: List<Reservation> = reservationService.getUserOwnBooks(userId)
+        val userOwnBooksDTOs: List<ReservationProfileDTO> = userOwnBooks.map { it.toReservationProfileDTO() }
+        val filteredAndSortedBooks: List<ReservationProfileDTO> = reservationService.filterAndSortUserBooks(userOwnBooksDTOs, filterCriteria, sortCriteria)
+        return filteredAndSortedBooks
+    }
 
     @GetMapping("/userReadBooks/{userId}")
     fun getUserReadBooks(@PathVariable userId: Int): Int =
         reservationService.getUserReservationsNumber(userId)
+
+    @GetMapping("/userLentBooks/{userId}")
+    fun getUserLentBooks(@PathVariable userId: Int): Int =
+        reservationService.getUserLentBooksNumber(userId)
 
     @GetMapping("/book-review/{bookId}")
     fun getBookReviews(@PathVariable bookId: Int, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
