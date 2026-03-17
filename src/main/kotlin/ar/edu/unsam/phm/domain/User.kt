@@ -1,12 +1,20 @@
 package ar.edu.unsam.phm.domain
 
+import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
 
 enum class UserType(val value: String){
-    PUBLISHER("Publisher"),
-    READER("Reader"),
-    COMBINED("Combined")
+    PUBLISHER("Publicador"),
+    READER("Lector"),
+    COMBINED("Lector / Publicador");
+
+    companion object {
+        fun fromValue(value: String): UserType {
+            return entries.find { it.value == value }
+                ?: throw ConflictException("UserType desconocido: $value")
+        }
+    }
 }
 
 class User(
@@ -20,6 +28,8 @@ class User(
     var bibliokarmas: Int = 0,
     var password: String = "",
 //    var books: MutableList<Book> = mutableListOf<Book>(),
+    var img: String = ""
+
 ): RepositoryElement {
     override var id = 0
 

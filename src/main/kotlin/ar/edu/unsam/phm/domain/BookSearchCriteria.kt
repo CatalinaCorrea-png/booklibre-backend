@@ -2,15 +2,17 @@ package ar.edu.unsam.phm.domain
 
 import java.time.LocalDate
 
-// esto no se lo vemos que opinan
 data class BookSearchCriteria (
-    val gender: Gender? = null,
-    val pagesRangeFrom: Int? = null,
-    val pagesRangeTo: Int? = null,
     val title: String? = null,
-    val ISBN: String? = null,
-    val ownBy: User? = null,
-    val from: LocalDate = LocalDate.now(),
-    val to: LocalDate = LocalDate.now(),
+    val genders: Set<Gender> = mutableSetOf(),
+    val pagesRangeMin: Int? = null,
+    val pagesRangeMax: Int? = null,
+    val pickUpDate: LocalDate = LocalDate.now(),
+    val dropOffDate: LocalDate = LocalDate.now(),
+    val isbn: String? = null,
+    val ownersName: String? = null,
+    val sortedBy: BookSortCriteria = SortByTitle,
+    val ascending: Boolean = true,
+    val page: Int = 0,
+    val pageSize: Int = 6
 )
-

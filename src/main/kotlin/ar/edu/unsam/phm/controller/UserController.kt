@@ -1,7 +1,12 @@
 package ar.edu.unsam.phm.controller
 
 import ar.edu.unsam.phm.services.UserService
+import ar.edu.unsam.phm.dto.UserDTO
+import ar.edu.unsam.phm.dto.toUserDTO
+
 import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
@@ -12,8 +17,8 @@ import ar.edu.unsam.phm.dto.AuthResponse
 
 @RestController
 @CrossOrigin("*")
+class UserController(private val userService: UserService) {
 
-class UserController(val userService: UserService) {
     @PostMapping("/login")
     fun getUser(@RequestBody request: AuthRequest) : AuthResponse {
         val user = User(email = request.email, password = request.password )
@@ -21,8 +26,7 @@ class UserController(val userService: UserService) {
         return AuthResponse(email= userOK.email, name= userOK.name, id= userOK.id)
     }
 
-
-
-
-
+    @GetMapping("/profile/{userId}")
+    fun getUserProfile(@PathVariable userId: Int): UserDTO =
+        userService.getUserProfile(userId)
 }

@@ -22,7 +22,13 @@ class BookSpec : DescribeSpec ({
 
         it("Una reserva de libro Comun por 4 dias de usuario nuevo") {
             // Arrange
-            val commonBook = Common()
+            val commonBook = Common(
+                this.title,
+                this.desc,
+                Gender.DRAMA,
+                Author(this.authorName, this.authorAvatarUrl),
+                0
+            )
 
             // Act
             newUser.reserveBook(book = commonBook, reservation = reservation)
@@ -59,7 +65,13 @@ class BookSpec : DescribeSpec ({
 
         it("Dos reservas de libro Comun por 4 dias de usuario nuevo") {
             // Arrange
-            val commonBook = Common()
+            val commonBook = Common(
+                this.title,
+                this.desc,
+                Gender.DRAMA,
+                Author(this.authorName, this.authorAvatarUrl),
+                0
+            )
             val otherReservation = Reservation(
                 user = newUser,
                 pickUpDate = LocalDate.now().minusDays(9),
@@ -82,7 +94,13 @@ class BookSpec : DescribeSpec ({
         it("No se puede reservar un libro que ya esta reservado en esa fecha") {
             // Arrange
             val newUser = User(userType = UserType.READER)
-            val commonBook = Common()
+            val commonBook = Common(
+                this.title,
+                this.desc,
+                Gender.DRAMA,
+                Author(this.authorName, this.authorAvatarUrl),
+                0
+            )
             val reservation =
                 Reservation(user = newUser, pickUpDate = LocalDate.now().minusDays(4), dropOffDate = LocalDate.now())
             val otherReservation =

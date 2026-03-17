@@ -1,16 +1,15 @@
 package ar.edu.unsam.phm.domain
 
-import ar.edu.unsam.phm.dto.BookDTO
 import ar.edu.unsam.phm.repository.RepositoryElement
 import java.time.LocalDate
 
 enum class Gender(val value: String) {
-    DRAMA("DRAMA"),
-    SCIENCE_FICTION("SCIENCIA FICCION"),
-    ROMANCE("ROMANCE"),
-    SELF_HELP("AUTO AYUDA"),
-    DESIGN("DISEÑO"),
-    CLASSIC_LITERATURE("LITERATURA_CLASICA")
+    DRAMA("Drama"),
+    SCIENCE_FICTION("Ciencia Ficcion"),
+    ROMANCE("Romance"),
+    SELF_HELP("Auto Ayuda"),
+    DESIGN("Diseño"),
+    CLASSIC_LITERATURE("Literatura Clasica")
 }
 
 enum class Language(val value: String) {
@@ -34,16 +33,22 @@ abstract class Book (
     var gender: Gender = Gender.DRAMA,
     var author: Author = Author("", ""),
     var numPages: Int = 0,
-    val ISBN: String = "978-3-16-148410-0",
+    var isbn: String = "978-3-16-148410-0",
     var language: Language = Language.SPANISH,
     var editorial: String = "",
     var publishDate: LocalDate = LocalDate.now(),
     var condition: BookCondition = BookCondition.EXCELLENT,
-    var reservations: MutableList<Reservation> = mutableListOf<Reservation>(),
+    var reservationsIds: MutableList<Int> = mutableListOf(),
     var owner: User = User(),
-    var imageSrc: String = ""
+    var imageSrc: String = "",
+    var timestamp: LocalDate = LocalDate.now()
+
 ): RepositoryElement {
     override var id = 0
+
+    fun addReservation(reservationId: Int) {
+        reservationsIds.add(reservationId)
+    }
 
     // Template Method Primitiva
     fun calculateBibliokarmas(reservation: Reservation) : Int = 5 * reservation.reservationDays() + typeBibliokarmas(reservation)
@@ -58,18 +63,61 @@ abstract class Book (
     override fun meetsCreationCriteria() {
         TODO()
     }
-
-    fun toDTO() = BookDTO(title = "")
 }
 
-class Common : Book() {
+class Common(
+    title: String = "",
+    desc: String = "",
+    gender: Gender = Gender.DRAMA,
+    author: Author = Author("", ""),
+    numPages: Int = 0,
+    isbn: String = "978-3-16-148410-0",
+    language: Language = Language.SPANISH,
+    editorial: String = "",
+    publishDate: LocalDate = LocalDate.now(),
+    condition: BookCondition = BookCondition.EXCELLENT,
+    reservationsIds: MutableList<Int> = mutableListOf(),
+    owner: User = User(),
+    imageSrc: String = ""
+)
+    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner) {
     override fun typeBibliokarmas(reservation: Reservation) : Int = if (reservation.user.bibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
 }
 
-class WithADedication : Book() {
-    override fun typeBibliokarmas(reservation: Reservation): Int = 200 * 10 * this.reservations.size
+class WithADedication(
+    title: String = "",
+    desc: String = "",
+    gender: Gender = Gender.DRAMA,
+    author: Author = Author("", ""),
+    numPages: Int = 0,
+    isbn: String = "978-3-16-148410-0",
+    language: Language = Language.SPANISH,
+    editorial: String = "",
+    publishDate: LocalDate = LocalDate.now(),
+    condition: BookCondition = BookCondition.EXCELLENT,
+    reservationsIds: MutableList<Int> = mutableListOf(),
+    owner: User = User(),
+    imageSrc: String = ""
+)
+    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner) {
+    override fun typeBibliokarmas(reservation: Reservation): Int = 200 * 10 * this.reservationsIds.size
 }
 
-class Collectable : Book() {
+class Collectable(
+    title: String = "",
+    desc: String = "",
+    gender: Gender = Gender.DRAMA,
+    author: Author = Author("", ""),
+    numPages: Int = 0,
+    isbn: String = "978-3-16-148410-0",
+    language: Language = Language.SPANISH,
+    editorial: String = "",
+    publishDate: LocalDate = LocalDate.now(),
+    condition: BookCondition = BookCondition.EXCELLENT,
+    reservationsIds: MutableList<Int> = mutableListOf(),
+    owner: User = User(),
+    imageSrc: String = ""
+)
+    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner) {
     override fun typeBibliokarmas(reservation: Reservation): Int = reservation.user.bibliokarmas / 5 + this.numPages
 }

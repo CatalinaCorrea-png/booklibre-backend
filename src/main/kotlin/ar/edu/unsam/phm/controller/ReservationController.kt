@@ -1,10 +1,13 @@
 package ar.edu.unsam.phm.controller
 
+import ar.edu.unsam.phm.dto.ReservationProfileDTO
 import ar.edu.unsam.phm.dto.ReviewDTO
+import ar.edu.unsam.phm.services.ReservationService
 import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.*
-import ar.edu.unsam.phm.services.ReservationService
 
 @RestController
 @CrossOrigin("*")
@@ -25,4 +28,11 @@ class ReservationController(private val reservationService: ReservationService) 
         reservationService.rateLoan(reservationId, body.rate, body.comment)
     }
 
+    @GetMapping("/userOwnBooks/{userId}")
+    fun getUserOwnBooks(@PathVariable userId: Int): List<ReservationProfileDTO> =
+        reservationService.getUserOwnBooks(userId)
+
+    @GetMapping("/userReadBooks/{userId}")
+    fun getUserReadBooks(@PathVariable userId: Int): Int =
+        reservationService.getUserReservationsNumber(userId)
 }
