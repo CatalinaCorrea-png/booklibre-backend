@@ -5,6 +5,7 @@ import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.services.BookService
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
 import ar.edu.unsam.phm.dto.ReviewDTO
+import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.services.ReservationService
 import ar.edu.unsam.phm.services.UserService
 import org.springframework.web.bind.annotation.CrossOrigin
@@ -61,7 +62,7 @@ class ReservationController(
 
     @GetMapping("/book-review/{bookId}")
     fun getBookReviews(@PathVariable bookId: Int, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
-        reservationService.getBookReviews(bookId, page, pageSize)
+        reservationService.getBookReviews(bookId, page, pageSize).map { it.toDTO() }
 
 //    @GetMapping("/book-review/{bookId}/average")
 //    fun getBookAverageRating(@PathVariable bookId: Int): Double =

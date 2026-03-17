@@ -2,6 +2,7 @@ package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
 import ar.edu.unsam.phm.dto.ReviewDTO
 import ar.edu.unsam.phm.dto.toDTO
@@ -81,13 +82,13 @@ class ReservationService(
         reservationRepository.repositoryObjects().filter { reservation ->
             reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
 
-    fun getBookReviews(bookId: Int, page: Int = 0, pageSize: Int = 2): List<ReviewDTO> {
+    fun getBookReviews(bookId: Int, page: Int = 0, pageSize: Int = 2): List<Review> {
         return reservationRepository.repositoryObjects()
             .filter { it.book.id == bookId && it.review.notEmptyReview() }
             .sortedByDescending { it.review.timestamp }
             .drop(page * pageSize)
             .take(pageSize)
-            .map { it.review.toDTO() }
+            .map { it.review }
     }
 
 //    fun getBookAverageRating(bookId: Int): Double {
