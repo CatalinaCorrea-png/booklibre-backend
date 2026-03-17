@@ -21,4 +21,6 @@ data class Review(
     override fun meetsCreationCriteria(): Boolean {
         TODO("Not yet implemented")
     }
+
+    fun notEmptyReview(): Boolean = this.rating > 0
 }

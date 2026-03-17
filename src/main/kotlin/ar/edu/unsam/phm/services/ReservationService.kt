@@ -83,19 +83,18 @@ class ReservationService(
 
     fun getBookReviews(bookId: Int): List<ReviewDTO> {
         return reservationRepository.repositoryObjects()
-            .filter { it.book.id == bookId }
-//            .filter { it.review.comment.isNotBlank() && it.review.rating > 0 }
+            .filter { it.book.id == bookId && it.review.notEmptyReview()}
             .sortedByDescending { it.review.timestamp }
             .map { it.review.toDTO() }
     }
 
-    fun getBookAverageRating(bookId: Int): Double {
-        val reviews = reservationRepository.repositoryObjects()
-            .filter { it.book.id == bookId }
-            .filter { it.review.rating > 0 }
-            .map { it.review.rating }
-
-        return if (reviews.isEmpty()) 0.0 else reviews.average()
-    }
+//    fun getBookAverageRating(bookId: Int): Double {
+//        val reviews = reservationRepository.repositoryObjects()
+//            .filter { it.book.id == bookId }
+//            .filter { it.review.rating > 0 }
+//            .map { it.review.rating }
+//
+//        return if (reviews.isEmpty()) 0.0 else reviews.average()
+//    }
 
 }
