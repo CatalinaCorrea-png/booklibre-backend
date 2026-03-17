@@ -18,7 +18,7 @@ data class Review(
         TODO("Not yet implemented")
     }
 
-    override fun meetsCreationCriteria(): Boolean {
+    override fun meetsCreationCriteria() {
         TODO("Not yet implemented")
     }
 }

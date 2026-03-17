@@ -51,7 +51,6 @@ open class Repository <Type: RepositoryElement> {
         return this.findObject(id)
     }
 
-    fun search(criteria: String): List<Type> =
-        this.collection.filter { item -> item.meetsSearchCriteria(criteria) }
+    fun search(criteria: String): List<Type> = collection.filter { item -> item.meetsSearchCriteria(criteria) }
 
 }

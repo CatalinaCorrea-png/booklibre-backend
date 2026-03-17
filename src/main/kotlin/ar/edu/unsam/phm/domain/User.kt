@@ -1,6 +1,7 @@
 package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.errors.ConflictException
+import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
 
 enum class UserType(val value: String){
@@ -25,16 +26,19 @@ class User(
     var userType: UserType = UserType.COMBINED,
     val timestamp: String = "",
     var bibliokarmas: Int = 0,
+    var password: String = "",
+//    var books: MutableList<Book> = mutableListOf<Book>(),
     var img: String = ""
 
 ): RepositoryElement {
     override var id = 0
 
-    override fun meetsSearchCriteria(criteria: String): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun meetsSearchCriteria(criteria: String) =
+        matchesPartiallyWith(criteria, name) || matchesPartiallyWith(criteria, email)
 
-    override fun meetsCreationCriteria(): Boolean {
-        TODO("Not yet implemented")
+
+    override fun meetsCreationCriteria() {
+        if (!isNotEmpty(name)) throw NotFoundException("El usuario tiene que tener un nombre")
+        if (!isNotEmpty(email)) throw NotFoundException("El usuario tiene que tener email")
     }
 }

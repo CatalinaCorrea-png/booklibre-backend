@@ -56,11 +56,11 @@ abstract class Book (
     // different for every type of book
     abstract fun typeBibliokarmas(reservation: Reservation) : Int
 
-    override fun meetsSearchCriteria(criteria: String): Boolean {
+    override fun meetsSearchCriteria(criteria: String) : Boolean {
         TODO()
     }
 
-    override fun meetsCreationCriteria(): Boolean {
+    override fun meetsCreationCriteria() {
         TODO()
     }
 }
