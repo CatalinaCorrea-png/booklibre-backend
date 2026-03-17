@@ -1,7 +1,6 @@
 package ar.edu.unsam.phm.dto
 
 import ar.edu.unsam.phm.domain.*
-import ar.edu.unsam.phm.domain.ReviewDTO
 import java.time.LocalDate
 import ar.edu.unsam.phm.domain.Reservation
 

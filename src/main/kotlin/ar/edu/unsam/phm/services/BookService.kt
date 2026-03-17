@@ -7,6 +7,7 @@ import ar.edu.unsam.phm.dto.BookDTO
 import ar.edu.unsam.phm.dto.PageResponse
 import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.errors.BusinessException
+import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import org.springframework.stereotype.Service
@@ -105,5 +106,8 @@ class BookService (
         // Si al menos una reserva coincide en fecha, no está disponible.
         return reservations.none { it.dateOverlaps(reservationTemp) }
     }
+
+    fun getBookById(id: Int): Book =
+        bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")
 
 }

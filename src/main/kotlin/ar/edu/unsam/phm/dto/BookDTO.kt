@@ -68,7 +68,7 @@ fun Book.toDTO(): BookDTO{
         language = this.language.value,
         editorial = this.editorial,
         publishDate = this.publishDate,
-        condition = this.condition.toString(),
+        condition = this.condition.value,
         reservationsIds = this.reservationsIds,
         owner = this.owner.toUserDTO(),
         imageSrc = this.imageSrc
