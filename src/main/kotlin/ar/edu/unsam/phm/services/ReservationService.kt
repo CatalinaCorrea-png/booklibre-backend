@@ -81,10 +81,12 @@ class ReservationService(
         reservationRepository.repositoryObjects().filter { reservation ->
             reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
 
-    fun getBookReviews(bookId: Int): List<ReviewDTO> {
+    fun getBookReviews(bookId: Int, page: Int = 0, pageSize: Int = 2): List<ReviewDTO> {
         return reservationRepository.repositoryObjects()
-            .filter { it.book.id == bookId && it.review.notEmptyReview()}
+            .filter { it.book.id == bookId && it.review.notEmptyReview() }
             .sortedByDescending { it.review.timestamp }
+            .drop(page * pageSize)
+            .take(pageSize)
             .map { it.review.toDTO() }
     }
 

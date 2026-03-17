@@ -60,8 +60,8 @@ class ReservationController(
         reservationService.getUserReservationsNumber(userId)
 
     @GetMapping("/book-review/{bookId}")
-    fun getBookReviews(@PathVariable bookId: Int): List<ReviewDTO> =
-        reservationService.getBookReviews(bookId)
+    fun getBookReviews(@PathVariable bookId: Int, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
+        reservationService.getBookReviews(bookId, page, pageSize)
 
 //    @GetMapping("/book-review/{bookId}/average")
 //    fun getBookAverageRating(@PathVariable bookId: Int): Double =
