@@ -4,7 +4,7 @@ import ar.edu.unsam.phm.domain.Common
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.domain.UserType
+import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
@@ -18,9 +18,9 @@ import java.time.LocalDate
 class ReservationSpec: DescribeSpec ({
     isolationMode = IsolationMode.InstancePerTest
 
-    val owner = User(userType = UserType.PUBLISHER)
-    val reader1 = User(userType = UserType.READER)
-    val reader2 = User(userType = UserType.READER)
+    val owner = User(userType = UserTypes.PUBLISHER)
+    val reader1 = User(userType = UserTypes.READER)
+    val reader2 = User(userType = UserTypes.READER)
 
     val commonBook = Common().apply {
         title = "1984"

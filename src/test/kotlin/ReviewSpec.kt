@@ -2,11 +2,10 @@ import ar.edu.unsam.phm.domain.Common
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.domain.UserType
+import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import ar.edu.unsam.phm.services.ReservationService
-import io.github.classgraph.AnnotationInfoList.emptyList
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec
 import java.time.LocalDate
@@ -16,7 +15,7 @@ import io.kotest.matchers.shouldBe
 class ReviewSpec: DescribeSpec ({
     isolationMode = IsolationMode.InstancePerTest
 
-    val owner = User(userType = UserType.PUBLISHER)
+    val owner = User(userType = UserTypes.PUBLISHER)
 
     val commonBook = Common().apply {
         title = "1984"

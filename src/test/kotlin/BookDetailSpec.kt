@@ -1,24 +1,20 @@
 import ar.edu.unsam.phm.domain.Common
-import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.domain.UserType
-import ar.edu.unsam.phm.errors.BusinessException
+import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
+import ar.edu.unsam.phm.repository.UserRepository
 import ar.edu.unsam.phm.services.BookService
-import ar.edu.unsam.phm.services.ReservationService
-import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import java.time.LocalDate
 
 class BookDetailSpec : DescribeSpec({
     isolationMode = IsolationMode.InstancePerTest
 
-    val owner = User(userType = UserType.PUBLISHER)
+    val owner = User(userType = UserTypes.PUBLISHER)
 
     val commonBook = Common().apply {
         title = "1984"
@@ -31,7 +27,7 @@ class BookDetailSpec : DescribeSpec({
             // Arrange
             val bookRepository = BookRepository()
             bookRepository.create(commonBook)
-            val bookService = BookService(bookRepository, ReservationRepository())
+            val bookService = BookService(bookRepository, ReservationRepository(), UserRepository())
 
             // Act
             val result = bookService.getBookById(commonBook.id)
@@ -42,7 +38,7 @@ class BookDetailSpec : DescribeSpec({
         it("Caso triste: lanza excepcion si el libro no existe") {
             // Arrange
             val bookRepository = BookRepository()
-            val bookService = BookService(bookRepository, ReservationRepository())
+            val bookService = BookService(bookRepository, ReservationRepository(), UserRepository())
 
             // Act & Assert
             shouldThrow<NotFoundException> { bookService.getBookById(999) }
