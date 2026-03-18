@@ -66,10 +66,8 @@ class ReservationService(
     fun getUserLentBooksNumber(userId: Int): Int {
         val userReserves: List<Reservation> = reservationRepository.repositoryObjects().filter { reservation ->
             reservation.bookOwnerId() == userId }
-        println(userReserves.map { it.toString() })
 
         val userReservesDTO: List<ReservationProfileDTO> = userReserves.map { it.toReservationProfileDTO() }
-        println(userReservesDTO.map { it.toString() })
 
         return userReservesDTO.filter { reservation -> reservation.state == "Prestado" }.size
 

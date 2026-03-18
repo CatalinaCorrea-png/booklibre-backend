@@ -4,13 +4,6 @@ import ar.edu.unsam.phm.repository.RepositoryElement
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-enum class State(val value: String){
-    AVAILABLE("Disponible"),
-    BORROWED("Prestado"),
-    SOON_TO_END("Proximo a vencer"),
-    RETURNED("Devuelto")
-}
-
 data class Reservation (
     var user: User = User(),
     var book: Book = Common(),

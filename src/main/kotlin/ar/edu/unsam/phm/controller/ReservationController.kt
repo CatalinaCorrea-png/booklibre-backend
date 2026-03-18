@@ -27,7 +27,6 @@ class ReservationController(
     // Esto lo hace dana seguro
     @PostMapping("/create-reservation")
     fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
-        println(reservationDTO.toString())
         val book = bookService.getBookById(reservationDTO.bookId)
         val user = userService.getUserById(reservationDTO.sessionId)
         val reservation = Reservation(

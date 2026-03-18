@@ -1,7 +1,7 @@
 package ar.edu.unsam.phm.dto
 
 import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.domain.UserType
+import ar.edu.unsam.phm.domain.UserTypes
 
 data class UserDTO(
     val id: Int,
@@ -22,7 +22,7 @@ data class UserDTO(
             email= this.email,
             cel= this.cel,
             location= this.location,
-            userType= UserType.fromValue(this.userType),
+            userType= UserTypes.fromValue(this.userType),
             timestamp= this.timestamp,
             bibliokarmas= this.bibliokarmas,
             img = this.img
