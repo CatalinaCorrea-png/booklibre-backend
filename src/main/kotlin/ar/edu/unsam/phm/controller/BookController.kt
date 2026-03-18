@@ -28,6 +28,7 @@ class BookController(
     @PostMapping("/crear-libro")
     fun createBook(@RequestBody bookCreateDTO: BookCreateDTO) {
         println("ownerId recibido: ${bookCreateDTO.ownerId}")
+        println("DTO recibido: $bookCreateDTO")
         val owner = bookService.getUser(bookCreateDTO.ownerId)
         val newBook = bookCreateDTO.createFromDTO(owner)
         bookService.createBook(newBook)

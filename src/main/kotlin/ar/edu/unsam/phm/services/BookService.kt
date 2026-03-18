@@ -21,12 +21,16 @@ class BookService(
     private val userRepository: UserRepository,
 ) {
     fun createBook(book: Book){
+        println("llamando meetsCreationCriteria")
+        book.meetsCreationCriteria()
+        println("pasó meetsCreationCriteria")
         bookRepository.create(book)
     }
 
     fun updateBook(id: Int, book: Book) {
         val existingBook = bookRepository.getObject(id)
         book.id = existingBook.id
+        book.meetsCreationCriteria()
         bookRepository.update(book)
     }
 

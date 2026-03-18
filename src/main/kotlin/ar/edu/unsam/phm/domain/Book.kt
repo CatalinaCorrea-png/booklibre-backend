@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.domain
 
+import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import java.time.LocalDate
@@ -10,14 +11,26 @@ enum class Gender(val value: String) {
     ROMANCE("Romance"),
     SELF_HELP("Auto Ayuda"),
     DESIGN("Diseño"),
-    CLASSIC_LITERATURE("Literatura Clasica")
+    CLASSIC_LITERATURE("Literatura Clasica");
+
+    companion object {
+        fun fromValue(value: String): Gender =
+            entries.find { it.value == value }
+                ?: throw IllegalArgumentException("Gender desconocido: $value")
+    }
 }
 
 enum class Language(val value: String) {
     SPANISH("ESPAÑOL"),
     ENGLISH("INGLES"),
     FRENCH("FRANCES"),
-    PORTUGUESE("PORTUGUES")
+    PORTUGUESE("PORTUGUES");
+
+    companion object {
+        fun fromValue(value: String): Language =
+            entries.find { it.value == value }
+                ?: throw IllegalArgumentException("Language desconocido: $value")
+    }
 }
 
 enum class BookCondition(val value: String) {
@@ -25,7 +38,13 @@ enum class BookCondition(val value: String) {
     VERY_GOOD("MUY BUENO"),
     GOOD("BUENO"),
     BAD("MALO"),
-    REGULAR("REGULAR")
+    REGULAR("REGULAR");
+
+    companion object {
+        fun fromValue(value: String): BookCondition =
+            entries.find { it.value == value }
+                ?: throw IllegalArgumentException("BookCondition desconocido: $value")
+    }
 }
 
 abstract class Book (
@@ -62,9 +81,13 @@ abstract class Book (
     }
 
     override fun meetsCreationCriteria() {
-        //falta el resto..
-        if (!isNotEmpty(title)) throw NotFoundException("El libro tiene que tener titulo")
-        if (!isNotEmpty(desc)) throw NotFoundException("El libro tiene que tener descripcion")
+        if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
+        if (!isNotEmpty(desc)) throw ConflictException("El libro tiene que tener descripcion")
+        if (!isNotEmpty(author.toString())) throw ConflictException("El libro tiene que tener autor")
+        if (numPages <= 0) throw ConflictException("El libro tiene que tener cantidad de paginas")
+        if (!isNotEmpty(isbn)) throw ConflictException("El libro tiene que tener ISBN")
+        if (!isNotEmpty(editorial)) throw ConflictException("El libro tiene que tener editorial")
+        if (!isNotEmpty(imageSrc)) throw ConflictException("El libro tiene que tener imagen de referencia")
     }
 }
 
