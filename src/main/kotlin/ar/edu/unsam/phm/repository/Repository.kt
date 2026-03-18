@@ -45,6 +45,7 @@ open class Repository <Type: RepositoryElement> {
         this.collection.find { item -> item.id == id }!!
 
     fun getObject(id: Int): Type {
+        println("getObject llamado con id: $id — tipo: ${collection.firstOrNull()?.javaClass?.simpleName} — colección: ${collection.map { it.id }}")
         if (!objectInCollection(id)) {
             throw NotFoundException("No existe el id: $id en el repositorio")
         }

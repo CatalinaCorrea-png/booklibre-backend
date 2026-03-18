@@ -1,5 +1,7 @@
 package ar.edu.unsam.phm.domain
 
+import ar.edu.unsam.phm.errors.ConflictException
+import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import java.time.LocalDate
 
@@ -37,6 +39,12 @@ abstract class Book (
     }
 
     override fun meetsCreationCriteria() {
-        TODO()
+        if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
+        if (!isNotEmpty(desc)) throw ConflictException("El libro tiene que tener descripcion")
+        if (!isNotEmpty(author.toString())) throw ConflictException("El libro tiene que tener autor")
+        if (numPages <= 0) throw ConflictException("El libro tiene que tener cantidad de paginas")
+        if (!isNotEmpty(isbn)) throw ConflictException("El libro tiene que tener ISBN")
+        if (!isNotEmpty(editorial)) throw ConflictException("El libro tiene que tener editorial")
+        if (!isNotEmpty(imageSrc)) throw ConflictException("El libro tiene que tener imagen de referencia")
     }
 }

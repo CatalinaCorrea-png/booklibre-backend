@@ -68,7 +68,7 @@ fun Book.toDTO(): BookDTO{
         language = this.language.value,
         editorial = this.editorial,
         publishDate = this.publishDate,
-        condition = this.condition.value,
+        condition = this.condition.toString(),
         reservationsIds = this.reservationsIds,
         owner = this.owner.toUserDTO(),
         imageSrc = this.imageSrc
@@ -97,6 +97,43 @@ fun Book.toProfileBookDTO(): ProfileBookDTO {
         imageSrc = this.imageSrc
     )
     return profileBookDTO
+}
+
+//hago un DTO aparte para la creacion, ya que en el create no necesito ID, ni reservations ID ni owner
+data class BookCreateDTO(
+    val title: String = "",
+    val bookType: String = "",
+    val desc: String = "",
+    val gender: String = "",
+    val book: String = "",
+    val authorName: String = "",
+    val authorAvatarUrl: String = "",
+    val numPages: Int = 0,
+    val isbn: String = "",
+    val language: String = "",
+    val editorial: String = "",
+    val publishDate: LocalDate? = null,
+    val condition: String = "",
+    val imageSrc: String = "",
+    val ownerId: Int = 0
+)
+
+fun BookCreateDTO.createFromDTO(owner: User): Book {
+    return Common(
+        title = this.title,
+        desc = this.desc,
+        gender = Gender.fromValue(this.gender),
+        author = Author(this.authorName, this.authorAvatarUrl),
+        numPages = this.numPages,
+        isbn = this.isbn,
+        language = Language.fromValue(this.language),
+        editorial = this.editorial,
+        publishDate = this.publishDate ?: LocalDate.now(),
+        condition = BookCondition.fromValue(this.condition),
+        reservationsIds = mutableListOf(),
+        owner = owner,
+        imageSrc = this.imageSrc
+    )
 }
 
 
