@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.domain
 
+import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import java.time.LocalDate
 
@@ -61,7 +62,9 @@ abstract class Book (
     }
 
     override fun meetsCreationCriteria() {
-        TODO()
+        //falta el resto..
+        if (!isNotEmpty(title)) throw NotFoundException("El libro tiene que tener titulo")
+        if (!isNotEmpty(desc)) throw NotFoundException("El libro tiene que tener descripcion")
     }
 }
 

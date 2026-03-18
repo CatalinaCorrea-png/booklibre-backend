@@ -1,6 +1,7 @@
 package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.Book
+import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.BookSearchCriteria
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.dto.BookDTO
@@ -9,22 +10,18 @@ import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
+import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.stereotype.Service
 
 
 @Service
-class BookService (
+class BookService(
     val bookRepository: BookRepository,
     val reservationRepository: ReservationRepository,
+    private val userRepository: UserRepository,
 ) {
     fun createBook(book: Book){
-        if(!canCreate(book)) throw BusinessException("El libro que intenta crear ya existe")
         bookRepository.create(book)
-    }
-
-    fun canCreate(book: Book) : Boolean {
-        //este != es que no esta en la lista
-        return bookRepository.findIndexInCollection(book.id) != -1
     }
 
     /*
@@ -56,6 +53,8 @@ class BookService (
         // Creo la lista de libros por pagina
         val paged = ordered.subList(fromIndex, toIndex)
 
+
+
         return PageResponse(
             content = paged.map { it.toDTO() },
             page = criteria.page,
@@ -63,6 +62,13 @@ class BookService (
             totalElements = totalElements,
             totalPages = totalPages
         )
+    }
+
+
+    fun getUser(id: Int): User {
+        println("usuarios en repo: ${userRepository.repositoryObjects().size}")
+        println("buscando usuario con id: $id")
+        return userRepository.getObject(id)
     }
 
     // FILTROS DE BUSQUEDA >.<

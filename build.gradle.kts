@@ -29,6 +29,8 @@ dependencies {
 
     // Traidos de nuestro proyecto
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    //para que jackson pueda deserializar los data class
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // básicos de cualquier proyecto Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-web")
