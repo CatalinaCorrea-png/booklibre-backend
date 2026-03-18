@@ -61,7 +61,7 @@ class ReservationService(
 
     fun getUserReservationsNumber(userId: Int): Int =
         reservationRepository.repositoryObjects().filter { reservation ->
-            reservation.holderId() == userId && !reservation.dropOffDate.isBefore(LocalDate.now()) }.size
+            reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
 
     fun getUserLentBooksNumber(userId: Int): Int {
         val userReserves: List<Reservation> = reservationRepository.repositoryObjects().filter { reservation ->
@@ -99,7 +99,7 @@ class ReservationService(
 
         val userNotReservedBooksInReservation = generateEmptyReservationsForNotReservedBooks(userNotReservedBooks)
 
-        val everyUserBookInReservation = (reservationsWithBooksOwnByUser + userNotReservedBooksInReservation)
+        val everyUserBookInReservation = (reservationsWithBooksOwnByUser + userNotReservedBooksInReservation).distinctBy { it.book.id }
 
         return everyUserBookInReservation
     }
