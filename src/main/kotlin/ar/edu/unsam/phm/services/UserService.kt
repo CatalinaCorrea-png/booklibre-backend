@@ -42,6 +42,9 @@ class UserService(
         }
     }
 
+    fun getUserById(id: Int): User =
+        userRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")
+
 
     fun getUserProfile(userId: Int): UserDTO {
         val user = userRepository.repositoryObjects().find { user -> user.id == userId }

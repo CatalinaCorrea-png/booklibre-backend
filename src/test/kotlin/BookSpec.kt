@@ -16,7 +16,7 @@ class BookSpec : DescribeSpec ({
     isolationMode = IsolationMode.InstancePerTest
 
     describe("Testing reservations and bibliokarmas for new User and 4 day reservation") {
-        val newUser = User(userType = UserType.READER)
+        val newUser = User(userType = UserTypes.READER)
         val reservation =
             Reservation(user = newUser, pickUpDate = LocalDate.now().minusDays(4), dropOffDate = LocalDate.now())
 
@@ -93,7 +93,7 @@ class BookSpec : DescribeSpec ({
 
         it("No se puede reservar un libro que ya esta reservado en esa fecha") {
             // Arrange
-            val newUser = User(userType = UserType.READER)
+            val newUser = User(userType = UserTypes.READER)
             val commonBook = Common(
                 this.title,
                 this.desc,

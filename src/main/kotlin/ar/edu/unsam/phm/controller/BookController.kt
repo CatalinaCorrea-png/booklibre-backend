@@ -1,16 +1,13 @@
 package ar.edu.unsam.phm.controller
 
-import ar.edu.unsam.phm.domain.Book
+
 import ar.edu.unsam.phm.domain.BookSearchCriteria
-import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.dto.BookCreateDTO
-import ar.edu.unsam.phm.dto.BookDTO
-import ar.edu.unsam.phm.dto.PageResponse
-import ar.edu.unsam.phm.dto.createFromDTO
+import ar.edu.unsam.phm.dto.*
+import ar.edu.unsam.phm.services.BookService
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
-import ar.edu.unsam.phm.services.BookService
 import org.springframework.web.bind.annotation.*
+
 
 @RestController
 @CrossOrigin("*")
@@ -40,5 +37,9 @@ class BookController(
         val updatedBook = bookCreateDTO.createFromDTO(owner)
         bookService.updateBook(id, updatedBook)
     }
+
+    @GetMapping("/book-detail/{id}")
+    fun getBookById(@PathVariable id: Int) =
+        bookService.getBookById(id).toDTO()
 
 }

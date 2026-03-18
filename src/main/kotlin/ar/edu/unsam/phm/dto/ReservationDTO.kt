@@ -1,7 +1,6 @@
 package ar.edu.unsam.phm.dto
 
 import ar.edu.unsam.phm.domain.*
-import ar.edu.unsam.phm.domain.ReviewDTO
 import java.time.LocalDate
 import ar.edu.unsam.phm.domain.Reservation
 
@@ -42,22 +41,24 @@ fun Reservation.toDTO() : ReservationDTO {
     )
 }
 
+fun LocalDate.isBetween(start: LocalDate, end: LocalDate): Boolean =
+    this.isAfter(start) && this.isBefore(end)
+
 data class ReservationProfileDTO(
     // Capaz se puede omitir el id de la reserva
     // Pero tambien puede estar bueno que te lleve al libro reservado
     val id: Int,
     val book: ProfileBookDTO,
-    val state: String
+    var state: String
 )
 
 fun Reservation.toReservationProfileDTO(): ReservationProfileDTO {
-    val temporaryReserve: Reservation = Reservation()
-    val isAvailable = !this.dateOverlaps(temporaryReserve)
+    val isBorrowed = LocalDate.now().isBetween(this.pickUpDate, this.dropOffDate)
 
     val reservationProfileDTO = ReservationProfileDTO(
         id = this.id,
         book = this.book.toProfileBookDTO(),
-        state = if (isAvailable) State.AVAILABLE.value else State.BORROWED.value
+        state = if (!isBorrowed) State.AVAILABLE.value else State.BORROWED.value
     )
     return reservationProfileDTO
 }
