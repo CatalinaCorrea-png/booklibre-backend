@@ -24,6 +24,12 @@ class BookService(
         bookRepository.create(book)
     }
 
+    fun updateBook(id: Int, book: Book) {
+        val existingBook = bookRepository.getObject(id)
+        book.id = existingBook.id
+        bookRepository.update(book)
+    }
+
     /*
     fun updateBook(updatedBook : BookDTO) : Book {
         val newBook = updatedBook.fromDTO()

@@ -10,10 +10,7 @@ import ar.edu.unsam.phm.dto.createFromDTO
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import ar.edu.unsam.phm.services.BookService
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @CrossOrigin("*")
@@ -29,11 +26,18 @@ class BookController(
     }
 
     @PostMapping("/crear-libro")
-    fun crearLibro(@RequestBody bookCreateDTO: BookCreateDTO) {
+    fun createBook(@RequestBody bookCreateDTO: BookCreateDTO) {
         println("ownerId recibido: ${bookCreateDTO.ownerId}")
         val owner = bookService.getUser(bookCreateDTO.ownerId)
-        val libroNuevo = bookCreateDTO.createFromDTO(owner)
-        bookService.createBook(libroNuevo)
+        val newBook = bookCreateDTO.createFromDTO(owner)
+        bookService.createBook(newBook)
+    }
+
+    @PutMapping("/editar-libro/{id}")
+    fun editBook(@PathVariable id: Int, @RequestBody bookCreateDTO: BookCreateDTO) {
+        val owner = bookService.getUser(bookCreateDTO.ownerId)
+        val updatedBook = bookCreateDTO.createFromDTO(owner)
+        bookService.updateBook(id, updatedBook)
     }
 
 }
