@@ -23,6 +23,8 @@ class BookService(
 ) {
     fun createBook(book: Book){
         println("llamando meetsCreationCriteria")
+        println("imageSrc recibido: '${book.imageSrc}'")
+        println("timestamp recibido: '${book.timestamp}'")
         book.meetsCreationCriteria()
         println("pasó meetsCreationCriteria")
         bookRepository.create(book)
@@ -30,6 +32,9 @@ class BookService(
 
     fun updateBook(id: Int, book: Book) {
         val existingBook = bookRepository.getObject(id)
+        println("imageSrc recibido: '${book.imageSrc}'")
+        println("imageSrc recibido: '${book.imageSrc}'")
+        println("timestamp recibido: '${book.timestamp}'")
         book.id = existingBook.id
         book.meetsCreationCriteria()
         bookRepository.update(book)
@@ -124,6 +129,5 @@ class BookService(
     }
 
     fun getBookById(id: Int): Book =
-        bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")
+        bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")}
 
-}
