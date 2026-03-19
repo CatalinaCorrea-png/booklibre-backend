@@ -1,13 +1,21 @@
 package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.User
+import ar.edu.unsam.phm.domain.UserTypes
+import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
 import ar.edu.unsam.phm.dto.UserDTO
 import ar.edu.unsam.phm.dto.toUserDTO
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.stereotype.Service
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import java.util.UUID
 
 import ar.edu.unsam.phm.errors.BusinessException
+import org.springframework.web.multipart.MultipartFile
 
 
 @Service
@@ -52,6 +60,56 @@ class UserService(
             throw NotFoundException("No se encontro un user con el id: $userId")
         }
         return user.toUserDTO()
+    }
+
+    private fun saveImage(image: MultipartFile): String {
+        val uploadDirectory: Path = Paths.get("uploads")
+
+        if (!Files.exists(uploadDirectory)) {
+            Files.createDirectories(uploadDirectory)
+        }
+
+        val originalFilename = image.originalFilename ?: "image"
+        val extension = originalFilename.substringAfterLast(".", "")
+        val uniqueFilename = if (extension.isNotBlank()) {
+            "${UUID.randomUUID()}.$extension"
+        } else {
+            UUID.randomUUID().toString()
+        }
+
+        val targetPath = uploadDirectory.resolve(uniqueFilename)
+        Files.copy(image.inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING)
+
+        return "uploads/$uniqueFilename"
+    }
+
+    fun updateUserProfile(userData: UpdateUserProfileDTO, image: MultipartFile?): UserDTO {
+        val existingUser = userRepository.getObject(userData.id)
+
+        val finalImagePath = if (image != null && !image.isEmpty) {
+           saveImage(image)
+        } else {
+            existingUser.img
+        }
+
+        val updatedUser = User(
+            name = userData.name,
+            description = userData.description,
+            email = userData.email,
+            cel = userData.cel,
+            location = userData.location,
+            userType = UserTypes.fromValue(userData.userType),
+            timestamp = userData.timestamp,
+            bibliokarmas = userData.bibliokarmas,
+            password = existingUser.password,
+            img = finalImagePath
+        ).apply {
+            id = existingUser.id
+        }
+
+        userRepository.update(updatedUser)
+
+        return updatedUser.toUserDTO()
     }
 
 }
