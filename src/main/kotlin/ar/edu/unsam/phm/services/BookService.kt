@@ -7,7 +7,6 @@ import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.dto.BookDTO
 import ar.edu.unsam.phm.dto.PageResponse
 import ar.edu.unsam.phm.dto.toDTO
-import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository

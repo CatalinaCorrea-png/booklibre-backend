@@ -3,8 +3,21 @@ package ar.edu.unsam.phm.domain
 import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.time.LocalDate
 
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "bookType"
+)
+@JsonSubTypes(
+    Type(value = Common::class, name = "COMUN"),
+    Type(value = WithADedication::class, name = "CON DEDICATORIA"),
+    Type(value = Collectable::class, name = "COLECCIONABLE"),
+)
 abstract class Book (
     var title: String = "",
     var desc: String = "",
@@ -19,8 +32,8 @@ abstract class Book (
     var reservationsIds: MutableList<Int> = mutableListOf(),
     var owner: User = User(),
     var imageSrc: String = "",
-    var timestamp: LocalDate = LocalDate.now()
-
+    var timestamp: LocalDate = LocalDate.now(),
+    val bookType: String
 ): RepositoryElement {
     override var id = 0
 
