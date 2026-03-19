@@ -17,6 +17,8 @@ class ReservationService(
     val bookRepository: BookRepository
 ){
     fun createReservation(reservation: Reservation) {
+        if (reservation.pickUpDate.isBefore(LocalDate.now()))
+            throw BusinessException("La fecha de recogida no puede ser anterior a hoy")
         if (!canReserve(reservation)) throw BusinessException("Reserva no disponible en esa fecha")
         reservationRepository.create(reservation)
 
