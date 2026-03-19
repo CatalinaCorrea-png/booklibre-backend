@@ -3,6 +3,7 @@ package ar.edu.unsam.phm.services
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
+import ar.edu.unsam.phm.domain.State
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
 import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
@@ -19,12 +20,15 @@ class ReservationService(
     fun createReservation(reservation: Reservation) {
         if (reservation.pickUpDate.isBefore(LocalDate.now()))
             throw BusinessException("La fecha de recogida no puede ser anterior a hoy")
+        if (reservation.dropOffDate.isBefore(reservation.pickUpDate))
+            throw BusinessException("No se puede reservar un libro si su fecha de devolucion es antes que su recogida")
         if (!canReserve(reservation)) throw BusinessException("Reserva no disponible en esa fecha")
         reservationRepository.create(reservation)
 
         // Acá sumo la reserva al libro?????
         val book = bookRepository.getObject(reservation.book.id)
         book.addReservation(reservation.id)
+        reservation.state = State.BORROWED
     }
 
     // esto tiene que estar negado asi devuelve true si no hay solapamiento
