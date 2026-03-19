@@ -30,6 +30,18 @@ data class UserDTO(
     }
 }
 
+data class UpdateUserProfileDTO(
+    val id: Int,
+    val name: String,
+    val description: String,
+    val email: String,
+    val cel: String,
+    val location: String,
+    val timestamp: String,
+    val bibliokarmas: Int,
+    val userType: String
+)
+
 fun User.toUserDTO(): UserDTO {
     return UserDTO(
         id = this.id,
