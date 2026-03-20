@@ -16,9 +16,10 @@ class Common(
     reservationsIds: MutableList<Int> = mutableListOf(),
     owner: User = User(),
     imageSrc: String = "",
-    timestamp:  LocalDate = LocalDate.now(),
+    timestamp: LocalDate = LocalDate.now(),
+    bookType: String = "COMUN"
 )
-    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner, imageSrc, timestamp = timestamp) {
+    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner, imageSrc, timestamp, bookType) {
     override fun typeBibliokarmas(reservation: Reservation) : Int = if (reservation.user.bibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
 }
 
@@ -36,9 +37,10 @@ class WithADedication(
     reservationsIds: MutableList<Int> = mutableListOf(),
     owner: User = User(),
     imageSrc: String = "",
-    timestamp:  LocalDate = LocalDate.now(),
+    timestamp: LocalDate = LocalDate.now(),
+    bookType: String = "CON DEDICATORIA"
 )
-    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,imageSrc,timestamp = timestamp) {
+    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,  imageSrc, timestamp, bookType) {
     override fun typeBibliokarmas(reservation: Reservation): Int = 200 * 10 * this.reservationsIds.size
 }
 
@@ -56,8 +58,9 @@ class Collectable(
     reservationsIds: MutableList<Int> = mutableListOf(),
     owner: User = User(),
     imageSrc: String = "",
-    timestamp:  LocalDate = LocalDate.now(),
+    timestamp: LocalDate = LocalDate.now(),
+    bookType: String = "COLECCIONABLE"
 )
-    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,imageSrc,timestamp = timestamp) {
+    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,  imageSrc, timestamp, bookType) {
     override fun typeBibliokarmas(reservation: Reservation): Int = reservation.user.bibliokarmas / 5 + this.numPages
 }

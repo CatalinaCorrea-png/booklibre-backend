@@ -20,19 +20,10 @@ data class BookDTO(
     var reservationsIds: MutableList<Int>,
     var owner: UserDTO,
     var imageSrc: String,
+    var bookBibliokarmas: Int = 0
     ) {
 
     fun fromDTO(): Book {
-        if (this.bookType == "COMUN") {
-            // return Common()
-        }
-        if (this.bookType == "CON DEDICATORIA") {
-            // return WithADedication()
-        }
-        if (this.bookType == "COLECCIONABLE") {
-            // return Collectable()
-        }
-        // Por ahora...
         return Common(
             title= this.title,
             desc= this.desc,
@@ -46,7 +37,8 @@ data class BookDTO(
             condition= BookCondition.valueOf(this.condition),
             reservationsIds = this.reservationsIds, // Las pido acá... ??
             owner= this.owner.fromDTO(),
-            imageSrc = this.imageSrc
+            imageSrc = this.imageSrc,
+
         ).apply {
             id = this@BookDTO.id
         }
@@ -54,7 +46,7 @@ data class BookDTO(
 
 }
 
-fun Book.toDTO(): BookDTO{
+fun Book.toDTO(reservation: Reservation = Reservation()): BookDTO{
     val bookDTO = BookDTO(
         id = this.id,
         title = this.title,
@@ -62,17 +54,20 @@ fun Book.toDTO(): BookDTO{
         gender = this.gender.value,
         authorName = this.author.name,
         authorAvatarUrl = this.author.avatar,
-        bookType = "COMUN",
+//        bookType = "COMUN",
         numPages = this.numPages,
         isbn=  this.isbn,
         language = this.language.value,
         editorial = this.editorial,
         publishDate = this.publishDate,
-        condition = this.condition.toString(),
+        condition = this.condition.value,
         reservationsIds = this.reservationsIds,
         owner = this.owner.toUserDTO(),
-        imageSrc = this.imageSrc
-    )
+        imageSrc = this.imageSrc,
+        bookType =  this.bookType,
+    ).apply {
+        this.bookBibliokarmas = this@toDTO.calculateBibliokarmas(reservation)
+    }
     return bookDTO
 }
 

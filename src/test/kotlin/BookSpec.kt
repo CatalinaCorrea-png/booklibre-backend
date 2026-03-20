@@ -1,22 +1,22 @@
-import ar.edu.unsam.phm.domain.Collectable
-import ar.edu.unsam.phm.domain.Common
-import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.domain.WithADedication
-import ar.edu.unsam.phm.errors.BusinessException
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.IsolationMode
-import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.shouldBe
-import ar.edu.unsam.phm.domain.*
-import java.time.LocalDate
-
-
+//import ar.edu.unsam.phm.domain.Collectable
+//import ar.edu.unsam.phm.domain.Common
+//import ar.edu.unsam.phm.domain.Reservation
+//import ar.edu.unsam.phm.domain.User
+//import ar.edu.unsam.phm.domain.WithADedication
+//import ar.edu.unsam.phm.errors.BusinessException
+//import io.kotest.assertions.throwables.shouldThrow
+//import io.kotest.core.spec.IsolationMode
+//import io.kotest.core.spec.style.DescribeSpec
+//import io.kotest.matchers.shouldBe
+//import ar.edu.unsam.phm.domain.*
+//import java.time.LocalDate
+//
+//
 //class BookSpec : DescribeSpec ({
 //    isolationMode = IsolationMode.InstancePerTest
 //
 //    describe("Testing reservations and bibliokarmas for new User and 4 day reservation") {
-//        val newUser = User(userType = UserTypes.READER)
+//        val newUser = User(userType = UserType.READER)
 //        val reservation =
 //            Reservation(user = newUser, pickUpDate = LocalDate.now().minusDays(4), dropOffDate = LocalDate.now())
 //
@@ -93,7 +93,7 @@ import java.time.LocalDate
 //
 //        it("No se puede reservar un libro que ya esta reservado en esa fecha") {
 //            // Arrange
-//            val newUser = User(userType = UserTypes.READER)
+//            val newUser = User(userType = UserType.READER)
 //            val commonBook = Common(
 //                this.title,
 //                this.desc,
