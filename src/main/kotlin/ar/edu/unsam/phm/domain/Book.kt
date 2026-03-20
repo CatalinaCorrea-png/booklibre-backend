@@ -1,7 +1,6 @@
 package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.errors.ConflictException
-import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type

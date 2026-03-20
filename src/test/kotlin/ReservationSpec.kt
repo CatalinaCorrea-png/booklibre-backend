@@ -1,8 +1,6 @@
-import ar.edu.unsam.phm.bootstrap.ApplicationBootstrap.mateoLopez
-import ar.edu.unsam.phm.bootstrap.ApplicationBootstrap.monteCristo
+
 import ar.edu.unsam.phm.domain.Common
 import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.errors.BusinessException
