@@ -117,14 +117,14 @@ data class BookCreateDTO(
 fun BookCreateDTO.createFromDTO(owner: User): Book {
     val title = this.title
     val desc = this.desc
-    val gender = Gender.fromValue(this.gender)
+    val gender = Gender.entries.find { it.value == this.gender } ?: throw IllegalArgumentException("Genero invalido: ${this.gender}")
     val author = Author(this.authorName, this.authorAvatarUrl)
     val numPages = this.numPages
     val isbn = this.isbn
-    val language = Language.fromValue(this.language)
+    val language = Language.entries.find { it.value == this.language } ?: throw IllegalArgumentException("Idioma invalido: ${this.language}")
     val editorial = this.editorial
     val publishDate = this.publishDate ?: LocalDate.now()
-    val condition = BookCondition.fromValue(this.condition)
+    val condition = BookCondition.entries.find { it.value == this.condition } ?: throw IllegalArgumentException("Condicion invalida: ${this.language}")
     val owner = owner
     val imageSrc = this.imageSrc
 
