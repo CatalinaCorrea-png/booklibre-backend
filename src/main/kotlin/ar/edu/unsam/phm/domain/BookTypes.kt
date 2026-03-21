@@ -20,7 +20,7 @@ class Common(
     bookType: String = "COMUN"
 )
     : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner, imageSrc, timestamp, bookType) {
-    override fun typeBibliokarmas(reservation: Reservation) : Int = if (reservation.user.bibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
+    override fun typeBibliokarmas(userBibliokarmas: Int) : Int = if (userBibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
 }
 
 class WithADedication(
@@ -41,7 +41,7 @@ class WithADedication(
     bookType: String = "CON DEDICATORIA"
 )
     : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,  imageSrc, timestamp, bookType) {
-    override fun typeBibliokarmas(reservation: Reservation): Int = 200 * 10 * this.reservationsIds.size
+    override fun typeBibliokarmas(userBibliokarmas: Int): Int = 200 * 10 * this.reservationsIds.size
 }
 
 class Collectable(
@@ -62,5 +62,5 @@ class Collectable(
     bookType: String = "COLECCIONABLE"
 )
     : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,  imageSrc, timestamp, bookType) {
-    override fun typeBibliokarmas(reservation: Reservation): Int = reservation.user.bibliokarmas / 5 + this.numPages
+    override fun typeBibliokarmas(userBibliokarmas: Int): Int = userBibliokarmas / 5 + this.numPages
 }

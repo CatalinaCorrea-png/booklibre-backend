@@ -1,7 +1,6 @@
 package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.errors.ConflictException
-import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
@@ -42,10 +41,10 @@ abstract class Book (
     }
 
     // Template Method Primitiva
-    fun calculateBibliokarmas(reservation: Reservation) : Int = 5 * reservation.reservationDays() + typeBibliokarmas(reservation)
+    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int) : Int = 5 * reservationDays + typeBibliokarmas(userBibliokarmas)
 
     // different for every type of book
-    abstract fun typeBibliokarmas(reservation: Reservation) : Int
+    abstract fun typeBibliokarmas(userBibliokarmas: Int) : Int
 
     override fun meetsSearchCriteria(criteria: String) : Boolean {
         TODO()

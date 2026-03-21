@@ -82,8 +82,9 @@ class BookService(
 
     fun getBooksBibliokarmas(bookDTOs: List<BookDTO>, criteria: BookSearchCriteria) : List<BookDTO> {
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
+        val user = userRepository.getObject(criteria.userId)
         bookDTOs.forEach { bookDTO ->
-            bookDTO.bookBibliokarmas = bookRepository.getObject(bookDTO.id).calculateBibliokarmas(reservationTemp)
+            bookDTO.bookBibliokarmas = bookRepository.getObject(bookDTO.id).calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas)
         }
         return bookDTOs
     }
