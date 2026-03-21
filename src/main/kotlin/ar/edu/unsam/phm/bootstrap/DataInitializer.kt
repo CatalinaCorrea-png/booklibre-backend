@@ -24,6 +24,5 @@ class DataInitializer(
             bookRepository,
             reservationRepository,
         )
-        println("usuarios cargados: ${userRepository.repositoryObjects().size}")
     }
 }
