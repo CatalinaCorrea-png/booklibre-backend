@@ -1,9 +1,6 @@
 package ar.edu.unsam.phm.services
 
-import ar.edu.unsam.phm.domain.Book
-import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.domain.BookSearchCriteria
-import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.BookDTO
 import ar.edu.unsam.phm.dto.PageResponse
 import ar.edu.unsam.phm.dto.toDTO
@@ -11,7 +8,10 @@ import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import ar.edu.unsam.phm.repository.UserRepository
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import kotlin.math.ceil
 
 
 @Service
@@ -39,87 +39,59 @@ class BookService(
         val newBook = updatedBook.fromDTO()
     }*/
 
-    fun getAvailableBooksBy(criteria: BookSearchCriteria): PageResponse<BookDTO> {
-        val allBooks = bookRepository.repositoryObjects()
+    fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
+        val reservedBookIds = reservationRepository.findReservedBookIds(searchCriteria)
+        val filteredAndAvailable = bookRepository.findAllByCriteria(searchCriteria, reservedBookIds)
 
-        val filtered = allBooks.filter { book ->
-            matchesTitle(book, criteria) &&
-                    matchesGender(book, criteria) &&
-                    matchesPages(book, criteria) &&
-                    matchesISBN(book, criteria) &&
-                    matchesOwner(book, criteria) &&
-                    matchesAvailability(book, criteria)
-        }
+        val ordered = sortInMemory(filteredAndAvailable, pageable.sort)
+        val paged = paginate(ordered,pageable)
 
-        val ordered = criteria.sortedBy.sort(filtered, criteria.ascending)
+        paged.content = getBooksBibliokarmas(paged.content, searchCriteria)
+        return paged
+    }
 
-        // PAGINACION
+    // Ahora lo hago aca, luego se hace en Repo con Query ?
+    private fun sortInMemory(books: List<Book>, sort: Sort): List<Book> {
+        val order = sort.firstOrNull() ?: return books
+        val field = BookSortField.from(order.property) // Creo/Elijo la criteria para el sorting
+
+        return if (order.isAscending)
+            books.sortedBy { field.selector(it) } // selector es "title", "owner" o "author"
+        else
+            books.sortedByDescending { field.selector(it) }
+    }
+
+    // Ahora lo hago aca, luego se hace en Repo con Query ?
+    private fun paginate(books: List<Book>, pageable: Pageable): PageResponse<BookDTO> {
         // Cuantas paginas son
-        val totalElements = ordered.size
-        val totalPages = if (totalElements == 0) 0 else Math.ceil(totalElements.toDouble() / criteria.pageSize).toInt()
+        val total = books.size
+        val totalPages = if (total == 0) 0 else ceil(total.toDouble() / pageable.pageSize).toInt()
         // Qué pagina devuelvo
-        val fromIndex = (criteria.page * criteria.pageSize).coerceAtMost(totalElements) // primer libro de la pagina
-        val toIndex = (fromIndex + criteria.pageSize).coerceAtMost(totalElements) // ultimo libro de la pagina
-        // Creo la lista de libros por pagina
-        val paged = ordered.subList(fromIndex, toIndex)
-
-
+        val from = (pageable.pageNumber * pageable.pageSize).coerceAtMost(total) // primer libro de la pagina
+        val to = (from + pageable.pageSize).coerceAtMost(total) // ultimo libro de la pagina
+        val paged = books.subList(from, to)
 
         return PageResponse(
             content = paged.map { it.toDTO() },
-            page = criteria.page,
-            pageSize = criteria.pageSize,
-            totalElements = totalElements,
+            page = pageable.pageNumber,
+            pageSize = pageable.pageSize,
+            totalElements = total,
             totalPages = totalPages
         )
     }
 
+    fun getBooksBibliokarmas(bookDTOs: List<BookDTO>, criteria: BookSearchCriteria) : List<BookDTO> {
+        val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
+        bookDTOs.forEach { bookDTO ->
+            bookDTO.bookBibliokarmas = bookRepository.getObject(bookDTO.id).calculateBibliokarmas(reservationTemp)
+        }
+        return bookDTOs
+    }
 
     fun getUser(id: Int): User {
         println("usuarios en repo: ${userRepository.repositoryObjects().size}")
         println("buscando usuario con id: $id")
         return userRepository.getObject(id)
-    }
-
-    // FILTROS DE BUSQUEDA >.<
-    private fun matchesTitle(book: Book, criteria: BookSearchCriteria): Boolean {
-        val title = criteria.title?.trim()
-        return title.isNullOrBlank() || book.title.contains(title, ignoreCase = true)
-    }
-
-    private fun matchesGender(book: Book, criteria: BookSearchCriteria): Boolean {
-        return criteria.genders.isEmpty() || criteria.genders.contains(book.gender)
-    }
-
-    private fun matchesPages(book: Book, criteria: BookSearchCriteria): Boolean {
-        val min = criteria.pagesRangeMin ?: 0
-        val max = criteria.pagesRangeMax ?: 1500 // Regla de negocio (Por ahora)
-        return book.numPages in min..max
-    }
-
-    private fun matchesISBN(book: Book, criteria: BookSearchCriteria): Boolean {
-        val isbn = criteria.isbn?.trim()
-        return isbn.isNullOrBlank() || book.isbn.contains(isbn, ignoreCase = true)
-    }
-
-    private fun matchesOwner(book: Book, criteria: BookSearchCriteria): Boolean {
-        val ownerName = criteria.ownersName?.trim()
-        return ownerName.isNullOrBlank() || book.owner.name.contains(ownerName, ignoreCase = true)
-    }
-
-    private fun matchesAvailability(book: Book, criteria: BookSearchCriteria): Boolean {
-        val pickUp = criteria.pickUpDate
-        val dropOff = criteria.dropOffDate
-        val reservationTemp = Reservation(pickUpDate = pickUp, dropOffDate = dropOff)
-
-        // No deberian ser null, pero por las dudas?
-        if (pickUp == null || dropOff == null) return true
-
-        // Me traigo todas las reservas del libro a chequear
-        val reservations = reservationRepository.repositoryObjects().filter { it.book.id == book.id }
-
-        // Si al menos una reserva coincide en fecha, no está disponible.
-        return reservations.none { it.dateOverlaps(reservationTemp) }
     }
 
     fun getBookById(id: Int): Book =

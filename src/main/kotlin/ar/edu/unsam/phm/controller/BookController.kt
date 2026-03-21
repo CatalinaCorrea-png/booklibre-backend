@@ -2,10 +2,13 @@ package ar.edu.unsam.phm.controller
 
 
 import ar.edu.unsam.phm.domain.BookSearchCriteria
+import ar.edu.unsam.phm.domain.Gender
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.services.BookService
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.web.bind.annotation.*
 
 
@@ -17,9 +20,19 @@ class BookController(
     private val bookRepository: BookRepository,
 ) {
 
-    @PostMapping("/filtered-books")
-    fun getFilteredBooks(@RequestBody bookSearchCriteria: BookSearchCriteria): PageResponse<BookDTO> {
-        return bookService.getAvailableBooksBy(bookSearchCriteria)
+    @GetMapping("/filtered-books")
+    fun getFilteredBooks(
+        @ModelAttribute criteria: BookSearchCriteria,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "6") size: Int,
+        @RequestParam(defaultValue = "title") sortBy: String,
+        @RequestParam(defaultValue = "true") ascending: Boolean
+    ): PageResponse<BookDTO> {
+        println(criteria.toString())
+        println("$page, $size, $sortBy, $ascending")
+        val direction = if (ascending) Sort.Direction.ASC else Sort.Direction.DESC
+        val pageable = PageRequest.of(page, size, Sort.by(direction, sortBy))
+        return bookService.searchBooks(criteria, pageable)
     }
 
     @PostMapping("/crear-libro")
@@ -42,4 +55,6 @@ class BookController(
     fun getBookById(@PathVariable id: Int) =
         bookService.getBookById(id).toDTO()
 
+    @GetMapping("/book-genders")
+    fun getBookGenders() = Gender
 }

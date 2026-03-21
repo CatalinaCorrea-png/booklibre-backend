@@ -4,15 +4,22 @@ import java.time.LocalDate
 
 data class BookSearchCriteria (
     val title: String? = null,
-    val genders: Set<Gender> = mutableSetOf(),
+    val genders: List<Gender> = listOf(),
     val pagesRangeMin: Int? = null,
     val pagesRangeMax: Int? = null,
     val pickUpDate: LocalDate = LocalDate.now(),
     val dropOffDate: LocalDate = LocalDate.now(),
     val isbn: String? = null,
     val ownersName: String? = null,
-    val sortedBy: BookSortCriteria = SortByTitle,
-    val ascending: Boolean = true,
-    val page: Int = 0,
-    val pageSize: Int = 6
 )
+
+// Volaron para utilizar el Sort y Pageable de Spring
+//data class SortingCriteria (
+//    val sortedBy: BookSortCriteria = SortByTitle,
+//    val ascending: Boolean = true,
+//)
+//
+//data class PageRequest (
+//    val page: Int = 0,
+//    val pageSize: Int = 6
+//)

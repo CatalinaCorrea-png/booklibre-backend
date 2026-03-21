@@ -27,7 +27,7 @@ data class BookDTO(
         return Common(
             title= this.title,
             desc= this.desc,
-            gender= Gender.DRAMA,
+            gender= Gender.valueOf(this.gender),
             author= Author(this.authorName, this.authorAvatarUrl),
             numPages = this.numPages,
             isbn=  this.isbn,
@@ -46,7 +46,7 @@ data class BookDTO(
 
 }
 
-fun Book.toDTO(reservation: Reservation = Reservation()): BookDTO{
+fun Book.toDTO(): BookDTO{
     val bookDTO = BookDTO(
         id = this.id,
         title = this.title,
@@ -65,9 +65,7 @@ fun Book.toDTO(reservation: Reservation = Reservation()): BookDTO{
         owner = this.owner.toUserDTO(),
         imageSrc = this.imageSrc,
         bookType =  this.bookType,
-    ).apply {
-        this.bookBibliokarmas = this@toDTO.calculateBibliokarmas(reservation)
-    }
+    )
     return bookDTO
 }
 
