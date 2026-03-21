@@ -41,50 +41,26 @@ class BookService(
 
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
         val reservedBookIds = reservationRepository.findReservedBookIds(searchCriteria)
-        val filteredAndAvailable = bookRepository.findAllByCriteria(searchCriteria, reservedBookIds)
+        val page = bookRepository.findAllByCriteria(searchCriteria, reservedBookIds, pageable)
 
-        val ordered = sortInMemory(filteredAndAvailable, pageable.sort)
-        val paged = paginate(ordered,pageable)
-
-        paged.content = getBooksBibliokarmas(paged.content, searchCriteria)
-        return paged
-    }
-
-    // Ahora lo hago aca, luego se hace en Repo con Query ?
-    private fun sortInMemory(books: List<Book>, sort: Sort): List<Book> {
-        val order = sort.firstOrNull() ?: return books
-        val field = BookSortField.from(order.property) // Creo/Elijo la criteria para el sorting
-
-        return if (order.isAscending)
-            books.sortedBy { field.selector(it) } // selector es "title", "owner" o "author"
-        else
-            books.sortedByDescending { field.selector(it) }
-    }
-
-    // Ahora lo hago aca, luego se hace en Repo con Query ?
-    private fun paginate(books: List<Book>, pageable: Pageable): PageResponse<BookDTO> {
-        // Cuantas paginas son
-        val total = books.size
-        val totalPages = if (total == 0) 0 else ceil(total.toDouble() / pageable.pageSize).toInt()
-        // Qué pagina devuelvo
-        val from = (pageable.pageNumber * pageable.pageSize).coerceAtMost(total) // primer libro de la pagina
-        val to = (from + pageable.pageSize).coerceAtMost(total) // ultimo libro de la pagina
-        val paged = books.subList(from, to)
+        val booksWithBibliokarmasDTO = getBooksBibliokarmasDTO(page.content, searchCriteria)
 
         return PageResponse(
-            content = paged.map { it.toDTO() },
-            page = pageable.pageNumber,
-            pageSize = pageable.pageSize,
-            totalElements = total,
-            totalPages = totalPages
+            content = booksWithBibliokarmasDTO,
+            page = page.number,
+            pageSize = page.size,
+            totalElements = page.totalElements.toInt(),
+            totalPages = page.totalPages
         )
     }
 
-    fun getBooksBibliokarmas(bookDTOs: List<BookDTO>, criteria: BookSearchCriteria) : List<BookDTO> {
+    fun getBooksBibliokarmasDTO(books: List<Book>, criteria: BookSearchCriteria) : List<BookDTO> {
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
         val user = userRepository.getObject(criteria.userId)
-        bookDTOs.forEach { bookDTO ->
-            bookDTO.bookBibliokarmas = bookRepository.getObject(bookDTO.id).calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas)
+        val bookDTOs = books.map { book ->
+            val bookDTO = book.toDTO()
+            bookDTO.bookBibliokarmas = book.calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas)
+            bookDTO
         }
         return bookDTOs
     }

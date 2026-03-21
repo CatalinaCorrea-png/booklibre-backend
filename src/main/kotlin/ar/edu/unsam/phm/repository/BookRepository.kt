@@ -4,27 +4,66 @@ import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.BookDTO
 import ar.edu.unsam.phm.dto.PageResponse
 import ar.edu.unsam.phm.dto.toDTO
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import kotlin.math.ceil
 
 @org.springframework.stereotype.Repository
 class BookRepository(
     private val reservationRepository: ReservationRepository  // inyección por constructor
 ): Repository<Book>() {
 
-    fun findAllByCriteria(criteria: BookSearchCriteria, reservedBookIds: Set<Int>): List<Book> {
+    fun findAllByCriteria(criteria: BookSearchCriteria, reservedBookIds: Set<Int>, pageable: Pageable): Page<Book> {
         val allBooks = this.repositoryObjects()
 
-        val filtered = allBooks.filter { book ->
-            matchesTitle(book, criteria) &&
-                    matchesGender(book, criteria) &&
-                    matchesPages(book, criteria) &&
-                    matchesISBN(book, criteria) &&
-                    matchesOwner(book, criteria)
+        val filteredAndAvailable = this.repositoryObjects().filter { book ->
+            book.owner.id != criteria.userId &&     // no me traigo mis propios libros
+            book.id !in reservedBookIds &&          // no está reservado
+            matchesTitle(book, criteria) &&         // filtros de busqueda de libro
+            matchesGender(book, criteria) &&
+            matchesPages(book, criteria) &&
+            matchesISBN(book, criteria) &&
+            matchesOwner(book, criteria)
         }
 
-        val filteredAndAvailable = filtered.filter { it.id !in reservedBookIds }
+        val sorted = sortInMemory(filteredAndAvailable, pageable.sort)
 
-        return filteredAndAvailable
+        val from = (pageable.pageNumber * pageable.pageSize).coerceAtMost(sorted.size) // primer libro de la pagina
+        val to = (from + pageable.pageSize).coerceAtMost(sorted.size) // ultimo libro de la pagina
+
+        return PageImpl(sorted.subList(from, to), pageable, sorted.size.toLong())
     }
+
+    // Ahora lo hago aca, luego se hace con Query ?
+    private fun sortInMemory(books: List<Book>, sort: Sort): List<Book> {
+        val order = sort.firstOrNull() ?: return books
+        val field = BookSortField.from(order.property) // Creo/Elijo la criteria para el sorting
+
+        return if (order.isAscending)
+            books.sortedBy { field.selector(it) } // selector es "title", "owner" o "author"
+        else
+            books.sortedByDescending { field.selector(it) }
+    }
+
+//    private fun paginate(books: List<Book>, pageable: Pageable): PageResponse<BookDTO> {
+//        // Cuantas paginas son
+//        val total = books.size
+//        val totalPages = if (total == 0) 0 else ceil(total.toDouble() / pageable.pageSize).toInt()
+//        // Qué pagina devuelvo
+//        val from = (pageable.pageNumber * pageable.pageSize).coerceAtMost(total) // primer libro de la pagina
+//        val to = (from + pageable.pageSize).coerceAtMost(total) // ultimo libro de la pagina
+//        val paged = books.subList(from, to)
+//
+//        return PageResponse(
+//            content = paged.map { it.toDTO() },
+//            page = pageable.pageNumber,
+//            pageSize = pageable.pageSize,
+//            totalElements = total,
+//            totalPages = totalPages
+//        )
+//    }
 
     // FILTROS DE BUSQUEDA >.<
     private fun matchesTitle(book: Book, criteria: BookSearchCriteria): Boolean {
