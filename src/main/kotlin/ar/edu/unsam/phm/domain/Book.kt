@@ -59,4 +59,6 @@ abstract class Book (
         if (!isNotEmpty(editorial)) throw ConflictException("El libro tiene que tener editorial")
         if (!isNotEmpty(imageSrc)) throw ConflictException("El libro tiene que tener imagen de referencia")
     }
+
+
 }

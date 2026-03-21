@@ -1,12 +1,10 @@
 package ar.edu.unsam.phm.services
 
-import ar.edu.unsam.phm.domain.Book
-import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.domain.BookSearchCriteria
-import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.BookDTO
 import ar.edu.unsam.phm.dto.PageResponse
 import ar.edu.unsam.phm.dto.toDTO
+import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
@@ -30,6 +28,19 @@ class BookService(
         book.id = existingBook.id
         book.meetsCreationCriteria()
         bookRepository.update(book)
+    }
+
+    fun deleteBook(id: Int) {
+        println("Buscando reservas para libro ID: $id")
+        val activeReservations = reservationRepository.collection
+            .filter { println("Reserva: book.id=${it.book.id} state=${it.state}")
+                it.book.id == id && it.state != State.RETURNED }
+
+        if (activeReservations.isNotEmpty()) {
+            throw ConflictException("No se puede eliminar un libro con reservas activas")
+        }
+
+        bookRepository.delete(id)
     }
 
     /*
