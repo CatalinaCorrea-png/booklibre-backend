@@ -28,8 +28,8 @@ class BookController(
         @RequestParam(defaultValue = "title") sortBy: String,
         @RequestParam(defaultValue = "true") ascending: Boolean
     ): PageResponse<BookDTO> {
-        println(criteria.toString())
-        println("$page, $size, $sortBy, $ascending")
+//        println(criteria.toString())
+//        println("$page, $size, $sortBy, $ascending")
         val direction = if (ascending) Sort.Direction.ASC else Sort.Direction.DESC
         val pageable = PageRequest.of(page, size, Sort.by(direction, sortBy))
         return bookService.searchBooks(criteria, pageable)
@@ -56,5 +56,5 @@ class BookController(
         bookService.getBookById(id).toDTO()
 
     @GetMapping("/book-genders")
-    fun getBookGenders() = Gender
+    fun getBookGenders() = Gender.entries
 }
