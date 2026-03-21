@@ -118,6 +118,12 @@ class ReservationService(
         }
     }
 
+/*
+*
+* Todo por la interfaz de paginado
+*
+* */
+
     private fun sortByAscTitle(list: List<ReservationProfileDTO>): List<ReservationProfileDTO> =
         list.sortedBy {it.book.title}
 
