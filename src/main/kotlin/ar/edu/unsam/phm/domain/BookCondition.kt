@@ -10,6 +10,6 @@ enum class BookCondition(val value: String) {
     companion object {
         fun fromValue(value: String): BookCondition =
             entries.find { it.value == value }
-                ?: throw IllegalArgumentException("BookCondition desconocido: $value")
+                ?: throw IllegalArgumentException("BookCondition invalido: $value")
     }
 }

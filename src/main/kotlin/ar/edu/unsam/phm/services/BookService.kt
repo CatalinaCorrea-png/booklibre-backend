@@ -21,19 +21,12 @@ class BookService(
     private val userRepository: UserRepository,
 ) {
     fun createBook(book: Book){
-        println("llamando meetsCreationCriteria")
-        println("imageSrc recibido: '${book.imageSrc}'")
-        println("timestamp recibido: '${book.timestamp}'")
         book.meetsCreationCriteria()
-        println("pasó meetsCreationCriteria")
         bookRepository.create(book)
     }
 
     fun updateBook(id: Int, book: Book) {
         val existingBook = bookRepository.getObject(id)
-        println("imageSrc recibido: '${book.imageSrc}'")
-        println("imageSrc recibido: '${book.imageSrc}'")
-        println("timestamp recibido: '${book.timestamp}'")
         book.id = existingBook.id
         book.meetsCreationCriteria()
         bookRepository.update(book)
@@ -81,8 +74,6 @@ class BookService(
 
 
     fun getUser(id: Int): User {
-        println("usuarios en repo: ${userRepository.repositoryObjects().size}")
-        println("buscando usuario con id: $id")
         return userRepository.getObject(id)
     }
 
