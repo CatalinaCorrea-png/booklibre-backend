@@ -46,10 +46,6 @@ abstract class Book (
     // different for every type of book
     abstract fun typeBibliokarmas(userBibliokarmas: Int) : Int
 
-    override fun meetsSearchCriteria(criteria: String) : Boolean {
-        TODO()
-    }
-
     override fun meetsCreationCriteria() {
         if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
         if (!isNotEmpty(desc)) throw ConflictException("El libro tiene que tener descripcion")
@@ -58,5 +54,17 @@ abstract class Book (
         if (!isNotEmpty(isbn)) throw ConflictException("El libro tiene que tener ISBN")
         if (!isNotEmpty(editorial)) throw ConflictException("El libro tiene que tener editorial")
         if (!isNotEmpty(imageSrc)) throw ConflictException("El libro tiene que tener imagen de referencia")
+    }
+
+    override fun meetsSearchCriteria(criteria: String) : Boolean =
+        criteria.isBlank() ||
+                this.title.contains(criteria.trim(), ignoreCase = true)
+//              || this.author.name.contains(criteria.trim(), ignoreCase = true)
+
+    fun meetsPagesCriteria(pagesRangeMin: Int?, pagesRangeMax: Int?): Boolean {
+//        println("pagesRangeMin: $pagesRangeMin - pagesRangeMax: $pagesRangeMax")
+        val min = pagesRangeMin ?: 0
+        val max = pagesRangeMax ?: 1500 // Regla de negocio (Por ahora)
+        return this.numPages in min..max
     }
 }

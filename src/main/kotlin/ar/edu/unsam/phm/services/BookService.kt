@@ -8,6 +8,7 @@ import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import ar.edu.unsam.phm.repository.UserRepository
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -40,10 +41,10 @@ class BookService(
     }*/
 
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
-        val reservedBookIds = reservationRepository.findReservedBookIds(searchCriteria)
-        val page = bookRepository.findAllByCriteria(searchCriteria, reservedBookIds, pageable)
+        val reservedBookIds : Set<Int> = reservationRepository.findReservedBookIds(searchCriteria)
+        val page : Page<Book> = bookRepository.findAllByCriteria(searchCriteria, reservedBookIds, pageable)
 
-        val booksWithBibliokarmasDTO = getBooksBibliokarmasDTO(page.content, searchCriteria)
+        val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
 
         return PageResponse(
             content = booksWithBibliokarmasDTO,
