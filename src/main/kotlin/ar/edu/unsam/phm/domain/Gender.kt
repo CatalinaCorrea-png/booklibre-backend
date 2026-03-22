@@ -7,9 +7,4 @@ enum class Gender(val value: String) {
     SELF_HELP("Auto Ayuda"),
     DESIGN("Diseño"),
     CLASSIC_LITERATURE("Literatura Clasica");
-    companion object {
-        fun fromValue(value: String): Gender =
-            entries.find { it.value == value }
-                ?: throw IllegalArgumentException("Gender desconocido: $value")
-    }
 }

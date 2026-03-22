@@ -36,6 +36,11 @@ class BookController(
         bookService.updateBook(id, updatedBook)
     }
 
+    @DeleteMapping("/eliminar-libro/{id}")
+    fun deleteBook(@PathVariable id: Int) {
+        bookService.deleteBook(id)
+    }
+
     @GetMapping("/book-detail/{id}")
     fun getBookById(@PathVariable id: Int) =
         bookService.getBookById(id).toDTO()
