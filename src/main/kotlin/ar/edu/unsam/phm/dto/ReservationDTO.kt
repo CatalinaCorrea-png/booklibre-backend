@@ -4,16 +4,19 @@ import ar.edu.unsam.phm.domain.*
 import java.time.LocalDate
 import ar.edu.unsam.phm.domain.Reservation
 
-data class ReservationDTO (
+data class ReservationDTO(
     val book: BookDTO,
     var id: Int,
     var user: UserDTO,
     var review: ReviewDTO,
     var pickUpDate: LocalDate,
     var dropOffDate: LocalDate,
-    var state: String
+    var state: State,
+    var canRate: Boolean,
+    var bibliokarmas: Int,
+    var loanedBy: String,
+    var loanedTo: String,
 ) {
-
     fun fromDTO(): Reservation {
         return Reservation(
             user= this.user.fromDTO(),
@@ -21,23 +24,28 @@ data class ReservationDTO (
             review= this.review.fromDTO(),
             pickUpDate= this.pickUpDate,
             dropOffDate= this.dropOffDate,
-            state= State.valueOf(this.state),
         ).apply {
             id = this@ReservationDTO.id
         }
     }
-
 }
 
-fun Reservation.toDTO() : ReservationDTO {
+fun Reservation.toDTO(): ReservationDTO {
+    val currentState = this.state
+    val canRate = currentState == State.RETURNED && this.review.rating == 0
+
     return ReservationDTO(
-        book = this.book.toDTO(),
-        id = this.id,
-        user = this.user.toUserDTO(),
-        review =  this.review.toDTO(),
-        pickUpDate = this.pickUpDate,
+        book        = this.book.toDTO(),
+        id          = this.id,
+        user        = this.user.toUserDTO(),
+        review      = this.review.toDTO(),
+        pickUpDate  = this.pickUpDate,
         dropOffDate = this.dropOffDate,
-        state = this.state.value
+        state       = this.state,
+        canRate = this.state == State.RETURNED && this.review.rating == 0,
+        bibliokarmas = this.user.bibliokarmas,
+        loanedBy    = this.book.owner.name,
+        loanedTo    = this.user.name,
     )
 }
 

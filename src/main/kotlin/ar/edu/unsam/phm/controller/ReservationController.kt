@@ -2,6 +2,7 @@ package ar.edu.unsam.phm.controller
 
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.dto.CreateReservationDTO
+import ar.edu.unsam.phm.dto.ReservationDTO
 import ar.edu.unsam.phm.services.BookService
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
 import ar.edu.unsam.phm.dto.ReviewDTO
@@ -39,17 +40,17 @@ class ReservationController(
     }
     // ESTAS SON LAS RESERVAS QUE VOS HICISTE
     @GetMapping("/lector/{userId}")
-    fun getReservesByUserId(@PathVariable userId: Int, @RequestParam(defaultValue = "") search: String) =
-        reservationService.getReservesByUserId(userId, search)
+    fun getReservesByUserId(@PathVariable userId: Int, @RequestParam(defaultValue = "") search: String): List<ReservationDTO> =
+        reservationService.getReservesByUserId(userId, search).map { it.toDTO() }
 
     // ESTAS SON LAS RESERVAS QUE TE HICIERON A VOS
     @GetMapping("/owner/{userId}")
-    fun getLoansMadeByUserId(@PathVariable userId: Int, @RequestParam(defaultValue = "") search: String) =
-        reservationService.getLoansMadeByUserId(userId, search)
+    fun getLoansMadeByUserId(@PathVariable userId: Int, @RequestParam(defaultValue = "") search: String): List<ReservationDTO>  =
+        reservationService.getLoansMadeByUserId(userId, search).map { it.toDTO() }
 
     @PatchMapping("/{reservationId}/calificar")
-    fun rateLoan(@PathVariable reservationId: Int, @RequestBody body: ReviewDTO) {
-        reservationService.rateLoan(reservationId, body.rating, body.review)
+    fun rateLoan(@PathVariable reservationId: Int, @RequestBody body: ReviewDTO, @RequestParam userId: Int) {
+        reservationService.rateLoan(reservationId, body.rating, body.review, userId)
     }
 
     @GetMapping("/userOwnBooks/{userId}")

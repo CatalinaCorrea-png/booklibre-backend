@@ -502,7 +502,6 @@ object ApplicationBootstrap {
             review = "Kafkiano en el mejor sentido. La burocracia como pesadilla existencial, muy bien logrado.",
             timestamp = LocalDate.of(2025, 8, 10)),
         pickUpDate = LocalDate.of(2025, 7, 20), dropOffDate = LocalDate.of(2025, 8, 9),
-        state = State.RETURNED
     )
 
     val reservaEmiliaPasada2 = Reservation(
@@ -511,7 +510,6 @@ object ApplicationBootstrap {
             review = "Hemingway en su máxima expresión. El final me dejó sin palabras.",
             timestamp = LocalDate.of(2025, 10, 15)),
         pickUpDate = LocalDate.of(2025, 9, 25), dropOffDate = LocalDate.of(2025, 10, 14),
-        state = State.RETURNED
     )
 
     val reservaEmiliaPasada3 = Reservation(
@@ -520,7 +518,6 @@ object ApplicationBootstrap {
             review = "Una experiencia única. Lo leí en orden lineal y luego saltando capítulos, totalmente diferente.",
             timestamp = LocalDate.of(2026, 1, 20)),
         pickUpDate = LocalDate.of(2025, 12, 28), dropOffDate = LocalDate.of(2026, 1, 19),
-        state = State.RETURNED
     )
 
     val reservaLucianoPasada1 = Reservation(
@@ -529,7 +526,6 @@ object ApplicationBootstrap {
             review = "Bella prosa, pero el protagonista me resultó difícil de empatizar. Vale la pena igual.",
             timestamp = LocalDate.of(2025, 6, 5)),
         pickUpDate = LocalDate.of(2025, 5, 15), dropOffDate = LocalDate.of(2025, 6, 4),
-        state = State.RETURNED
     )
 
     val reservaLucianoPasada2 = Reservation(
@@ -538,7 +534,6 @@ object ApplicationBootstrap {
             review = "Dostoyevski entiende la psicología humana como nadie. Raskolnikov es aterrador y fascinante.",
             timestamp = LocalDate.of(2025, 9, 3)),
         pickUpDate = LocalDate.of(2025, 8, 12), dropOffDate = LocalDate.of(2025, 9, 2),
-        state = State.RETURNED
     )
 
     val reservaLucianoPasada3 = Reservation(
@@ -547,7 +542,6 @@ object ApplicationBootstrap {
             review = "Lo releí de adulto y sigue siendo mágico. Rowling construyó un mundo increíble.",
             timestamp = LocalDate.of(2026, 2, 1)),
         pickUpDate = LocalDate.of(2026, 1, 10), dropOffDate = LocalDate.of(2026, 1, 31),
-        state = State.RETURNED
     )
 
     val reservaValentinaPasada1 = Reservation(
@@ -556,7 +550,6 @@ object ApplicationBootstrap {
             review = "Una aventura atemporal. Twain critica la sociedad con humor fino.",
             timestamp = LocalDate.of(2025, 5, 20)),
         pickUpDate = LocalDate.of(2025, 4, 28), dropOffDate = LocalDate.of(2025, 5, 19),
-        state = State.RETURNED
     )
 
     val reservaValentinaPasada2 = Reservation(
@@ -565,7 +558,6 @@ object ApplicationBootstrap {
             review = "Imprescindible. Cada vez más vigente. Orwell era un visionario.",
             timestamp = LocalDate.of(2025, 11, 8)),
         pickUpDate = LocalDate.of(2025, 10, 18), dropOffDate = LocalDate.of(2025, 11, 7),
-        state = State.RETURNED
     )
 
     val reservaValentinaPasada3 = Reservation(
@@ -574,7 +566,6 @@ object ApplicationBootstrap {
             review = "Proust exige paciencia pero recompensa con una belleza literaria incomparable.",
             timestamp = LocalDate.of(2026, 1, 5)),
         pickUpDate = LocalDate.of(2025, 12, 10), dropOffDate = LocalDate.of(2026, 1, 4),
-        state = State.RETURNED
     )
 
     val reservaMateoPasada1 = Reservation(
@@ -583,7 +574,6 @@ object ApplicationBootstrap {
             review = "Monumental. Victor Hugo logra que te importen profundamente personajes de hace dos siglos.",
             timestamp = LocalDate.of(2025, 7, 14)),
         pickUpDate = LocalDate.of(2025, 6, 10), dropOffDate = LocalDate.of(2025, 7, 13),
-        state = State.RETURNED
     )
 
     val reservaMateoPasada2 = Reservation(
@@ -592,7 +582,6 @@ object ApplicationBootstrap {
             review = "Filosóficamente rico pero denso. Hay que entrar con paciencia y tiempo.",
             timestamp = LocalDate.of(2025, 10, 29)),
         pickUpDate = LocalDate.of(2025, 9, 20), dropOffDate = LocalDate.of(2025, 10, 28),
-        state = State.RETURNED
     )
 
     val reservaMateoPasada3 = Reservation(
@@ -601,7 +590,6 @@ object ApplicationBootstrap {
             review = "La mejor historia de venganza jamás escrita. No pude soltarlo.",
             timestamp = LocalDate.of(2026, 2, 15)),
         pickUpDate = LocalDate.of(2026, 1, 22), dropOffDate = LocalDate.of(2026, 2, 14),
-        state = State.RETURNED
     )
 
     val reservaElProceso2 = Reservation(
@@ -610,7 +598,6 @@ object ApplicationBootstrap {
             review = "Una obra que te deja paralizado. La burocracia como metáfora de la existencia.",
             timestamp = LocalDate.of(2025, 9, 12)),
         pickUpDate = LocalDate.of(2025, 8, 22), dropOffDate = LocalDate.of(2025, 9, 11),
-        state = State.RETURNED
     )
 
     val reservaElProceso3 = Reservation(
@@ -619,7 +606,6 @@ object ApplicationBootstrap {
             review = "Kafka logra que te sientas atrapado junto al protagonista. Incómodo pero brillante.",
             timestamp = LocalDate.of(2025, 11, 30)),
         pickUpDate = LocalDate.of(2025, 11, 10), dropOffDate = LocalDate.of(2025, 11, 29),
-        state = State.RETURNED
     )
 
     val reservaAdiosArmas2 = Reservation(
@@ -628,7 +614,6 @@ object ApplicationBootstrap {
             review = "La guerra contada sin heroísmo, con una honestidad brutal. Hemingway no decepciona.",
             timestamp = LocalDate.of(2025, 7, 8)),
         pickUpDate = LocalDate.of(2025, 6, 18), dropOffDate = LocalDate.of(2025, 7, 7),
-        state = State.RETURNED
     )
 
     val reservaAdiosArmas3 = Reservation(
@@ -637,7 +622,6 @@ object ApplicationBootstrap {
             review = "Buena prosa, aunque el ritmo se me hizo lento en el medio. El final salva todo.",
             timestamp = LocalDate.of(2026, 1, 14)),
         pickUpDate = LocalDate.of(2025, 12, 25), dropOffDate = LocalDate.of(2026, 1, 13),
-        state = State.RETURNED
     )
 
     val reservaRayuela2 = Reservation(
@@ -646,7 +630,6 @@ object ApplicationBootstrap {
             review = "Cortázar rompe todo y lo reconstruye mejor. Exige concentración pero vale cada página.",
             timestamp = LocalDate.of(2025, 8, 28)),
         pickUpDate = LocalDate.of(2025, 8, 8), dropOffDate = LocalDate.of(2025, 8, 27),
-        state = State.RETURNED
     )
 
     val reservaRayuela3 = Reservation(
@@ -655,7 +638,6 @@ object ApplicationBootstrap {
             review = "La mejor novela latinoamericana que leí. La estructura no lineal es un viaje mental.",
             timestamp = LocalDate.of(2026, 2, 20)),
         pickUpDate = LocalDate.of(2026, 1, 30), dropOffDate = LocalDate.of(2026, 2, 19),
-        state = State.RETURNED
     )
 
     val reservaGranGatsby2 = Reservation(
@@ -664,7 +646,6 @@ object ApplicationBootstrap {
             review = "El sueño americano desnudo. Fitzgerald escribe con una elegancia que duele.",
             timestamp = LocalDate.of(2025, 7, 2)),
         pickUpDate = LocalDate.of(2025, 6, 12), dropOffDate = LocalDate.of(2025, 7, 1),
-        state = State.RETURNED
     )
 
     val reservaGranGatsby3 = Reservation(
@@ -673,7 +654,6 @@ object ApplicationBootstrap {
             review = "Corto e intenso. La fiesta como fachada del vacío, muy bien retratado.",
             timestamp = LocalDate.of(2025, 10, 5)),
         pickUpDate = LocalDate.of(2025, 9, 15), dropOffDate = LocalDate.of(2025, 10, 4),
-        state = State.RETURNED
     )
 
     val reservaCrimen2 = Reservation(
@@ -682,7 +662,6 @@ object ApplicationBootstrap {
             review = "La culpa narrada desde adentro. Dostoyevski te mete en la cabeza de Raskolnikov sin escapatoria.",
             timestamp = LocalDate.of(2025, 6, 20)),
         pickUpDate = LocalDate.of(2025, 5, 30), dropOffDate = LocalDate.of(2025, 6, 19),
-        state = State.RETURNED
     )
 
     val reservaCrimen3 = Reservation(
@@ -691,7 +670,6 @@ object ApplicationBootstrap {
             review = "Denso pero absorbente. El juicio final es magistral.",
             timestamp = LocalDate.of(2025, 12, 10)),
         pickUpDate = LocalDate.of(2025, 11, 20), dropOffDate = LocalDate.of(2025, 12, 9),
-        state = State.RETURNED
     )
 
     val reservaHarryPotter2 = Reservation(
@@ -700,7 +678,6 @@ object ApplicationBootstrap {
             review = "Un clásico moderno. La magia de Hogwarts no envejece nunca.",
             timestamp = LocalDate.of(2025, 5, 10)),
         pickUpDate = LocalDate.of(2025, 4, 20), dropOffDate = LocalDate.of(2025, 5, 9),
-        state = State.RETURNED
     )
 
     val reservaHarryPotter3 = Reservation(
@@ -709,7 +686,7 @@ object ApplicationBootstrap {
             review = "Lo leí por primera vez de adulta y entendí por qué marcó a toda una generación.",
             timestamp = LocalDate.of(2025, 8, 5)),
         pickUpDate = LocalDate.of(2025, 7, 16), dropOffDate = LocalDate.of(2025, 8, 4),
-        state = State.RETURNED
+
     )
 
     val reservaHuckFinn2 = Reservation(
@@ -718,7 +695,7 @@ object ApplicationBootstrap {
             review = "Twain disfraza la crítica social de aventura infantil con una habilidad increíble.",
             timestamp = LocalDate.of(2025, 9, 22)),
         pickUpDate = LocalDate.of(2025, 9, 2), dropOffDate = LocalDate.of(2025, 9, 21),
-        state = State.RETURNED
+
     )
 
     val reservaHuckFinn3 = Reservation(
@@ -727,7 +704,7 @@ object ApplicationBootstrap {
             review = "Entretenido, aunque algunos pasajes se sienten datados. El vínculo Huck-Jim es lo mejor.",
             timestamp = LocalDate.of(2026, 1, 28)),
         pickUpDate = LocalDate.of(2026, 1, 8), dropOffDate = LocalDate.of(2026, 1, 27),
-        state = State.RETURNED
+
     )
 
     val reservaN19842 = Reservation(
@@ -736,7 +713,7 @@ object ApplicationBootstrap {
             review = "Perturbador y necesario. Lo releí y cada vez me parece más actual.",
             timestamp = LocalDate.of(2025, 6, 30)),
         pickUpDate = LocalDate.of(2025, 6, 10), dropOffDate = LocalDate.of(2025, 6, 29),
-        state = State.RETURNED
+
     )
 
     val reservaN19843 = Reservation(
@@ -745,7 +722,7 @@ object ApplicationBootstrap {
             review = "El Gran Hermano ya existe. Orwell lo supo antes que todos.",
             timestamp = LocalDate.of(2025, 12, 22)),
         pickUpDate = LocalDate.of(2025, 12, 2), dropOffDate = LocalDate.of(2025, 12, 21),
-        state = State.RETURNED
+
     )
 
     val reservaLosMiserables2 = Reservation(
@@ -754,7 +731,7 @@ object ApplicationBootstrap {
             review = "Jean Valjean es uno de los personajes más conmovedores de la literatura universal.",
             timestamp = LocalDate.of(2025, 8, 18)),
         pickUpDate = LocalDate.of(2025, 7, 28), dropOffDate = LocalDate.of(2025, 8, 17),
-        state = State.RETURNED
+
     )
 
     val reservaLosMiserables3 = Reservation(
@@ -763,7 +740,7 @@ object ApplicationBootstrap {
             review = "Largo pero cada página tiene peso. Hugo no desperdicia ni un capítulo.",
             timestamp = LocalDate.of(2026, 2, 10)),
         pickUpDate = LocalDate.of(2026, 1, 20), dropOffDate = LocalDate.of(2026, 2, 9),
-        state = State.RETURNED
+
     )
 
     val reservaMontagnaMagica2 = Reservation(
@@ -772,8 +749,7 @@ object ApplicationBootstrap {
             review = "Mann logra que el tiempo del sanatorio se sienta tan eterno como para el protagonista.",
             timestamp = LocalDate.of(2025, 11, 15)),
         pickUpDate = LocalDate.of(2025, 10, 25), dropOffDate = LocalDate.of(2025, 11, 14),
-        state = State.RETURNED
-    )
+            )
 
     val reservaMontagnaMagica3 = Reservation(
         user = valentinaSosa, book = montagnaMagica,
@@ -781,7 +757,7 @@ object ApplicationBootstrap {
             review = "Muy filosófica, quizás demasiado. Los diálogos entre Naphta y Settembrini son brillantes.",
             timestamp = LocalDate.of(2026, 1, 10)),
         pickUpDate = LocalDate.of(2025, 12, 20), dropOffDate = LocalDate.of(2026, 1, 9),
-        state = State.RETURNED
+
     )
 
     val reservaMonteCristo2 = Reservation(
@@ -790,7 +766,7 @@ object ApplicationBootstrap {
             review = "Imposible soltar. La venganza de Dantès es satisfactoria en cada nivel.",
             timestamp = LocalDate.of(2025, 7, 25)),
         pickUpDate = LocalDate.of(2025, 7, 5), dropOffDate = LocalDate.of(2025, 7, 24),
-        state = State.RETURNED
+
     )
 
     val reservaMonteCristo3 = Reservation(
@@ -799,7 +775,15 @@ object ApplicationBootstrap {
             review = "Dumas teje una trama perfecta. Cada detalle de los primeros capítulos vuelve al final.",
             timestamp = LocalDate.of(2025, 10, 18)),
         pickUpDate = LocalDate.of(2025, 9, 28), dropOffDate = LocalDate.of(2025, 10, 17),
-        state = State.RETURNED
+
+    )
+
+    val reservaSinCalificar = Reservation(
+        user = emiliaRomero,
+        book = elProceso,
+        review = Review(), // sin rating
+        pickUpDate = LocalDate.of(2026, 1, 1),
+        dropOffDate = LocalDate.of(2026, 2, 1),
     )
 
 // ─── Reservas activas/futuras ─────────────────────────────────────────────
@@ -808,56 +792,56 @@ object ApplicationBootstrap {
         user = emiliaRomero, book = jardinCerezos,
         review = Review(),
         pickUpDate = LocalDate.of(2026, 3, 15), dropOffDate = LocalDate.of(2026, 3, 29),
-        state = State.BORROWED
+
     )
 
     val reservaEmilia2 = Reservation(
         user = emiliaRomero, book = ficciones,
         review = Review(),
         pickUpDate = LocalDate.of(2026, 4, 1), dropOffDate = LocalDate.of(2026, 4, 14),
-        state = State.AVAILABLE
+
     )
 
     val reservaLuciano1 = Reservation(
         user = lucianoVega, book = fundacion,
         review = Review(),
         pickUpDate = LocalDate.of(2026, 3, 20), dropOffDate = LocalDate.of(2026, 4, 3),
-        state = State.BORROWED
+
     )
 
     val reservaLuciano2 = Reservation(
         user = lucianoVega, book = vueltaMundo,
         review = Review(),
         pickUpDate = LocalDate.of(2026, 4, 5), dropOffDate = LocalDate.of(2026, 4, 19),
-        state = State.AVAILABLE
+
     )
 
     val reservaValentina1 = Reservation(
         user = valentinaSosa, book = cienAnios,
         review = Review(),
         pickUpDate = LocalDate.of(2026, 3, 10), dropOffDate = LocalDate.of(2026, 3, 24),
-        state = State.BORROWED
+
     )
 
     val reservaValentina2 = Reservation(
         user = valentinaSosa, book = guerraPaz,
         review = Review(),
         pickUpDate = LocalDate.of(2026, 4, 2), dropOffDate = LocalDate.of(2026, 4, 16),
-        state = State.AVAILABLE
+
     )
 
     val reservaMateo1 = Reservation(
         user = mateoLopez, book = cuentosMisterio,
         review = Review(),
         pickUpDate = LocalDate.of(2026, 3, 18), dropOffDate = LocalDate.of(2026, 4, 1),
-        state = State.BORROWED
+
     )
 
     val reservaMateo2 = Reservation(
         user = mateoLopez, book = senoraDalloway,
         review = Review(),
         pickUpDate = LocalDate.of(2026, 4, 7), dropOffDate = LocalDate.of(2026, 4, 21),
-        state = State.AVAILABLE
+
     )
 
     // ─── Función de inicialización ────────────────────────────────────────────
@@ -894,7 +878,7 @@ object ApplicationBootstrap {
             reservaN19842, reservaN19843,
             reservaLosMiserables2, reservaLosMiserables3,
             reservaMontagnaMagica2, reservaMontagnaMagica3,
-            reservaMonteCristo2, reservaMonteCristo3,
+            reservaMonteCristo2, reservaMonteCristo3, reservaSinCalificar,
         ).forEach { reservationRepository.create(it) }
 
         listOf(
