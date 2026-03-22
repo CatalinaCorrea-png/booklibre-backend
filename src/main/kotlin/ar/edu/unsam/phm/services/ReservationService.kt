@@ -3,8 +3,10 @@ package ar.edu.unsam.phm.services
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
-import ar.edu.unsam.phm.domain.State
+import ar.edu.unsam.phm.dto.PagedResult
+import ar.edu.unsam.phm.dto.ReservationDTO
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
+import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
@@ -40,18 +42,29 @@ class ReservationService(
         return reservationRepository.repositoryObjects().filter { it.dateOverlaps(reservation) }.toMutableList()
     }
 
-    fun getReservesByUserId(userId: Int, search: String): List<Reservation> {
-        return reservationRepository.findByLectorId(userId).filter { res ->
+    fun getReservesByUserId(userId: Int, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
+        val filtered = reservationRepository.findByLectorId(userId).filter { res ->
             res.book.title.contains(search, ignoreCase = true) ||
                     res.book.author.name.contains(search, ignoreCase = true)
-        }
+        }.map { it.toDTO()}
+        return PagedResult(
+            items = filtered.drop(page * pageSize).take(pageSize),
+            total = filtered.size,
+            totalPages = Math.ceil(filtered.size.toDouble() / pageSize).toInt()
+        )
     }
 
-    fun getLoansMadeByUserId(userId: Int, search: String): List<Reservation> {
-        return reservationRepository.findByOwnerId(userId).filter { res ->
+    fun getLoansMadeByUserId(userId: Int, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
+        val filtered = reservationRepository.findByOwnerId(userId).filter { res ->
             res.book.title.contains(search, ignoreCase = true) ||
                     res.book.author.name.contains(search, ignoreCase = true)
-        }
+        }.map { it.toDTO()}
+
+        return PagedResult(
+            items = filtered.drop(page * pageSize).take(pageSize),
+            total = filtered.size,
+            totalPages = Math.ceil(filtered.size.toDouble() / pageSize).toInt()
+        )
     }
 
     fun rateLoan(reservationId: Int, puntuacion: Int, comentario: String, userId: Int) {

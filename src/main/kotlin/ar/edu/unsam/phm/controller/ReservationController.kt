@@ -2,6 +2,7 @@ package ar.edu.unsam.phm.controller
 
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.dto.CreateReservationDTO
+import ar.edu.unsam.phm.dto.PagedResult
 import ar.edu.unsam.phm.dto.ReservationDTO
 import ar.edu.unsam.phm.services.BookService
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
@@ -40,13 +41,21 @@ class ReservationController(
     }
     // ESTAS SON LAS RESERVAS QUE VOS HICISTE
     @GetMapping("/lector/{userId}")
-    fun getReservesByUserId(@PathVariable userId: Int, @RequestParam(defaultValue = "") search: String): List<ReservationDTO> =
-        reservationService.getReservesByUserId(userId, search).map { it.toDTO() }
+    fun getReservesByUserId(
+        @PathVariable userId: Int,
+        @RequestParam(defaultValue = "") search: String,
+        @RequestParam page: Int,
+        @RequestParam pageSize: Int): PagedResult<ReservationDTO> =
+        reservationService.getReservesByUserId(userId, search, page, pageSize)
 
     // ESTAS SON LAS RESERVAS QUE TE HICIERON A VOS
     @GetMapping("/owner/{userId}")
-    fun getLoansMadeByUserId(@PathVariable userId: Int, @RequestParam(defaultValue = "") search: String): List<ReservationDTO>  =
-        reservationService.getLoansMadeByUserId(userId, search).map { it.toDTO() }
+    fun getLoansMadeByUserId(
+        @PathVariable userId: Int,
+        @RequestParam(defaultValue = "") search: String,
+        @RequestParam page: Int,
+        @RequestParam pageSize: Int): PagedResult<ReservationDTO>  =
+        reservationService.getLoansMadeByUserId(userId, search, page, pageSize)
 
     @PatchMapping("/{reservationId}/calificar")
     fun rateLoan(@PathVariable reservationId: Int, @RequestBody body: ReviewDTO, @RequestParam userId: Int) {
