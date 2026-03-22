@@ -1,6 +1,8 @@
 package ar.edu.unsam.phm.controller
 
+import ar.edu.unsam.phm.domain.FilterCriteria
 import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.SortCriteria
 import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.dto.PagedResult
 import ar.edu.unsam.phm.dto.ReservationDTO
@@ -63,7 +65,11 @@ class ReservationController(
     }
 
     @GetMapping("/userOwnBooks/{userId}")
-    fun getUserOwnBooks(@PathVariable userId: Int, @RequestParam filterCriteria: String, @RequestParam sortCriteria: String): List<ReservationProfileDTO> {
+    fun getUserOwnBooks(
+        @PathVariable userId: Int,
+        @RequestParam(defaultValue = "ALL") filterCriteria: FilterCriteria,
+        @RequestParam(defaultValue = "DATE_DESC") sortCriteria: SortCriteria
+    ): List<ReservationProfileDTO> {
         val userOwnBooks: List<Reservation> = reservationService.getUserOwnBooks(userId)
         val userOwnBooksDTOs: List<ReservationProfileDTO> = userOwnBooks.map { it.toReservationProfileDTO() }
         val filteredAndSortedBooks: List<ReservationProfileDTO> = reservationService.filterAndSortUserBooks(userOwnBooksDTOs, filterCriteria, sortCriteria)
