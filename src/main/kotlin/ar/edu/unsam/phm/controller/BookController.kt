@@ -37,8 +37,6 @@ class BookController(
 
     @PostMapping("/crear-libro")
     fun createBook(@RequestBody bookCreateDTO: BookCreateDTO) {
-        println("ownerId recibido: ${bookCreateDTO.ownerId}")
-        println("DTO recibido: $bookCreateDTO")
         val owner = bookService.getUser(bookCreateDTO.ownerId)
         val newBook = bookCreateDTO.createFromDTO(owner)
         bookService.createBook(newBook)
@@ -49,6 +47,11 @@ class BookController(
         val owner = bookService.getUser(bookCreateDTO.ownerId)
         val updatedBook = bookCreateDTO.createFromDTO(owner)
         bookService.updateBook(id, updatedBook)
+    }
+
+    @DeleteMapping("/eliminar-libro/{id}")
+    fun deleteBook(@PathVariable id: Int) {
+        bookService.deleteBook(id)
     }
 
     @GetMapping("/book-detail/{id}")

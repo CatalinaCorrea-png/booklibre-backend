@@ -4,6 +4,7 @@ import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.BookDTO
 import ar.edu.unsam.phm.dto.PageResponse
 import ar.edu.unsam.phm.dto.toDTO
+import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
@@ -22,9 +23,7 @@ class BookService(
     private val userRepository: UserRepository,
 ) {
     fun createBook(book: Book){
-        println("llamando meetsCreationCriteria")
         book.meetsCreationCriteria()
-        println("pasó meetsCreationCriteria")
         bookRepository.create(book)
     }
 
@@ -33,6 +32,19 @@ class BookService(
         book.id = existingBook.id
         book.meetsCreationCriteria()
         bookRepository.update(book)
+    }
+
+    fun deleteBook(id: Int) {
+        println("Buscando reservas para libro ID: $id")
+        val activeReservations = reservationRepository.collection
+            .filter { println("Reserva: book.id=${it.book.id} state=${it.state}")
+                it.book.id == id && it.state != State.RETURNED }
+
+        if (activeReservations.isNotEmpty()) {
+            throw ConflictException("No se puede eliminar un libro con reservas activas")
+        }
+
+        bookRepository.delete(id)
     }
 
     /*
@@ -67,12 +79,9 @@ class BookService(
     }
 
     fun getUser(id: Int): User {
-        println("usuarios en repo: ${userRepository.repositoryObjects().size}")
-        println("buscando usuario con id: $id")
         return userRepository.getObject(id)
     }
 
     fun getBookById(id: Int): Book =
-        bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")
+        bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")}
 
-}

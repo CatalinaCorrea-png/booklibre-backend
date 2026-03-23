@@ -5,7 +5,7 @@ import ar.edu.unsam.phm.errors.NotFoundException
 
 open class Repository <Type: RepositoryElement> {
     private var idCounter: Int = 1
-    private val collection: MutableList<Type> = mutableListOf()
+    val collection: MutableList<Type> = mutableListOf()
 
     private fun getIDs(): List<Int> = collection.map { it.id }
 
@@ -50,6 +50,10 @@ open class Repository <Type: RepositoryElement> {
             throw NotFoundException("No existe el id: $id en el repositorio")
         }
         return this.findObject(id)
+    }
+
+    fun delete(id: Int): Unit {
+        this.collection.remove(this.getObject(id))
     }
 
     fun search(criteria: String): List<Type> = collection.filter { item -> item.meetsSearchCriteria(criteria) }

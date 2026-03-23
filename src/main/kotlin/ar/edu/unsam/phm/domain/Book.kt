@@ -67,4 +67,5 @@ abstract class Book (
         val max = pagesRangeMax ?: 1500 // Regla de negocio (Por ahora)
         return this.numPages in min..max
     }
+
 }

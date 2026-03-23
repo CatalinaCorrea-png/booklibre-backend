@@ -497,229 +497,100 @@ object ApplicationBootstrap {
     // ─── Reservas pasadas (finalizadas — libros leídos) ───────────────────────
 
     val reservaEmiliaPasada1 = Reservation(
-        user = emiliaRomero,
-        book = elProceso,
-        review = Review(
-            reviewerName = emiliaRomero.name,
-            rating = 4,
+        user = emiliaRomero, book = elProceso,
+        review = Review(reviewerName = emiliaRomero.name, rating = 4,
             review = "Kafkiano en el mejor sentido. La burocracia como pesadilla existencial, muy bien logrado.",
-            timestamp = LocalDate.of(2025, 8, 10)
-        ),
-        pickUpDate = LocalDate.of(2025, 7, 20),
-        dropOffDate = LocalDate.of(2025, 8, 9),
+            timestamp = LocalDate.of(2025, 8, 10)),
+        pickUpDate = LocalDate.of(2025, 7, 20), dropOffDate = LocalDate.of(2025, 8, 9),
     )
 
     val reservaEmiliaPasada2 = Reservation(
-        user = emiliaRomero,
-        book = adiosArmas,
-        review = Review(
-            reviewerName = emiliaRomero.name,
-            rating = 5,
+        user = emiliaRomero, book = adiosArmas,
+        review = Review(reviewerName = emiliaRomero.name, rating = 5,
             review = "Hemingway en su máxima expresión. El final me dejó sin palabras.",
-            timestamp = LocalDate.of(2025, 10, 15)
-        ),
-        pickUpDate = LocalDate.of(2025, 9, 25),
-        dropOffDate = LocalDate.of(2025, 10, 14),
+            timestamp = LocalDate.of(2025, 10, 15)),
+        pickUpDate = LocalDate.of(2025, 9, 25), dropOffDate = LocalDate.of(2025, 10, 14),
     )
 
     val reservaEmiliaPasada3 = Reservation(
-        user = emiliaRomero,
-        book = rayuela,
-        review = Review(
-            reviewerName = emiliaRomero.name,
-            rating = 5,
+        user = emiliaRomero, book = rayuela,
+        review = Review(reviewerName = emiliaRomero.name, rating = 5,
             review = "Una experiencia única. Lo leí en orden lineal y luego saltando capítulos, totalmente diferente.",
-            timestamp = LocalDate.of(2026, 1, 20)
-        ),
-        pickUpDate = LocalDate.of(2025, 12, 28),
-        dropOffDate = LocalDate.of(2026, 1, 19),
+            timestamp = LocalDate.of(2026, 1, 20)),
+        pickUpDate = LocalDate.of(2025, 12, 28), dropOffDate = LocalDate.of(2026, 1, 19),
     )
 
     val reservaLucianoPasada1 = Reservation(
-        user = lucianoVega,
-        book = granGatsby,
-        review = Review(
-            reviewerName = lucianoVega.name,
-            rating = 3,
+        user = lucianoVega, book = granGatsby,
+        review = Review(reviewerName = lucianoVega.name, rating = 3,
             review = "Bella prosa, pero el protagonista me resultó difícil de empatizar. Vale la pena igual.",
-            timestamp = LocalDate.of(2025, 6, 5)
-        ),
-        pickUpDate = LocalDate.of(2025, 5, 15),
-        dropOffDate = LocalDate.of(2025, 6, 4),
+            timestamp = LocalDate.of(2025, 6, 5)),
+        pickUpDate = LocalDate.of(2025, 5, 15), dropOffDate = LocalDate.of(2025, 6, 4),
     )
 
     val reservaLucianoPasada2 = Reservation(
-        user = lucianoVega,
-        book = crimen,
-        review = Review(
-            reviewerName = lucianoVega.name,
-            rating = 5,
+        user = lucianoVega, book = crimen,
+        review = Review(reviewerName = lucianoVega.name, rating = 5,
             review = "Dostoyevski entiende la psicología humana como nadie. Raskolnikov es aterrador y fascinante.",
-            timestamp = LocalDate.of(2025, 9, 3)
-        ),
-        pickUpDate = LocalDate.of(2025, 8, 12),
-        dropOffDate = LocalDate.of(2025, 9, 2),
+            timestamp = LocalDate.of(2025, 9, 3)),
+        pickUpDate = LocalDate.of(2025, 8, 12), dropOffDate = LocalDate.of(2025, 9, 2),
     )
 
     val reservaLucianoPasada3 = Reservation(
-        user = lucianoVega,
-        book = harryPotter,
-        review = Review(
-            reviewerName = lucianoVega.name,
-            rating = 4,
+        user = lucianoVega, book = harryPotter,
+        review = Review(reviewerName = lucianoVega.name, rating = 4,
             review = "Lo releí de adulto y sigue siendo mágico. Rowling construyó un mundo increíble.",
-            timestamp = LocalDate.of(2026, 2, 1)
-        ),
-        pickUpDate = LocalDate.of(2026, 1, 10),
-        dropOffDate = LocalDate.of(2026, 1, 31),
+            timestamp = LocalDate.of(2026, 2, 1)),
+        pickUpDate = LocalDate.of(2026, 1, 10), dropOffDate = LocalDate.of(2026, 1, 31),
     )
 
     val reservaValentinaPasada1 = Reservation(
-        user = valentinaSosa,
-        book = huckFinn,
-        review = Review(
-            reviewerName = valentinaSosa.name,
-            rating = 4,
+        user = valentinaSosa, book = huckFinn,
+        review = Review(reviewerName = valentinaSosa.name, rating = 4,
             review = "Una aventura atemporal. Twain critica la sociedad con humor fino.",
-            timestamp = LocalDate.of(2025, 5, 20)
-        ),
-        pickUpDate = LocalDate.of(2025, 4, 28),
-        dropOffDate = LocalDate.of(2025, 5, 19),
+            timestamp = LocalDate.of(2025, 5, 20)),
+        pickUpDate = LocalDate.of(2025, 4, 28), dropOffDate = LocalDate.of(2025, 5, 19),
     )
 
     val reservaValentinaPasada2 = Reservation(
-        user = valentinaSosa,
-        book = n1984,
-        review = Review(
-            reviewerName = valentinaSosa.name,
-            rating = 5,
+        user = valentinaSosa, book = n1984,
+        review = Review(reviewerName = valentinaSosa.name, rating = 5,
             review = "Imprescindible. Cada vez más vigente. Orwell era un visionario.",
-            timestamp = LocalDate.of(2025, 11, 8)
-        ),
-        pickUpDate = LocalDate.of(2025, 10, 18),
-        dropOffDate = LocalDate.of(2025, 11, 7),
+            timestamp = LocalDate.of(2025, 11, 8)),
+        pickUpDate = LocalDate.of(2025, 10, 18), dropOffDate = LocalDate.of(2025, 11, 7),
     )
 
     val reservaValentinaPasada3 = Reservation(
-        user = valentinaSosa,
-        book = caminoSwann,
-        review = Review(
-            reviewerName = valentinaSosa.name,
-            rating = 4,
+        user = valentinaSosa, book = caminoSwann,
+        review = Review(reviewerName = valentinaSosa.name, rating = 4,
             review = "Proust exige paciencia pero recompensa con una belleza literaria incomparable.",
-            timestamp = LocalDate.of(2026, 1, 5)
-        ),
-        pickUpDate = LocalDate.of(2025, 12, 10),
-        dropOffDate = LocalDate.of(2026, 1, 4),
+            timestamp = LocalDate.of(2026, 1, 5)),
+        pickUpDate = LocalDate.of(2025, 12, 10), dropOffDate = LocalDate.of(2026, 1, 4),
     )
 
-    // Mateo leyó: losMiserables (luciano), montagnaMagica (emilia), monteCristo (valentina)
     val reservaMateoPasada1 = Reservation(
-        user = mateoLopez,
-        book = losMiserables,
-        review = Review(
-            reviewerName = mateoLopez.name,
-            rating = 5,
+        user = mateoLopez, book = losMiserables,
+        review = Review(reviewerName = mateoLopez.name, rating = 5,
             review = "Monumental. Victor Hugo logra que te importen profundamente personajes de hace dos siglos.",
-            timestamp = LocalDate.of(2025, 7, 14)
-        ),
-        pickUpDate = LocalDate.of(2025, 6, 10),
-        dropOffDate = LocalDate.of(2025, 7, 13),
+            timestamp = LocalDate.of(2025, 7, 14)),
+        pickUpDate = LocalDate.of(2025, 6, 10), dropOffDate = LocalDate.of(2025, 7, 13),
     )
 
     val reservaMateoPasada2 = Reservation(
-        user = mateoLopez,
-        book = montagnaMagica,
-        review = Review(
-            reviewerName = mateoLopez.name,
-            rating = 3,
+        user = mateoLopez, book = montagnaMagica,
+        review = Review(reviewerName = mateoLopez.name, rating = 3,
             review = "Filosóficamente rico pero denso. Hay que entrar con paciencia y tiempo.",
-            timestamp = LocalDate.of(2025, 10, 29)
-        ),
-        pickUpDate = LocalDate.of(2025, 9, 20),
-        dropOffDate = LocalDate.of(2025, 10, 28),
+            timestamp = LocalDate.of(2025, 10, 29)),
+        pickUpDate = LocalDate.of(2025, 9, 20), dropOffDate = LocalDate.of(2025, 10, 28),
     )
 
     val reservaMateoPasada3 = Reservation(
-        user = mateoLopez,
-        book = monteCristo,
-        review = Review(
-            reviewerName = mateoLopez.name,
-            rating = 5,
+        user = mateoLopez, book = monteCristo,
+        review = Review(reviewerName = mateoLopez.name, rating = 5,
             review = "La mejor historia de venganza jamás escrita. No pude soltarlo.",
-            timestamp = LocalDate.of(2026, 2, 15)
-        ),
-        pickUpDate = LocalDate.of(2026, 1, 22),
-        dropOffDate = LocalDate.of(2026, 2, 14),
+            timestamp = LocalDate.of(2026, 2, 15)),
+        pickUpDate = LocalDate.of(2026, 1, 22), dropOffDate = LocalDate.of(2026, 2, 14),
     )
-
-    // ─── Reservas activas/futuras ─────────────────────────────────────────────
-
-    val reservaEmilia1 = Reservation(
-        user = emiliaRomero,
-        book = jardinCerezos,
-        review = Review(),
-        pickUpDate = LocalDate.of(2026, 3, 15),
-        dropOffDate = LocalDate.of(2026, 3, 29),
-    )
-
-    val reservaEmilia2 = Reservation(
-        user = emiliaRomero,
-        book = ficciones,
-        review = Review(),
-        pickUpDate = LocalDate.of(2026, 4, 1),
-        dropOffDate = LocalDate.of(2026, 4, 14),
-    )
-
-    val reservaLuciano1 = Reservation(
-        user = lucianoVega,
-        book = fundacion,
-        review = Review(),
-        pickUpDate = LocalDate.of(2026, 3, 20),
-        dropOffDate = LocalDate.of(2026, 4, 3),
-    )
-
-    val reservaLuciano2 = Reservation(
-        user = lucianoVega,
-        book = vueltaMundo,
-        review = Review(),
-        pickUpDate = LocalDate.of(2026, 4, 5),
-        dropOffDate = LocalDate.of(2026, 4, 19),
-    )
-
-    val reservaValentina1 = Reservation(
-        user = valentinaSosa,
-        book = cienAnios,
-        review = Review(),
-        pickUpDate = LocalDate.of(2026, 3, 10),
-        dropOffDate = LocalDate.of(2026, 3, 24),
-    )
-
-    val reservaValentina2 = Reservation(
-        user = valentinaSosa,
-        book = guerraPaz,
-        review = Review(),
-        pickUpDate = LocalDate.of(2026, 4, 2),
-        dropOffDate = LocalDate.of(2026, 4, 16),
-    )
-
-    val reservaMateo1 = Reservation(
-        user = mateoLopez,
-        book = cuentosMisterio,
-        review = Review(),
-        pickUpDate = LocalDate.of(2026, 3, 18),
-        dropOffDate = LocalDate.of(2026, 4, 1),
-    )
-
-    val reservaMateo2 = Reservation(
-        user = mateoLopez,
-        book = senoraDalloway,
-        review = Review(),
-        pickUpDate = LocalDate.of(2026, 4, 7),
-        dropOffDate = LocalDate.of(2026, 4, 21),
-    )
-
-    // ─── Reservas pasadas adicionales (más reviews por libro) ────────────────────
 
     val reservaElProceso2 = Reservation(
         user = valentinaSosa, book = elProceso,
@@ -728,6 +599,7 @@ object ApplicationBootstrap {
             timestamp = LocalDate.of(2025, 9, 12)),
         pickUpDate = LocalDate.of(2025, 8, 22), dropOffDate = LocalDate.of(2025, 9, 11),
     )
+
     val reservaElProceso3 = Reservation(
         user = mateoLopez, book = elProceso,
         review = Review(reviewerName = mateoLopez.name, rating = 4,
@@ -743,6 +615,7 @@ object ApplicationBootstrap {
             timestamp = LocalDate.of(2025, 7, 8)),
         pickUpDate = LocalDate.of(2025, 6, 18), dropOffDate = LocalDate.of(2025, 7, 7),
     )
+
     val reservaAdiosArmas3 = Reservation(
         user = mateoLopez, book = adiosArmas,
         review = Review(reviewerName = mateoLopez.name, rating = 3,
@@ -758,6 +631,7 @@ object ApplicationBootstrap {
             timestamp = LocalDate.of(2025, 8, 28)),
         pickUpDate = LocalDate.of(2025, 8, 8), dropOffDate = LocalDate.of(2025, 8, 27),
     )
+
     val reservaRayuela3 = Reservation(
         user = mateoLopez, book = rayuela,
         review = Review(reviewerName = mateoLopez.name, rating = 5,
@@ -773,6 +647,7 @@ object ApplicationBootstrap {
             timestamp = LocalDate.of(2025, 7, 2)),
         pickUpDate = LocalDate.of(2025, 6, 12), dropOffDate = LocalDate.of(2025, 7, 1),
     )
+
     val reservaGranGatsby3 = Reservation(
         user = mateoLopez, book = granGatsby,
         review = Review(reviewerName = mateoLopez.name, rating = 4,
@@ -788,6 +663,7 @@ object ApplicationBootstrap {
             timestamp = LocalDate.of(2025, 6, 20)),
         pickUpDate = LocalDate.of(2025, 5, 30), dropOffDate = LocalDate.of(2025, 6, 19),
     )
+
     val reservaCrimen3 = Reservation(
         user = mateoLopez, book = crimen,
         review = Review(reviewerName = mateoLopez.name, rating = 4,
@@ -803,12 +679,14 @@ object ApplicationBootstrap {
             timestamp = LocalDate.of(2025, 5, 10)),
         pickUpDate = LocalDate.of(2025, 4, 20), dropOffDate = LocalDate.of(2025, 5, 9),
     )
+
     val reservaHarryPotter3 = Reservation(
         user = valentinaSosa, book = harryPotter,
         review = Review(reviewerName = valentinaSosa.name, rating = 4,
             review = "Lo leí por primera vez de adulta y entendí por qué marcó a toda una generación.",
             timestamp = LocalDate.of(2025, 8, 5)),
         pickUpDate = LocalDate.of(2025, 7, 16), dropOffDate = LocalDate.of(2025, 8, 4),
+
     )
 
     val reservaHuckFinn2 = Reservation(
@@ -817,13 +695,16 @@ object ApplicationBootstrap {
             review = "Twain disfraza la crítica social de aventura infantil con una habilidad increíble.",
             timestamp = LocalDate.of(2025, 9, 22)),
         pickUpDate = LocalDate.of(2025, 9, 2), dropOffDate = LocalDate.of(2025, 9, 21),
+
     )
+
     val reservaHuckFinn3 = Reservation(
         user = mateoLopez, book = huckFinn,
         review = Review(reviewerName = mateoLopez.name, rating = 3,
             review = "Entretenido, aunque algunos pasajes se sienten datados. El vínculo Huck-Jim es lo mejor.",
             timestamp = LocalDate.of(2026, 1, 28)),
         pickUpDate = LocalDate.of(2026, 1, 8), dropOffDate = LocalDate.of(2026, 1, 27),
+
     )
 
     val reservaN19842 = Reservation(
@@ -832,13 +713,16 @@ object ApplicationBootstrap {
             review = "Perturbador y necesario. Lo releí y cada vez me parece más actual.",
             timestamp = LocalDate.of(2025, 6, 30)),
         pickUpDate = LocalDate.of(2025, 6, 10), dropOffDate = LocalDate.of(2025, 6, 29),
+
     )
+
     val reservaN19843 = Reservation(
         user = mateoLopez, book = n1984,
         review = Review(reviewerName = mateoLopez.name, rating = 5,
             review = "El Gran Hermano ya existe. Orwell lo supo antes que todos.",
             timestamp = LocalDate.of(2025, 12, 22)),
         pickUpDate = LocalDate.of(2025, 12, 2), dropOffDate = LocalDate.of(2025, 12, 21),
+
     )
 
     val reservaLosMiserables2 = Reservation(
@@ -847,13 +731,16 @@ object ApplicationBootstrap {
             review = "Jean Valjean es uno de los personajes más conmovedores de la literatura universal.",
             timestamp = LocalDate.of(2025, 8, 18)),
         pickUpDate = LocalDate.of(2025, 7, 28), dropOffDate = LocalDate.of(2025, 8, 17),
+
     )
+
     val reservaLosMiserables3 = Reservation(
         user = valentinaSosa, book = losMiserables,
         review = Review(reviewerName = valentinaSosa.name, rating = 4,
             review = "Largo pero cada página tiene peso. Hugo no desperdicia ni un capítulo.",
             timestamp = LocalDate.of(2026, 2, 10)),
         pickUpDate = LocalDate.of(2026, 1, 20), dropOffDate = LocalDate.of(2026, 2, 9),
+
     )
 
     val reservaMontagnaMagica2 = Reservation(
@@ -862,13 +749,15 @@ object ApplicationBootstrap {
             review = "Mann logra que el tiempo del sanatorio se sienta tan eterno como para el protagonista.",
             timestamp = LocalDate.of(2025, 11, 15)),
         pickUpDate = LocalDate.of(2025, 10, 25), dropOffDate = LocalDate.of(2025, 11, 14),
-    )
+            )
+
     val reservaMontagnaMagica3 = Reservation(
         user = valentinaSosa, book = montagnaMagica,
         review = Review(reviewerName = valentinaSosa.name, rating = 3,
             review = "Muy filosófica, quizás demasiado. Los diálogos entre Naphta y Settembrini son brillantes.",
             timestamp = LocalDate.of(2026, 1, 10)),
         pickUpDate = LocalDate.of(2025, 12, 20), dropOffDate = LocalDate.of(2026, 1, 9),
+
     )
 
     val reservaMonteCristo2 = Reservation(
@@ -877,13 +766,82 @@ object ApplicationBootstrap {
             review = "Imposible soltar. La venganza de Dantès es satisfactoria en cada nivel.",
             timestamp = LocalDate.of(2025, 7, 25)),
         pickUpDate = LocalDate.of(2025, 7, 5), dropOffDate = LocalDate.of(2025, 7, 24),
+
     )
+
     val reservaMonteCristo3 = Reservation(
         user = lucianoVega, book = monteCristo,
         review = Review(reviewerName = lucianoVega.name, rating = 5,
             review = "Dumas teje una trama perfecta. Cada detalle de los primeros capítulos vuelve al final.",
             timestamp = LocalDate.of(2025, 10, 18)),
         pickUpDate = LocalDate.of(2025, 9, 28), dropOffDate = LocalDate.of(2025, 10, 17),
+
+    )
+
+    val reservaSinCalificar = Reservation(
+        user = emiliaRomero,
+        book = elProceso,
+        review = Review(), // sin rating
+        pickUpDate = LocalDate.of(2026, 1, 1),
+        dropOffDate = LocalDate.of(2026, 2, 1),
+    )
+
+// ─── Reservas activas/futuras ─────────────────────────────────────────────
+
+    val reservaEmilia1 = Reservation(
+        user = emiliaRomero, book = jardinCerezos,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 3, 15), dropOffDate = LocalDate.of(2026, 3, 29),
+
+    )
+
+    val reservaEmilia2 = Reservation(
+        user = emiliaRomero, book = ficciones,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 4, 1), dropOffDate = LocalDate.of(2026, 4, 14),
+
+    )
+
+    val reservaLuciano1 = Reservation(
+        user = lucianoVega, book = fundacion,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 3, 20), dropOffDate = LocalDate.of(2026, 4, 3),
+
+    )
+
+    val reservaLuciano2 = Reservation(
+        user = lucianoVega, book = vueltaMundo,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 4, 5), dropOffDate = LocalDate.of(2026, 4, 19),
+
+    )
+
+    val reservaValentina1 = Reservation(
+        user = valentinaSosa, book = cienAnios,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 3, 10), dropOffDate = LocalDate.of(2026, 3, 24),
+
+    )
+
+    val reservaValentina2 = Reservation(
+        user = valentinaSosa, book = guerraPaz,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 4, 2), dropOffDate = LocalDate.of(2026, 4, 16),
+
+    )
+
+    val reservaMateo1 = Reservation(
+        user = mateoLopez, book = cuentosMisterio,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 3, 18), dropOffDate = LocalDate.of(2026, 4, 1),
+
+    )
+
+    val reservaMateo2 = Reservation(
+        user = mateoLopez, book = senoraDalloway,
+        review = Review(),
+        pickUpDate = LocalDate.of(2026, 4, 7), dropOffDate = LocalDate.of(2026, 4, 21),
+
     )
 
     // ─── Función de inicialización ────────────────────────────────────────────
@@ -920,7 +878,7 @@ object ApplicationBootstrap {
             reservaN19842, reservaN19843,
             reservaLosMiserables2, reservaLosMiserables3,
             reservaMontagnaMagica2, reservaMontagnaMagica3,
-            reservaMonteCristo2, reservaMonteCristo3,
+            reservaMonteCristo2, reservaMonteCristo3, reservaSinCalificar,
         ).forEach { reservationRepository.create(it) }
 
         listOf(
@@ -930,4 +888,5 @@ object ApplicationBootstrap {
             reservaMateo1, reservaMateo2,
         ).forEach { reservationRepository.create(it) }
     }
+
 }

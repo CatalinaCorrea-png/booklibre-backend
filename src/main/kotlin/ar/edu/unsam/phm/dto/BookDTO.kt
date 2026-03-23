@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.dto
 import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.errors.ConflictException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -112,21 +113,24 @@ data class BookCreateDTO(
 )
 
 fun BookCreateDTO.createFromDTO(owner: User): Book {
-    return Common(
-        title = this.title,
-        desc = this.desc,
-        gender = Gender.fromValue(this.gender),
-        author = Author(this.authorName, this.authorAvatarUrl),
-        numPages = this.numPages,
-        isbn = this.isbn,
-        language = Language.fromValue(this.language),
-        editorial = this.editorial,
-        publishDate = this.publishDate ?: LocalDate.now(),
-        condition = BookCondition.fromValue(this.condition),
-        reservationsIds = mutableListOf(),
-        owner = owner,
-        imageSrc = this.imageSrc
-    )
-}
+    val title = this.title
+    val desc = this.desc
+    val gender = Gender.entries.find { it.value == this.gender } ?: throw IllegalArgumentException("Genero invalido: ${this.gender}")
+    val author = Author(this.authorName, this.authorAvatarUrl)
+    val numPages = this.numPages
+    val isbn = this.isbn
+    val language = Language.entries.find { it.value == this.language } ?: throw IllegalArgumentException("Idioma invalido: ${this.language}")
+    val editorial = this.editorial
+    val publishDate = this.publishDate ?: LocalDate.now()
+    val condition = BookCondition.entries.find { it.value == this.condition } ?: throw IllegalArgumentException("Condicion invalida: ${this.language}")
+    val owner = owner
+    val imageSrc = this.imageSrc
 
+    return when (this.bookType) {
+        "COMUN" -> Common(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, mutableListOf(), owner, imageSrc)
+        "CON DEDICATORIA" -> WithADedication(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, mutableListOf(), owner, imageSrc)
+        "COLECCIONABLE" -> Collectable(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, mutableListOf(), owner, imageSrc)
+        else -> throw ConflictException("Tipo de libro inválido: ${this.bookType}")
+    }
+}
 

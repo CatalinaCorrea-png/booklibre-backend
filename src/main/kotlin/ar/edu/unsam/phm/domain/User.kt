@@ -1,7 +1,6 @@
 package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
-import ar.edu.unsam.phm.dto.UserDTO
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
 
