@@ -21,6 +21,7 @@ data class AuthRegisterRequest(
     val password: String
 ) {}
 
+
 data class AuthUserRegisterRequest(
     val name: String = "nombre", // Agregar esto en register
     var lastName: String = "apellido",
