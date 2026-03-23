@@ -1,7 +1,6 @@
 package ar.edu.unsam.phm.controller
 
 import ar.edu.unsam.phm.services.UserService
-import ar.edu.unsam.phm.dto.UserDTO
 
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
@@ -10,9 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.dto.AuthRequest
-import ar.edu.unsam.phm.dto.AuthResponse
-import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
+import ar.edu.unsam.phm.dto.*
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestPart
@@ -27,6 +24,21 @@ class UserController(private val userService: UserService) {
         val user = User(email = request.email, password = request.password )
         val userOK = userService.validate(user)
         return AuthResponse(email= userOK.email, name= userOK.name, id= userOK.id)
+    }
+
+    @PostMapping("/register")
+    fun createUser(@RequestBody request: AuthRegisterRequest): AuthResponse {
+        val user = User(
+            email = request.email,
+            password = request.password,
+            name = request.name
+        )
+        userService.create(user)
+        return AuthResponse(
+            email = user.email,
+            name = user.name,
+            id = user.id
+        )
     }
 
     @GetMapping("/profile/{userId}")
