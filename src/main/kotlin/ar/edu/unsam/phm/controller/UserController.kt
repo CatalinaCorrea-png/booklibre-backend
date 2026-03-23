@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.dto.*
+import ar.edu.unsam.phm.dto.AuthRegisterRequest
+import ar.edu.unsam.phm.dto.AuthRequest
+import ar.edu.unsam.phm.dto.AuthResponse
+import ar.edu.unsam.phm.dto.UserDTO
+import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestPart
