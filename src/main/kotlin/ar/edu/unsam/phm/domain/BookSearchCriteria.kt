@@ -12,6 +12,10 @@ data class BookSearchCriteria (
     val dropOffDate: LocalDate = LocalDate.now(),
     val isbn: String? = null,
     val ownersName: String? = null,
+        val page: Int = 0,
+        val pageSize: Int = 6,
+        val sortBy: String = "title",
+        val ascending: Boolean = true,
 )
 
 // Volaron para utilizar el Sort y Pageable de Spring

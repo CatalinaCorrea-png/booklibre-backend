@@ -23,15 +23,15 @@ class BookController(
     @GetMapping("/filtered-books")
     fun getFilteredBooks(
         @ModelAttribute criteria: BookSearchCriteria,
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "6") size: Int,
-        @RequestParam(defaultValue = "title") sortBy: String,
-        @RequestParam(defaultValue = "true") ascending: Boolean
+//        @RequestParam(defaultValue = "0") page: Int,
+//        @RequestParam(defaultValue = "6") size: Int,
+//        @RequestParam(defaultValue = "title") sortBy: String,
+//        @RequestParam(defaultValue = "true") ascending: Boolean
     ): PageResponse<BookDTO> {
 //        println(criteria.toString())
 //        println("$page, $size, $sortBy, $ascending")
-        val direction = if (ascending) Sort.Direction.ASC else Sort.Direction.DESC
-        val pageable = PageRequest.of(page, size, Sort.by(direction, sortBy))
+        val direction = if (criteria.ascending) Sort.Direction.ASC else Sort.Direction.DESC
+        val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
         return bookService.searchBooks(criteria, pageable)
     }
 
