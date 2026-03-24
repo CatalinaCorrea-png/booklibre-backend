@@ -1,8 +1,6 @@
 package ar.edu.unsam.phm.services
 
-import ar.edu.unsam.phm.domain.Book
-import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.Review
+import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.PagedResult
 import ar.edu.unsam.phm.dto.ReservationDTO
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
@@ -14,6 +12,7 @@ import ar.edu.unsam.phm.repository.ReservationRepository
 import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import kotlin.math.ceil
 
 @Service
 class ReservationService(
@@ -124,48 +123,15 @@ class ReservationService(
         return everyUserBookInReservation
     }
 
-    private fun filterBooksInReservationListBy(filterCrit: String, bookList: List<ReservationProfileDTO>): List<ReservationProfileDTO> {
-        if (filterCrit == "Todos") {
-            return bookList
-        } else {
-            return bookList.filter { reserve ->
-    //            tengo que hacer esto xq hay mas estados de los que tengo que manejar
-                if (reserve.state == "Proximo a vencer") reserve.state = "Prestado"
-                else if (reserve.state == "Devuelto") reserve.state = "Disponible"
-
-                reserve.state == filterCrit
-            }
-        }
-    }
-
-/*
-*
-* Todo por la interfaz de paginado
-*
-* */
-
-    private fun sortByAscTitle(list: List<ReservationProfileDTO>): List<ReservationProfileDTO> =
-        list.sortedBy {it.book.title}
-
-    private fun sortByDescTitle(list: List<ReservationProfileDTO>): List<ReservationProfileDTO> =
-        list.sortedByDescending {it.book.title}
-
-    private fun sortByAscDate(list: List<ReservationProfileDTO>): List<ReservationProfileDTO> =
-        list.sortedBy {it.book.timestamp}
-
-    private fun sortByDescDate(list: List<ReservationProfileDTO>): List<ReservationProfileDTO> =
-        list.sortedByDescending {it.book.timestamp}
-
-    fun filterAndSortUserBooks(bookList: List<ReservationProfileDTO>, filterCrit: String, sortCrit: String): List<ReservationProfileDTO> {
-        var filteredBooks = this.filterBooksInReservationListBy(filterCrit, bookList)
-
-        when (sortCrit) {
-            "title_asc" -> filteredBooks = this.sortByAscTitle(filteredBooks)
-            "title_desc" -> filteredBooks = this.sortByDescTitle(filteredBooks)
-            "date_asc" -> filteredBooks = this.sortByAscDate(filteredBooks)
-            "date_desc" -> filteredBooks = this.sortByDescDate(filteredBooks)
-        }
-        return filteredBooks
+    fun filterAndSortUserBooks(bookList: List<ReservationProfileDTO>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
+        var filteredAndSortedBookList: List<ReservationProfileDTO> = bookList
+                                                                        .filter ( filterCrit.predicate ) // equiv. to { reservation -> filterCrit.predicate(reservation) }
+                                                                        .sortedWith ( sortCrit.comparator )
+        return PagedResult(
+            items = filteredAndSortedBookList.drop(page * pageSize).take(pageSize),
+            total = filteredAndSortedBookList.size,
+            totalPages = ceil(filteredAndSortedBookList.size.toDouble() / pageSize).toInt()
+        )
     }
 
     fun getBookReviews(bookId: Int, page: Int = 0, pageSize: Int = 2): List<Review> {
