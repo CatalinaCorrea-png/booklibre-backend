@@ -4,6 +4,7 @@ import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.services.BookService
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
+import ar.edu.unsam.phm.dto.ReservedPeriodDTO
 import ar.edu.unsam.phm.dto.ReviewDTO
 import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.dto.toDTO
@@ -71,6 +72,10 @@ class ReservationController(
     @GetMapping("/book-review/{bookId}")
     fun getBookReviews(@PathVariable bookId: Int, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
         reservationService.getBookReviews(bookId, page, pageSize).map { it.toDTO() }
+
+    @GetMapping("/reservations/book/{bookId}/dates")
+    fun getReservedDatesByBook(@PathVariable bookId: Int): List<ReservedPeriodDTO> =
+        reservationService.getReservedDates(bookId)
 
 //    @GetMapping("/book-review/{bookId}/average")
 //    fun getBookAverageRating(@PathVariable bookId: Int): Double =

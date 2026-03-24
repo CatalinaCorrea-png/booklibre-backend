@@ -4,24 +4,26 @@ import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.State
+import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
+import ar.edu.unsam.phm.dto.ReservedPeriodDTO
 import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
+import ar.edu.unsam.phm.repository.Repository
 import ar.edu.unsam.phm.repository.ReservationRepository
+import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
 class ReservationService(
     val reservationRepository: ReservationRepository,
-    val bookRepository: BookRepository
+    val bookRepository: BookRepository,
+    val userRepository: UserRepository
 ){
     fun createReservation(reservation: Reservation) {
-        if (reservation.pickUpDate.isBefore(LocalDate.now()))
-            throw BusinessException("La fecha de recogida no puede ser anterior a hoy")
-        if (reservation.dropOffDate.isBefore(reservation.pickUpDate))
-            throw BusinessException("No se puede reservar un libro si su fecha de devolucion es antes que su recogida")
+        reservation.validate()
         if (!canReserve(reservation)) throw BusinessException("Reserva no disponible en esa fecha")
         reservationRepository.create(reservation)
 
@@ -29,10 +31,13 @@ class ReservationService(
         val book = bookRepository.getObject(reservation.book.id)
         book.addReservation(reservation.id)
         reservation.state = State.BORROWED
+
+        val user = userRepository.getObject(reservation.user.id)
+        user.addBibliokarmas(book.calculateBibliokarmas(reservation))
     }
 
     // esto tiene que estar negado asi devuelve true si no hay solapamiento
-    fun canReserve(reservation: Reservation) : Boolean = reservationRepository.repositoryObjects().any { !it.dateOverlaps(reservation) }
+    fun canReserve(reservation: Reservation) : Boolean = reservationRepository.repositoryObjects().none { it.book.id == reservation.book.id && it.dateOverlaps(reservation) }
 
     fun getAvailableReservations(reservation: Reservation) : MutableList<Reservation> {
         return reservationRepository.repositoryObjects().filter { it.dateOverlaps(reservation) }.toMutableList()
@@ -154,6 +159,11 @@ class ReservationService(
             .take(pageSize)
             .map { it.review }
     }
+
+    fun getReservedDates(bookId: Int): List<ReservedPeriodDTO> =
+        reservationRepository.repositoryObjects()
+            .filter { it.book.id == bookId }
+            .map { ReservedPeriodDTO(it.pickUpDate, it.dropOffDate) }
 
 //    fun getBookAverageRating(bookId: Int): Double {
 //        val reviews = reservationRepository.repositoryObjects()
