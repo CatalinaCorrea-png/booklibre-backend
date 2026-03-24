@@ -47,11 +47,6 @@ class BookService(
         bookRepository.delete(id)
     }
 
-    /*
-    fun updateBook(updatedBook : BookDTO) : Book {
-        val newBook = updatedBook.fromDTO()
-    }*/
-
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
         val reservedBookIds : Set<Int> = reservationRepository.findReservedBookIds(searchCriteria)
         val page : Page<Book> = bookRepository.findAllByCriteria(searchCriteria, reservedBookIds, pageable)

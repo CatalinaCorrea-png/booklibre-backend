@@ -541,7 +541,7 @@ object ApplicationBootstrap {
         review = Review(reviewerName = lucianoVega.name, rating = 4,
             review = "Lo releí de adulto y sigue siendo mágico. Rowling construyó un mundo increíble.",
             timestamp = LocalDate.of(2026, 2, 1)),
-        pickUpDate = LocalDate.of(2026, 1, 10), dropOffDate = LocalDate.of(2026, 1, 31),
+        pickUpDate = LocalDate.of(2026, 4, 10), dropOffDate = LocalDate.of(2026, 4, 29),
     )
 
     val reservaValentinaPasada1 = Reservation(

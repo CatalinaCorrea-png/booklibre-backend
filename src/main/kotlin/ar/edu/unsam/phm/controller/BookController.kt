@@ -6,8 +6,6 @@ import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Gender
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.services.BookService
-import ar.edu.unsam.phm.repository.BookRepository
-import ar.edu.unsam.phm.repository.ReservationRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.web.bind.annotation.*
@@ -18,8 +16,6 @@ import java.time.LocalDate
 @CrossOrigin("*")
 class BookController(
     val bookService: BookService,
-    private val reservationRepository: ReservationRepository,
-    private val bookRepository: BookRepository,
 ) {
 
     @GetMapping("/filtered-books")
