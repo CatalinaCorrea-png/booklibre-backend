@@ -64,4 +64,6 @@ data class Reservation (
     fun validate(){
         isPickUpBeforeDropOff() && isPickUpNotBeforeToday()
     }
+
+    fun isActive(): Boolean = state == State.BORROWED || state == State.SOON_TO_END
 }

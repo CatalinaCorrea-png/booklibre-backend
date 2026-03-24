@@ -1,9 +1,9 @@
 package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.*
-import ar.edu.unsam.phm.dto.BookDTO
-import ar.edu.unsam.phm.dto.PageResponse
-import ar.edu.unsam.phm.dto.toDTO
+import ar.edu.unsam.phm.dto.*
+import ar.edu.unsam.phm.errors.BusinessException
+import ar.edu.unsam.phm.services.UserService
 import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
@@ -22,29 +22,28 @@ class BookService(
     val reservationRepository: ReservationRepository,
     private val userRepository: UserRepository,
 ) {
-    fun createBook(book: Book){
-        book.meetsCreationCriteria()
-        bookRepository.create(book)
+
+    fun createBook(bookCreateDTO: BookCreateDTO){
+        val owner = userRepository.getObject(bookCreateDTO.ownerId)
+        val newBook = bookCreateDTO.createFromDTO(owner)
+        newBook.meetsCreationCriteria()
+        bookRepository.create(newBook)
     }
 
-    fun updateBook(id: Int, book: Book) {
+    fun updateBook(id: Int, bookCreateDTO: BookCreateDTO) {
+        val owner = userRepository.getObject(bookCreateDTO.ownerId)
+        val newBook = bookCreateDTO.createFromDTO(owner)
         val existingBook = bookRepository.getObject(id)
-        book.id = existingBook.id
-        book.meetsCreationCriteria()
-        bookRepository.update(book)
+        newBook.id = existingBook.id
+        newBook.meetsCreationCriteria()
+        bookRepository.update(newBook)
     }
 
-    fun deleteBook(id: Int) {
-        println("Buscando reservas para libro ID: $id")
-        val activeReservations = reservationRepository.collection
-            .filter { println("Reserva: book.id=${it.book.id} state=${it.state}")
-                it.book.id == id && it.state != State.RETURNED }
-
-        if (activeReservations.isNotEmpty()) {
-            throw ConflictException("No se puede eliminar un libro con reservas activas")
-        }
-
-        bookRepository.delete(id)
+    fun deleteBook(bookId: Int) {
+        if (reservationRepository.hasActiveReservations(bookId))
+            throw BusinessException("No se puede eliminar el libro porque tiene reservas activas")
+        reservationRepository.deleteFutureReservations(bookId)
+        bookRepository.delete(bookId)
     }
 
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
