@@ -3,6 +3,7 @@ package ar.edu.unsam.phm.repository
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.BookSearchCriteria
 import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.State
 import java.time.LocalDate
 
 @org.springframework.stereotype.Repository
@@ -26,4 +27,19 @@ class ReservationRepository: Repository<Reservation>() {
             .map { it.book.id }
             .toSet()
     }
+
+
+    fun hasActiveReservations(bookId: Int): Boolean =
+        findByBookId(bookId).any { reservation ->
+            val today = LocalDate.now()
+            !today.isAfter(reservation.dropOffDate) && !today.isBefore(reservation.pickUpDate)
+        }
+
+    fun hasFutureReservations(bookId: Int): Boolean =
+        findByBookId(bookId).any { it.pickUpDate.isAfter(LocalDate.now()) }
+
+    fun deleteFutureReservations(bookId: Int) =
+        findByBookId(bookId)
+            .filter { it.pickUpDate.isAfter(LocalDate.now()) }
+            .forEach { delete(it.id) }
 }
