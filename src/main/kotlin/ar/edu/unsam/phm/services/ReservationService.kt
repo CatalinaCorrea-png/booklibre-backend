@@ -38,7 +38,7 @@ class ReservationService(
 //        reservation.state = State.BORROWED
 
         val user = userRepository.getObject(reservation.user.id)
-        user.addBibliokarmas(book.calculateBibliokarmas(reservation))
+        user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas))
     }
 
     // esto tiene que estar negado asi devuelve true si no hay solapamiento

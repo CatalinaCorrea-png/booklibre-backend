@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.data:spring-data-commons")
     val kotestVersion = "5.8.0"
 
     // Traidos de nuestro proyecto
