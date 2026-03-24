@@ -35,7 +35,7 @@ class ReservationService(
         // Acá sumo la reserva al libro?????
         val book = bookRepository.getObject(reservation.book.id)
         book.addReservation(reservation.id)
-        reservation.state = State.BORROWED
+//        reservation.state = State.BORROWED
 
         val user = userRepository.getObject(reservation.user.id)
         user.addBibliokarmas(book.calculateBibliokarmas(reservation))
