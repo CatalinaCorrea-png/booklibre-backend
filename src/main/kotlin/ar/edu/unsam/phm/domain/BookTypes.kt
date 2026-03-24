@@ -41,7 +41,7 @@ class WithADedication(
     bookType: String = "CON DEDICATORIA"
 )
     : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,  imageSrc, timestamp, bookType) {
-    override fun typeBibliokarmas(reservation: Reservation): Int = 200 * 10 * this.reservationsIds.size
+    override fun typeBibliokarmas(reservation: Reservation): Int = 200 + 10 * this.reservationsIds.size
 }
 
 class Collectable(
@@ -62,5 +62,10 @@ class Collectable(
     bookType: String = "COLECCIONABLE"
 )
     : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,  imageSrc, timestamp, bookType) {
-    override fun typeBibliokarmas(reservation: Reservation): Int = reservation.user.bibliokarmas / 5 + this.numPages
+    override fun typeBibliokarmas(reservation: Reservation): Int {
+        val userKarmas = reservation.user.bibliokarmas
+        // redondeo hacia arriba
+        val fifthPart = (userKarmas + 4) / 5
+        return fifthPart + this.numPages
+    }
 }

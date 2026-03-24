@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.domain
 
+import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -40,11 +41,27 @@ data class Reservation (
 
     fun holderId(): Int = this.user.id
 
+    private fun isPickUpNotBeforeToday(): Boolean {
+        return if (this.pickUpDate.isBefore(LocalDate.now()))
+            throw BusinessException("La fecha de recogida no puede ser anterior a hoy")
+        else true
+    }
+
+    private fun isPickUpBeforeDropOff(): Boolean {
+        return if (this.dropOffDate.isBefore(this.pickUpDate))
+            throw BusinessException("No se puede reservar un libro si su fecha de devolucion es antes que su recogida")
+        else true
+    }
+    
     override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO("Not yet implemented")
     }
 
     override fun meetsCreationCriteria() {
         TODO("Not yet implemented")
+    }
+
+    fun validate(){
+        isPickUpBeforeDropOff() && isPickUpNotBeforeToday()
     }
 }

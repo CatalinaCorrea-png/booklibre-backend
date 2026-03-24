@@ -20,6 +20,10 @@ class User(
 ): RepositoryElement {
     override var id = 0
 
+    fun addBibliokarmas(bibliokarmas: Int){
+        this.bibliokarmas += bibliokarmas
+    }
+
     override fun meetsSearchCriteria(criteria: String) =
         matchesPartiallyWith(criteria, name) || matchesPartiallyWith(criteria, email)
 
