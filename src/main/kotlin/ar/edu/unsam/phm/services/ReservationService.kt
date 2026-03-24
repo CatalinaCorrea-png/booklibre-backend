@@ -12,6 +12,7 @@ import ar.edu.unsam.phm.repository.ReservationRepository
 import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import kotlin.math.ceil
 
 @Service
 class ReservationService(
@@ -122,10 +123,16 @@ class ReservationService(
         return everyUserBookInReservation
     }
 
-    fun filterAndSortUserBooks(bookList: List<ReservationProfileDTO>, filterCrit: FilterCriteria, sortCrit: SortCriteria): List<ReservationProfileDTO> =
-        bookList
-            .filter ( filterCrit.predicate ) // equiv. to { reservation -> filterCrit.predicate(reservation) }
-            .sortedWith ( sortCrit.comparator )
+    fun filterAndSortUserBooks(bookList: List<ReservationProfileDTO>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
+        var filteredAndSortedBookList: List<ReservationProfileDTO> = bookList
+                                                                        .filter ( filterCrit.predicate ) // equiv. to { reservation -> filterCrit.predicate(reservation) }
+                                                                        .sortedWith ( sortCrit.comparator )
+        return PagedResult(
+            items = filteredAndSortedBookList.drop(page * pageSize).take(pageSize),
+            total = filteredAndSortedBookList.size,
+            totalPages = ceil(filteredAndSortedBookList.size.toDouble() / pageSize).toInt()
+        )
+    }
 
     fun getBookReviews(bookId: Int, page: Int = 0, pageSize: Int = 2): List<Review> {
         return reservationRepository.repositoryObjects()

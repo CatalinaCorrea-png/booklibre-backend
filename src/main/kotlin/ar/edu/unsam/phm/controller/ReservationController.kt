@@ -68,11 +68,13 @@ class ReservationController(
     fun getUserOwnBooks(
         @PathVariable userId: Int,
         @RequestParam(defaultValue = "ALL") filterCriteria: FilterCriteria,
-        @RequestParam(defaultValue = "DATE_DESC") sortCriteria: SortCriteria
-    ): List<ReservationProfileDTO> {
+        @RequestParam(defaultValue = "DATE_DESC") sortCriteria: SortCriteria,
+        @RequestParam page: Int,
+        @RequestParam pageSize: Int
+    ): PagedResult<ReservationProfileDTO> {
         val userOwnBooks: List<Reservation> = reservationService.getUserOwnBooks(userId)
         val userOwnBooksDTOs: List<ReservationProfileDTO> = userOwnBooks.map { it.toReservationProfileDTO() }
-        val filteredAndSortedBooks: List<ReservationProfileDTO> = reservationService.filterAndSortUserBooks(userOwnBooksDTOs, filterCriteria, sortCriteria)
+        val filteredAndSortedBooks: PagedResult<ReservationProfileDTO> = reservationService.filterAndSortUserBooks(userOwnBooksDTOs, page, pageSize, filterCriteria, sortCriteria)
         return filteredAndSortedBooks
     }
 

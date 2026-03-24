@@ -10,7 +10,7 @@ enum class UserTypes(val value: String){
     companion object {
         fun fromValue(value: String): UserTypes {
             return entries.find { it.value == value }
-                ?: throw ConflictException("UserType desconocido: $value")
+                ?: throw ConflictException("Tipo de usuario desconocido: $value")
         }
     }
 }
