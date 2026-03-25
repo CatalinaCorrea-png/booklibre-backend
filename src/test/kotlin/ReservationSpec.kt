@@ -30,57 +30,64 @@ class ReservationSpec: DescribeSpec ({
 
     describe("Caso feliz y caso triste cuando quiero reservar un libro") {
 
-        val reserveExisting = Reservation(
-            user = reader1,
-            book = commonBook,
-            pickUpDate = LocalDate.of(2026, 4, 1),
-            dropOffDate = LocalDate.of(2026, 4, 10)
-        )
-
         it("No puede reservar un libro prestado en esa fecha") {
             // Arrange
-            val reservaRepository = ReservationRepository()
-            reservaRepository.create(reserveExisting)
-            val bookRepository = BookRepository()
-            bookRepository.create(commonBook)
             val userRepository = UserRepository()
-            userRepository.create(owner)
-            userRepository.create(reader1)
+            val reservaRepository = ReservationRepository()
+            val bookRepository = BookRepository()
+
             userRepository.create(reader2)
+            bookRepository.create(commonBook)
 
-            val reservationService = ReservationService(reservaRepository, bookRepository, userRepository)
-
-            val newReservationDTO = CreateReservationDTO(
-                bookId = commonBook.id,
-                sessionId = reader2.id,
-                pickUpDate = LocalDate.of(2026, 4, 5),  // se superpone
-                dropOffDate = LocalDate.of(2026, 4, 15)
+            val reserveExisting = Reservation(
+                user = reader1,
+                book = commonBook,
+                pickUpDate = LocalDate.of(2026, 4, 1),
+                dropOffDate = LocalDate.of(2026, 4, 10)
             )
-
-            // Act & Assert
-            shouldThrow<BusinessException> { reservationService.createReservation(newReservationDTO) }
-        }
-
-        it("Puede reservar un libro en una fecha libre") {
-            val reservaRepository = ReservationRepository()
             reservaRepository.create(reserveExisting)
-            val bookRepository = BookRepository()
-            bookRepository.create(commonBook)
-            val userRepository = UserRepository()
-            userRepository.create(owner)
-            userRepository.create(reader1)
-            userRepository.create(reader2)
 
             val reservationService = ReservationService(reservaRepository, bookRepository, userRepository)
 
-            val newReservationDTO = CreateReservationDTO(
+            val newReservation = CreateReservationDTO(
                 bookId = commonBook.id,
                 sessionId = reader2.id,
-                pickUpDate = LocalDate.of(2026, 4, 11),  // no se superpone
+                pickUpDate = LocalDate.of(2026, 4, 5), // se superpone con 4/1 - 4/10
                 dropOffDate = LocalDate.of(2026, 4, 20)
             )
 
-            shouldNotThrow<BusinessException> { reservationService.createReservation(newReservationDTO) }
+            // Act & Assert
+            shouldThrow<BusinessException> { reservationService.createReservation(newReservation) }
+        }
+
+        it("Puede reservar un libro en una fecha libre") {
+            // Arrange
+            val userRepository = UserRepository()
+            val reservaRepository = ReservationRepository()
+            val bookRepository = BookRepository()
+
+            userRepository.create(reader2)
+            bookRepository.create(commonBook)
+
+            val reserveExisting = Reservation(
+                user = reader1,
+                book = commonBook,
+                pickUpDate = LocalDate.of(2026, 4, 1),
+                dropOffDate = LocalDate.of(2026, 4, 10)
+            )
+            reservaRepository.create(reserveExisting)
+
+            val reservationService = ReservationService(reservaRepository, bookRepository, userRepository)
+
+            val newReservation = CreateReservationDTO(
+                bookId = commonBook.id,
+                sessionId = reader2.id,
+                pickUpDate = LocalDate.of(2026, 4, 11), // no se superpone
+                dropOffDate = LocalDate.of(2026, 4, 20)
+            )
+
+            // Act & Assert
+            shouldNotThrow<BusinessException> { reservationService.createReservation(newReservation) }
         }
     }
 
