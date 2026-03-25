@@ -13,6 +13,9 @@ import kotlin.math.ceil
 @org.springframework.stereotype.Repository
 class BookRepository(): Repository<Book>() {
 
+    fun findAllByUserId(userId: Int): List<Book> =
+            this.repositoryObjects().filter { book -> book.owner.id == userId }
+
     fun findAllByCriteria(criteria: BookSearchCriteria, reservedBookIds: Set<Int>, pageable: Pageable): Page<Book> {
 
         val filteredAndAvailable = this.repositoryObjects().filter { book ->

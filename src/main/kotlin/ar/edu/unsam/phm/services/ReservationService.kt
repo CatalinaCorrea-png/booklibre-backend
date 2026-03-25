@@ -3,9 +3,8 @@ package ar.edu.unsam.phm.services
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
-import ar.edu.unsam.phm.domain.State
-import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.dto.PagedResult
 import ar.edu.unsam.phm.dto.ReservationDTO
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
@@ -14,7 +13,6 @@ import ar.edu.unsam.phm.dto.ReservedPeriodDTO
 import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
-import ar.edu.unsam.phm.repository.Repository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.stereotype.Service
@@ -59,7 +57,7 @@ class ReservationService(
         return PagedResult(
             items = filtered.drop(page * pageSize).take(pageSize),
             total = filtered.size,
-            totalPages = Math.ceil(filtered.size.toDouble() / pageSize).toInt()
+            totalPages = ceil(filtered.size.toDouble() / pageSize).toInt()
         )
     }
 
@@ -72,7 +70,7 @@ class ReservationService(
         return PagedResult(
             items = filtered.drop(page * pageSize).take(pageSize),
             total = filtered.size,
-            totalPages = Math.ceil(filtered.size.toDouble() / pageSize).toInt()
+            totalPages = ceil(filtered.size.toDouble() / pageSize).toInt()
         )
     }
 
@@ -100,35 +98,36 @@ class ReservationService(
 
         val userReservesDTO: List<ReservationProfileDTO> = userReserves.map { it.toReservationProfileDTO() }
 
-        return userReservesDTO.filter { reservation -> reservation.state == "Prestado" }.size
+        return userReservesDTO.filter { reservation -> reservation.state.value == "Prestado" }.size
 
     }
 
+    fun orchestrateFilterAndSortBooks(userId: Int, page: Int, pageSize: Int, filterCriteria: FilterCriteria, sortCriteria: SortCriteria): PagedResult<ReservationProfileDTO> {
+        val userOwnBooks: List<Reservation> = this.getUserOwnBooks(userId)
+        val userOwnBooksDTOs: List<ReservationProfileDTO> = userOwnBooks.map { it.toReservationProfileDTO() }
+        val filteredAndSortedBooks: PagedResult<ReservationProfileDTO> = this.filterAndSortUserBooks(userOwnBooksDTOs, page, pageSize, filterCriteria, sortCriteria)
+        return filteredAndSortedBooks
+    }
 
     private fun generateEmptyReservationsForNotReservedBooks(booksList: List<Book>): List<Reservation> =
         booksList.map { book -> Reservation(book = book, pickUpDate = LocalDate.of(1000, 1, 1), dropOffDate = LocalDate.of(1000, 2, 1)) }
 
-    private fun getEveryUserBook(userId: Int): List<Book> =
-        bookRepository.repositoryObjects().filter { book -> book.owner.id == userId }
-
-    private fun getEveryReservationWithUserBook(userId: Int): List<Reservation> =
-        reservationRepository.repositoryObjects().filter { reserve -> reserve.bookOwnerId() == userId }
-
     private fun filterNoReservedBooks(books: List<Book>, reservations: List<Reservation>): List<Book> =
         books.filter { book -> reservations.none { reservation -> reservation.book.id == book.id} }
 
-
     fun getUserOwnBooks(userId: Int): List<Reservation> {
 
-        val everyUserOwnBook: List<Book> = this.getEveryUserBook(userId)
+        val everyUserOwnBook: List<Book> = bookRepository.findAllByUserId(userId)
 
-        val reservationsWithBooksOwnByUser: List<Reservation> = this.getEveryReservationWithUserBook(userId)
+        val reservationsWithBooksOwnByUser: List<Reservation> = reservationRepository.findByOwnerId(userId)
 
         val userNotReservedBooks = this.filterNoReservedBooks(everyUserOwnBook, reservationsWithBooksOwnByUser)
 
         val userNotReservedBooksInReservation = generateEmptyReservationsForNotReservedBooks(userNotReservedBooks)
 
-        val everyUserBookInReservation = (reservationsWithBooksOwnByUser + userNotReservedBooksInReservation).distinctBy { it.book.id }
+        val everyUserBookInReservation = (reservationsWithBooksOwnByUser + userNotReservedBooksInReservation)
+            .sortedByDescending { it.pickUpDate }
+            .distinctBy { it.book.id }
 
         return everyUserBookInReservation
     }
@@ -157,4 +156,5 @@ class ReservationService(
         reservationRepository.repositoryObjects()
             .filter { it.book.id == bookId }
             .map { ReservedPeriodDTO(it.pickUpDate, it.dropOffDate) }
+
 }

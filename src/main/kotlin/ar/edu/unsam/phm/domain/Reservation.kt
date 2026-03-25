@@ -33,6 +33,7 @@ data class Reservation (
             today.isAfter(dropOffDate)  -> State.RETURNED
             today.isBefore(pickUpDate)  -> State.BORROWED
             dropOffDate.minusDays(2) <= today -> State.SOON_TO_END
+            today >= pickUpDate -> State.ACTIVE
             else -> State.AVAILABLE
         }
     }

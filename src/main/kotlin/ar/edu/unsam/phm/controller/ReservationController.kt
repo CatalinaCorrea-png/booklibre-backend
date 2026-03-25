@@ -28,11 +28,11 @@ class ReservationController(
     val bookService: BookService,
     val userService: UserService
 ) {
+
     @PostMapping("/create-reservation")
     fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
         reservationService.createReservation(reservationDTO)
     }
-
     // ESTAS SON LAS RESERVAS QUE VOS HICISTE
     @GetMapping("/lector/{userId}")
     fun getReservesByUserId(
@@ -63,12 +63,8 @@ class ReservationController(
         @RequestParam(defaultValue = "DATE_DESC") sortCriteria: SortCriteria,
         @RequestParam page: Int,
         @RequestParam pageSize: Int
-    ): PagedResult<ReservationProfileDTO> {
-        val userOwnBooks: List<Reservation> = reservationService.getUserOwnBooks(userId)
-        val userOwnBooksDTOs: List<ReservationProfileDTO> = userOwnBooks.map { it.toReservationProfileDTO() }
-        val filteredAndSortedBooks: PagedResult<ReservationProfileDTO> = reservationService.filterAndSortUserBooks(userOwnBooksDTOs, page, pageSize, filterCriteria, sortCriteria)
-        return filteredAndSortedBooks
-    }
+    ): PagedResult<ReservationProfileDTO> =
+        reservationService.orchestrateFilterAndSortBooks(userId, page, pageSize, filterCriteria, sortCriteria)
 
     @GetMapping("/userReadBooks/{userId}")
     fun getUserReadBooks(@PathVariable userId: Int): Int =
