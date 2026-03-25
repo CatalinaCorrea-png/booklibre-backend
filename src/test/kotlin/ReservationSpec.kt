@@ -3,9 +3,11 @@ import ar.edu.unsam.phm.domain.Common
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
+import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
+import ar.edu.unsam.phm.repository.UserRepository
 import ar.edu.unsam.phm.services.ReservationService
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
@@ -41,18 +43,22 @@ class ReservationSpec: DescribeSpec ({
             reservaRepository.create(reserveExisting)
             val bookRepository = BookRepository()
             bookRepository.create(commonBook)
+            val userRepository = UserRepository()
+            userRepository.create(owner)
+            userRepository.create(reader1)
+            userRepository.create(reader2)
 
-            val reservationService = ReservationService(reservaRepository, bookRepository)
+            val reservationService = ReservationService(reservaRepository, bookRepository, userRepository)
 
-            val newReservation = Reservation(
-                user = reader2,
-                book = commonBook,
+            val newReservationDTO = CreateReservationDTO(
+                bookId = commonBook.id,
+                sessionId = reader2.id,
                 pickUpDate = LocalDate.of(2026, 4, 5),  // se superpone
                 dropOffDate = LocalDate.of(2026, 4, 15)
             )
 
             // Act & Assert
-            shouldThrow<BusinessException> { reservationService.createReservation(newReservation) }
+            shouldThrow<BusinessException> { reservationService.createReservation(newReservationDTO) }
         }
 
         it("Puede reservar un libro en una fecha libre") {
@@ -60,17 +66,21 @@ class ReservationSpec: DescribeSpec ({
             reservaRepository.create(reserveExisting)
             val bookRepository = BookRepository()
             bookRepository.create(commonBook)
+            val userRepository = UserRepository()
+            userRepository.create(owner)
+            userRepository.create(reader1)
+            userRepository.create(reader2)
 
-            val reservationService = ReservationService(reservaRepository, bookRepository)
+            val reservationService = ReservationService(reservaRepository, bookRepository, userRepository)
 
-            val newReservation = Reservation(
-                user = reader2,
-                book = commonBook,
+            val newReservationDTO = CreateReservationDTO(
+                bookId = commonBook.id,
+                sessionId = reader2.id,
                 pickUpDate = LocalDate.of(2026, 4, 11),  // no se superpone
                 dropOffDate = LocalDate.of(2026, 4, 20)
             )
 
-            shouldNotThrow<BusinessException> { reservationService.createReservation(newReservation) }
+            shouldNotThrow<BusinessException> { reservationService.createReservation(newReservationDTO) }
         }
     }
 

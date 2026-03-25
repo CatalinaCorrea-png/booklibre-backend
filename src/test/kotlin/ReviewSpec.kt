@@ -5,6 +5,7 @@ import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
+import ar.edu.unsam.phm.repository.UserRepository
 import ar.edu.unsam.phm.services.ReservationService
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec
@@ -44,7 +45,7 @@ class ReviewSpec: DescribeSpec ({
 
             bookRepository.create(commonBook)
             reservationRepository.create(reservation)
-            val reservationService = ReservationService(reservationRepository, bookRepository)
+            val reservationService = ReservationService(reservationRepository, bookRepository, UserRepository())
 
             // Act
             val result = reservationService.getBookReviews(commonBook.id, 0, 10)
@@ -55,7 +56,7 @@ class ReviewSpec: DescribeSpec ({
         it("Caso triste: no encuentra reseñas para un libro inexistente") {
             val reservationRepository = ReservationRepository()
             val bookRepository = BookRepository()
-            val reservationService = ReservationService(reservationRepository, bookRepository)
+            val reservationService = ReservationService(reservationRepository, bookRepository, UserRepository())
 
             val result = reservationService.getBookReviews(999, 0, 10)
 
