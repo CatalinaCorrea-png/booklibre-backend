@@ -31,8 +31,9 @@ data class ReservationDTO(
 }
 
 fun Reservation.toDTO(): ReservationDTO {
-    val currentState = this.state
-    val canRate = currentState == State.RETURNED && this.review.rating == 0
+    //val currentState = this.state
+    //val canRate = currentState == State.RETURNED && this.review.rating == 0
+    val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()
 
     return ReservationDTO(
         book        = this.book.toDTO(),
@@ -43,7 +44,7 @@ fun Reservation.toDTO(): ReservationDTO {
         dropOffDate = this.dropOffDate,
         state       = this.state,
         canRate = this.state == State.RETURNED && this.review.rating == 0,
-        bibliokarmas = this.user.bibliokarmas,
+        bibliokarmas = this.book.calculateBibliokarmas(days, this.user.bibliokarmas),
         loanedBy    = this.book.owner.name,
         loanedTo    = this.user.name,
     )
