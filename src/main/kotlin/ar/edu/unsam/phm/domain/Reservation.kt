@@ -31,10 +31,9 @@ data class Reservation (
     val today = LocalDate.now()
         return when {
             today.isAfter(dropOffDate)  -> State.RETURNED
-            today.isBefore(pickUpDate)  -> State.AVAILABLE
+            today.isBefore(pickUpDate) -> State.RESERVED
             dropOffDate.minusDays(2) <= today -> State.SOON_TO_END
-            today >= pickUpDate -> State.ACTIVE
-            else -> State.BORROWED
+            else -> State.ACTIVE
         }
     }
 
