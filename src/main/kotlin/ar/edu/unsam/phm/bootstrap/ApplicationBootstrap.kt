@@ -608,6 +608,30 @@ object ApplicationBootstrap {
         pickUpDate = LocalDate.of(2025, 11, 10), dropOffDate = LocalDate.of(2025, 11, 29),
     )
 
+    val reservaElProceso4 = Reservation(
+        user = emiliaRomero, book = elProceso,
+        review = Review(reviewerName = emiliaRomero.name, rating = 3,
+            review = "Me costó entrar pero una vez adentro no pude parar. La angustia de K. se siente real.",
+            timestamp = LocalDate.of(2025, 6, 5)),
+        pickUpDate = LocalDate.of(2025, 5, 15), dropOffDate = LocalDate.of(2025, 6, 4),
+    )
+
+    val reservaElProceso5 = Reservation(
+        user = lucianoVega, book = elProceso,
+        review = Review(reviewerName = lucianoVega.name, rating = 5,
+            review = "El absurdo kafkiano en estado puro. Una pesadilla que no podés dejar de leer.",
+            timestamp = LocalDate.of(2025, 7, 20)),
+        pickUpDate = LocalDate.of(2025, 6, 30), dropOffDate = LocalDate.of(2025, 7, 19),
+    )
+
+    val reservaElProceso6 = Reservation(
+        user = mateoLopez, book = elProceso,
+        review = Review(reviewerName = mateoLopez.name, rating = 4,
+            review = "La culpa sin causa explicada, qué incómodo y qué genial.",
+            timestamp = LocalDate.of(2025, 10, 1)),
+        pickUpDate = LocalDate.of(2025, 9, 11), dropOffDate = LocalDate.of(2025, 9, 30),
+    )
+
     val reservaAdiosArmas2 = Reservation(
         user = valentinaSosa, book = adiosArmas,
         review = Review(reviewerName = valentinaSosa.name, rating = 4,
@@ -879,6 +903,7 @@ object ApplicationBootstrap {
             reservaLosMiserables2, reservaLosMiserables3,
             reservaMontagnaMagica2, reservaMontagnaMagica3,
             reservaMonteCristo2, reservaMonteCristo3, reservaSinCalificar,
+            reservaElProceso4, reservaElProceso5, reservaElProceso6,
         ).forEach { reservationRepository.create(it) }
 
         listOf(

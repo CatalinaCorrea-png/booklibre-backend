@@ -37,9 +37,8 @@ class ReservationService(
         reservation.validate()
         if (!canReserve(reservation)) throw BusinessException("Reserva no disponible en esa fecha")
         reservationRepository.create(reservation)
-        book.addReservation(reservation.id)
-
         user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas))
+        book.addReservation(reservation.id)
     }
 
     // esto tiene que estar negado asi devuelve true si no hay solapamiento
