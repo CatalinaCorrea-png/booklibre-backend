@@ -3,9 +3,11 @@ import ar.edu.unsam.phm.domain.Common
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
+import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
+import ar.edu.unsam.phm.repository.UserRepository
 import ar.edu.unsam.phm.services.ReservationService
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
@@ -28,27 +30,30 @@ class ReservationSpec: DescribeSpec ({
 
     describe("Caso feliz y caso triste cuando quiero reservar un libro") {
 
-        val reserveExisting = Reservation(
-            user = reader1,
-            book = commonBook,
-            pickUpDate = LocalDate.of(2026, 4, 1),
-            dropOffDate = LocalDate.of(2026, 4, 10)
-        )
-
         it("No puede reservar un libro prestado en esa fecha") {
             // Arrange
+            val userRepository = UserRepository()
             val reservaRepository = ReservationRepository()
-            reservaRepository.create(reserveExisting)
             val bookRepository = BookRepository()
+
+            userRepository.create(reader2)
             bookRepository.create(commonBook)
 
-            val reservationService = ReservationService(reservaRepository, bookRepository)
-
-            val newReservation = Reservation(
-                user = reader2,
+            val reserveExisting = Reservation(
+                user = reader1,
                 book = commonBook,
-                pickUpDate = LocalDate.of(2026, 4, 5),  // se superpone
-                dropOffDate = LocalDate.of(2026, 4, 15)
+                pickUpDate = LocalDate.of(2026, 4, 1),
+                dropOffDate = LocalDate.of(2026, 4, 10)
+            )
+            reservaRepository.create(reserveExisting)
+
+            val reservationService = ReservationService(reservaRepository, bookRepository, userRepository)
+
+            val newReservation = CreateReservationDTO(
+                bookId = commonBook.id,
+                sessionId = reader2.id,
+                pickUpDate = LocalDate.of(2026, 4, 5), // se superpone con 4/1 - 4/10
+                dropOffDate = LocalDate.of(2026, 4, 20)
             )
 
             // Act & Assert
@@ -56,20 +61,32 @@ class ReservationSpec: DescribeSpec ({
         }
 
         it("Puede reservar un libro en una fecha libre") {
+            // Arrange
+            val userRepository = UserRepository()
             val reservaRepository = ReservationRepository()
-            reservaRepository.create(reserveExisting)
             val bookRepository = BookRepository()
+
+            userRepository.create(reader2)
             bookRepository.create(commonBook)
 
-            val reservationService = ReservationService(reservaRepository, bookRepository)
-
-            val newReservation = Reservation(
-                user = reader2,
+            val reserveExisting = Reservation(
+                user = reader1,
                 book = commonBook,
-                pickUpDate = LocalDate.of(2026, 4, 11),  // no se superpone
+                pickUpDate = LocalDate.of(2026, 4, 1),
+                dropOffDate = LocalDate.of(2026, 4, 10)
+            )
+            reservaRepository.create(reserveExisting)
+
+            val reservationService = ReservationService(reservaRepository, bookRepository, userRepository)
+
+            val newReservation = CreateReservationDTO(
+                bookId = commonBook.id,
+                sessionId = reader2.id,
+                pickUpDate = LocalDate.of(2026, 4, 11), // no se superpone
                 dropOffDate = LocalDate.of(2026, 4, 20)
             )
 
+            // Act & Assert
             shouldNotThrow<BusinessException> { reservationService.createReservation(newReservation) }
         }
     }
