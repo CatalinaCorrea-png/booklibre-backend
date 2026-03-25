@@ -39,6 +39,8 @@ class BookService(
         newBook.id = existingBook.id
         newBook.meetsCreationCriteria()
         bookRepository.update(newBook)
+
+        reservationRepository.updateBookReference(newBook)
     }
 
     fun deleteBook(bookId: Int) {

@@ -3,7 +3,6 @@ package ar.edu.unsam.phm.repository
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.BookSearchCriteria
 import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.State
 import java.time.LocalDate
 
 @org.springframework.stereotype.Repository
@@ -26,6 +25,12 @@ class ReservationRepository: Repository<Reservation>() {
             .filter { it.dateOverlaps(reservationTemp) }
             .map { it.book.id }
             .toSet()
+    }
+
+    fun updateBookReference(updatedBook: Book) {
+        collection
+            .filter { it.book.id == updatedBook.id }
+            .forEach { it.book = updatedBook }
     }
 
 
