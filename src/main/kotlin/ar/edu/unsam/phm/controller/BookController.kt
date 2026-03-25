@@ -32,17 +32,17 @@ class BookController(
         return bookService.searchBooks(criteria, pageable)
     }
 
-    @PostMapping("/crear-libro")
+    @PostMapping("/create-book")
     fun createBook(@RequestBody bookCreateDTO: BookCreateDTO) {
         bookService.createBook(bookCreateDTO)
     }
 
-    @PutMapping("/editar-libro/{id}")
+    @PutMapping("/edit-book/{id}")
     fun editBook(@PathVariable id: Int, @RequestBody bookCreateDTO: BookCreateDTO) {
         bookService.updateBook(id, bookCreateDTO)
     }
 
-    @DeleteMapping("/eliminar-libro/{id}")
+    @DeleteMapping("/delete-book/{id}")
     fun deleteBook(@PathVariable id: Int) {
         bookService.deleteBook(id)
     }
