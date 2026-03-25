@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import kotlin.math.ceil
 
 
@@ -77,5 +79,12 @@ class BookService(
     }
 
     fun getBookById(id: Int): Book =
-        bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")}
+        bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")
 
+    fun recalculateBibliokarmas(bookId: Int, userId: Int, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
+        val book = bookRepository.getObject(bookId)
+        val user = userRepository.getObject(userId)
+        val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()
+        return book.calculateBibliokarmas(days, user.bibliokarmas)
+    }
+}

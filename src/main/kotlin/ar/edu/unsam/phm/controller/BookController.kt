@@ -17,7 +17,6 @@ import java.time.LocalDate
 class BookController(
     val bookService: BookService,
 ) {
-
     @GetMapping("/filtered-books")
     fun getFilteredBooks(
         @ModelAttribute criteria: BookSearchCriteria,
@@ -53,17 +52,9 @@ class BookController(
         bookService.getBookById(id).toDTO()
 
     @GetMapping("/book-detail/{id}/bibliokarmas")
-    fun calculateBibliokarmas(
-        @PathVariable id: Int,
-        @RequestParam userId: Int,
-        @RequestParam pickUpDate: LocalDate,
-        @RequestParam dropOffDate: LocalDate
-    ): Int {
-        val book = bookService.getBookById(id)
-        val user = bookService.getUser(userId)
-        val tempReservation = Reservation(user = user, pickUpDate = pickUpDate, dropOffDate = dropOffDate)
-        return book.calculateBibliokarmas(tempReservation.reservationDays(), user.bibliokarmas)
-    }
+    fun calculateBibliokarmas(@PathVariable id: Int, @RequestParam userId: Int, @RequestParam pickUpDate: LocalDate, @RequestParam dropOffDate: LocalDate): Int =
+        bookService.recalculateBibliokarmas(id, userId, pickUpDate, dropOffDate)
+
 
     @GetMapping("/book-genders")
     fun getBookGenders() = Gender.entries

@@ -28,20 +28,11 @@ class ReservationController(
     val bookService: BookService,
     val userService: UserService
 ) {
-
-    // Esto lo hace dana seguro
     @PostMapping("/create-reservation")
     fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
-        val book = bookService.getBookById(reservationDTO.bookId)
-        val user = userService.getUserById(reservationDTO.sessionId)
-        val reservation = Reservation(
-            book = book,
-            user = user,
-            pickUpDate = reservationDTO.pickUpDate,
-            dropOffDate = reservationDTO.dropOffDate
-        )
-        reservationService.createReservation(reservation)
+        reservationService.createReservation(reservationDTO)
     }
+
     // ESTAS SON LAS RESERVAS QUE VOS HICISTE
     @GetMapping("/lector/{userId}")
     fun getReservesByUserId(
@@ -94,8 +85,4 @@ class ReservationController(
     @GetMapping("/reservations/book/{bookId}/dates")
     fun getReservedDatesByBook(@PathVariable bookId: Int): List<ReservedPeriodDTO> =
         reservationService.getReservedDates(bookId)
-
-//    @GetMapping("/book-review/{bookId}/average")
-//    fun getBookAverageRating(@PathVariable bookId: Int): Double =
-//        reservationService.getBookAverageRating(bookId)
 }

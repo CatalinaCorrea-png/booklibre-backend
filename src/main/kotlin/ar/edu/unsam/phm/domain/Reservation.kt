@@ -17,7 +17,7 @@ data class Reservation (
     override var id = 0
     val state: State get() = calculateState() // se recalcula cada vez que se accede, lo saco de el constructor
 
-    fun reservationDays(): Int = ChronoUnit.DAYS.between(pickUpDate, dropOffDate).toInt()
+    fun reservationDays(): Int = ChronoUnit.DAYS.between(pickUpDate, dropOffDate).toInt() + 1
 
     // Se superponen si:
     // El inicio de A NO es después del fin de B

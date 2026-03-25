@@ -27,17 +27,20 @@ class ReservationService(
     val bookRepository: BookRepository,
     val userRepository: UserRepository
 ){
-    fun createReservation(reservation: Reservation) {
+    fun createReservation(reservation: CreateReservationDTO) {
+        val book = bookRepository.getObject(reservation.bookId)
+        val user = userRepository.getObject(reservation.sessionId)
+        val reservation = Reservation(
+            book = book,
+            user = user,
+            pickUpDate = reservation.pickUpDate,
+            dropOffDate = reservation.dropOffDate
+        )
         reservation.validate()
         if (!canReserve(reservation)) throw BusinessException("Reserva no disponible en esa fecha")
         reservationRepository.create(reservation)
-
-        // Acá sumo la reserva al libro?????
-        val book = bookRepository.getObject(reservation.book.id)
         book.addReservation(reservation.id)
-//        reservation.state = State.BORROWED
 
-        val user = userRepository.getObject(reservation.user.id)
         user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas))
     }
 
@@ -154,14 +157,4 @@ class ReservationService(
         reservationRepository.repositoryObjects()
             .filter { it.book.id == bookId }
             .map { ReservedPeriodDTO(it.pickUpDate, it.dropOffDate) }
-
-//    fun getBookAverageRating(bookId: Int): Double {
-//        val reviews = reservationRepository.repositoryObjects()
-//            .filter { it.book.id == bookId }
-//            .filter { it.review.rating > 0 }
-//            .map { it.review.rating }
-//
-//        return if (reviews.isEmpty()) 0.0 else reviews.average()
-//    }
-
 }
