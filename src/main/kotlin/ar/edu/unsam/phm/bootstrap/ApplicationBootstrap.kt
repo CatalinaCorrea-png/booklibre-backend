@@ -52,7 +52,7 @@ object ApplicationBootstrap {
         email = "emilia@example.com",
         cel = "1112345678",
         location = "Buenos Aires, AR",
-        timestamp = "2021-10-27",
+        timestamp = "27/10/2021",
         userType = UserTypes.COMBINED,
         password = "123456",
         bibliokarmas = 110,
