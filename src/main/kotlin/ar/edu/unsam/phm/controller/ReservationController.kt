@@ -29,7 +29,6 @@ class ReservationController(
     val userService: UserService
 ) {
 
-    // Esto lo hace dana seguro
     @PostMapping("/create-reservation")
     fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
         val book = bookService.getBookById(reservationDTO.bookId)
@@ -72,12 +71,8 @@ class ReservationController(
         @RequestParam(defaultValue = "DATE_DESC") sortCriteria: SortCriteria,
         @RequestParam page: Int,
         @RequestParam pageSize: Int
-    ): PagedResult<ReservationProfileDTO> {
-        val userOwnBooks: List<Reservation> = reservationService.getUserOwnBooks(userId)
-        val userOwnBooksDTOs: List<ReservationProfileDTO> = userOwnBooks.map { it.toReservationProfileDTO() }
-        val filteredAndSortedBooks: PagedResult<ReservationProfileDTO> = reservationService.filterAndSortUserBooks(userOwnBooksDTOs, page, pageSize, filterCriteria, sortCriteria)
-        return filteredAndSortedBooks
-    }
+    ): PagedResult<ReservationProfileDTO> =
+        reservationService.orchestrateFilterAndSortBooks(userId, page, pageSize, filterCriteria, sortCriteria)
 
     @GetMapping("/userReadBooks/{userId}")
     fun getUserReadBooks(@PathVariable userId: Int): Int =
@@ -94,8 +89,4 @@ class ReservationController(
     @GetMapping("/reservations/book/{bookId}/dates")
     fun getReservedDatesByBook(@PathVariable bookId: Int): List<ReservedPeriodDTO> =
         reservationService.getReservedDates(bookId)
-
-//    @GetMapping("/book-review/{bookId}/average")
-//    fun getBookAverageRating(@PathVariable bookId: Int): Double =
-//        reservationService.getBookAverageRating(bookId)
 }

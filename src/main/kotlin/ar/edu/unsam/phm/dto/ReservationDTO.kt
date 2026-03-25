@@ -57,16 +57,15 @@ data class ReservationProfileDTO(
     // Pero tambien puede estar bueno que te lleve al libro reservado
     val id: Int,
     val book: ProfileBookDTO,
-    var state: String
+    var state: State
 )
 
 fun Reservation.toReservationProfileDTO(): ReservationProfileDTO {
-    val isBorrowed = LocalDate.now().isBetween(this.pickUpDate, this.dropOffDate)
 
     val reservationProfileDTO = ReservationProfileDTO(
         id = this.id,
         book = this.book.toProfileBookDTO(),
-        state = if (!isBorrowed) State.AVAILABLE.value else State.BORROWED.value
+        state = this.state
     )
     return reservationProfileDTO
 }
