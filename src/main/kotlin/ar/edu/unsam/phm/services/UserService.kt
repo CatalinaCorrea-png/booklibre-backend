@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption
 import java.util.UUID
 
 import ar.edu.unsam.phm.errors.BusinessException
+import ar.edu.unsam.phm.errors.ConflictException
 import org.springframework.web.multipart.MultipartFile
 
 
@@ -42,13 +43,12 @@ class UserService(
 
     fun create(user: User) {
         val existingUser: List<User> = userRepository.search(user.email)
-        if (existingUser.isEmpty()){
+        if (existingUser.isEmpty()) {
             user.meetsCreationCriteria()
             userRepository.create(user)
-        }else{
-            throw BusinessException("Email incorrecto")
-        }
-    }
+        }  else {
+            throw ConflictException("Email '${user.email}' ya se encuentra registrado")
+    }}
 
     fun getUserById(id: Int): User =
         userRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")
