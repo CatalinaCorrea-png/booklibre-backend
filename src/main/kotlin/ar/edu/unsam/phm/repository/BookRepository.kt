@@ -14,20 +14,20 @@ import kotlin.math.ceil
 class BookRepository(): Repository<Book>() {
 
     fun findAllByUserId(userId: Int): List<Book> =
-            this.repositoryObjects().filter { book -> book.owner.id == userId }
+        this.repositoryObjects().filter { book -> book.owner.id == userId }
 
     fun findAllByCriteria(criteria: BookSearchCriteria, reservedBookIds: Set<Int>, pageable: Pageable): Page<Book> {
 
         val filteredAndAvailable = this.repositoryObjects().filter { book ->
             book.owner.id != criteria.userId &&     // no me traigo mis propios libros
-            book.id !in reservedBookIds &&          // no está reservado
-            // filtros de busqueda de libro
-            book.meetsSearchCriteria(criteria.title?.trim()!!) &&
-            (criteria.genders.isEmpty() ||
-            criteria.genders.any { gender -> book.matchesPartiallyWith(gender.value, book.gender.value) } )&&
-            book.meetsPagesCriteria(criteria.pagesRangeMin, criteria.pagesRangeMax) &&
-            book.matchesPartiallyWith(criteria.isbn?.trim()!!, book.isbn) &&
-            book.matchesPartiallyWith(criteria.ownersName?.trim()!!, book.owner.name)
+                    book.id !in reservedBookIds &&          // no está reservado
+                    // filtros de busqueda de libro
+                    book.meetsSearchCriteria(criteria.title?.trim()!!) &&
+                    (criteria.genders.isEmpty() ||
+                            criteria.genders.any { gender -> book.matchesPartiallyWith(gender.value, book.gender.value) } )&&
+                    book.meetsPagesCriteria(criteria.pagesRangeMin, criteria.pagesRangeMax) &&
+                    book.matchesPartiallyWith(criteria.isbn?.trim()!!, book.isbn) &&
+                    book.matchesPartiallyWith(criteria.ownersName?.trim()!!, book.owner.name)
         }
 
         val sorted = sortInMemory(filteredAndAvailable, pageable.sort)
