@@ -91,15 +91,10 @@ class ReservationService(
         reservationRepository.repositoryObjects().filter { reservation ->
             reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
 
-    fun getUserLentBooksNumber(userId: Int): Int {
-        val userReserves: List<Reservation> = reservationRepository.repositoryObjects().filter { reservation ->
-            reservation.bookOwnerId() == userId }
+    fun getUserLentBooksNumber(userId: Int): Int =
+        reservationRepository.repositoryObjects().filter { reservation ->
+            reservation.bookOwnerId() == userId && (reservation.state == State.ACTIVE || reservation.state == State.BORROWED || reservation.state == State.SOON_TO_END)}.size
 
-        val userReservesDTO: List<ReservationProfileDTO> = userReserves.map { it.toReservationProfileDTO() }
-
-        return userReservesDTO.filter { reservation -> reservation.state.value == "Prestado" }.size
-
-    }
 
     fun orchestrateFilterAndSortBooks(userId: Int, page: Int, pageSize: Int, filterCriteria: FilterCriteria, sortCriteria: SortCriteria): PagedResult<ReservationProfileDTO> {
         val userOwnBooks: List<Reservation> = this.getUserOwnBooks(userId)
