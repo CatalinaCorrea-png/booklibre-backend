@@ -21,7 +21,8 @@ data class BookDTO(
     var reservationsIds: MutableList<Int>,
     var owner: UserDTO,
     var imageSrc: String,
-    var bookBibliokarmas: Int = 0
+    var bookBibliokarmas: Int = 0,
+    var rating: Double = 0.0
     ) {
 
     fun fromDTO(): Book {
@@ -55,7 +56,6 @@ fun Book.toDTO(): BookDTO{
         gender = this.gender.value,
         authorName = this.author.name,
         authorAvatarUrl = this.author.avatar,
-//        bookType = "COMUN",
         numPages = this.numPages,
         isbn=  this.isbn,
         language = this.language.value,
@@ -65,7 +65,7 @@ fun Book.toDTO(): BookDTO{
         reservationsIds = this.reservationsIds,
         owner = this.owner.toUserDTO(),
         imageSrc = this.imageSrc,
-        bookType =  this.bookType,
+        bookType =  this.bookType
     )
     return bookDTO
 }

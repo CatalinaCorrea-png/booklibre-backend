@@ -55,9 +55,9 @@ class BookService(
         val page : Page<Book> = bookRepository.findAllByCriteria(searchCriteria, reservedBookIds, pageable)
 
         val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
-
+        val booksWithRatings : List<BookDTO> = calculateRatingAvg(booksWithBibliokarmasDTO)
         return PageResponse(
-            content = booksWithBibliokarmasDTO,
+            content = booksWithRatings,
             page = page.number,
             pageSize = page.size,
             totalElements = page.totalElements.toInt(),
@@ -74,6 +74,14 @@ class BookService(
             bookDTO
         }
         return bookDTOs
+    }
+
+    fun calculateRatingAvg(booksDTO: List<BookDTO>) : List<BookDTO> {
+        return booksDTO.map { bookDTO ->
+            val ratings = reservationRepository.findRatingsByBookId(bookDTO.id)
+            bookDTO.rating = if (ratings.isEmpty()) 0.0 else ratings.average()
+            bookDTO
+        }
     }
 
     fun getUser(id: Int): User {

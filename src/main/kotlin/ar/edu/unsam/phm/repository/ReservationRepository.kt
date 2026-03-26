@@ -18,6 +18,10 @@ class ReservationRepository: Repository<Reservation>() {
         return this.repositoryObjects().filter { it.book.id == bookId }
     }
 
+    fun findRatingsByBookId(bookId: Int): List<Int> {
+        return this.repositoryObjects().filter { it.book.id == bookId }.map { it.review.rating }
+    }
+
     fun findReservedBookIds(criteria: BookSearchCriteria): Set<Int> {
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
 
