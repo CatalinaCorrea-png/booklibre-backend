@@ -35,7 +35,7 @@ class UserService(
     fun search( user: User) : User {
         val userMatch = userRepository.search(user.email)
         if (userMatch.isEmpty()){
-            throw NotFoundException("Credenciales incorrectas")
+            throw BusinessException("Credenciales incorrectas")
         }else{
             return userMatch.first()
         }
