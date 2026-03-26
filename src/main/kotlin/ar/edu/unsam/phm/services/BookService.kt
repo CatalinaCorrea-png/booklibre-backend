@@ -78,7 +78,7 @@ class BookService(
 
     fun calculateRatingAvg(booksDTO: List<BookDTO>) : List<BookDTO> {
         return booksDTO.map { bookDTO ->
-            val ratings = reservationRepository.findRatingsByBookId(bookDTO.id)
+            val ratings = reservationRepository.findRatingsByBookId(bookDTO.id).filter { !(it <= 0.0) }
             bookDTO.rating = if (ratings.isEmpty()) 0.0 else ratings.average()
             bookDTO
         }
