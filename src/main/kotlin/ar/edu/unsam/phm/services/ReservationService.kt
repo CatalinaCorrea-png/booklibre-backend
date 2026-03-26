@@ -111,11 +111,9 @@ class ReservationService(
 
     fun getUserOwnBooks(userId: Int): List<Reservation> {
         val everyUserOwnBook: List<Book> = bookRepository.findAllByUserId(userId)
-        val existingBookIds = everyUserOwnBook.map { it.id }.toSet()
 
         val reservationsWithBooksOwnByUser: List<Reservation> = reservationRepository
             .findByOwnerId(userId)
-            .filter { existingBookIds.contains(it.book.id) }
 
         val userNotReservedBooks = this.filterNoReservedBooks(everyUserOwnBook, reservationsWithBooksOwnByUser)
         val userNotReservedBooksInReservation = generateEmptyReservationsForNotReservedBooks(userNotReservedBooks)
@@ -126,23 +124,6 @@ class ReservationService(
 
         return everyUserBookInReservation
     }
-
-//    fun getUserOwnBooks(userId: Int): List<Reservation> {
-//
-//        val everyUserOwnBook: List<Book> = bookRepository.findAllByUserId(userId)
-//
-//        val reservationsWithBooksOwnByUser: List<Reservation> = reservationRepository.findByOwnerId(userId)
-//
-//        val userNotReservedBooks = this.filterNoReservedBooks(everyUserOwnBook, reservationsWithBooksOwnByUser)
-//
-//        val userNotReservedBooksInReservation = generateEmptyReservationsForNotReservedBooks(userNotReservedBooks)
-//
-//        val everyUserBookInReservation = (reservationsWithBooksOwnByUser + userNotReservedBooksInReservation)
-//            .sortedByDescending { it.pickUpDate }
-//            .distinctBy { it.book.id }
-//
-//        return everyUserBookInReservation
-//    }
 
     fun filterAndSortUserBooks(bookList: List<ReservationProfileDTO>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
         var filteredAndSortedBookList: List<ReservationProfileDTO> = bookList
