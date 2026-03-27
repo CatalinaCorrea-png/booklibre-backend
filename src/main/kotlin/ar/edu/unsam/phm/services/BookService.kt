@@ -52,7 +52,10 @@ class BookService(
 
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
         val reservedBookIds : Set<Int> = reservationRepository.findReservedBookIds(searchCriteria)
-        val page : Page<Book> = bookRepository.findAllByCriteria(searchCriteria, reservedBookIds, pageable)
+        // no pasar ids al repo. Me traigo las dos listas y hago la dif aca (sacar las reservadas
+        val filteredAndAvailable : List<Book> = bookRepository.findAllByCriteria(searchCriteria).filter { book -> book.id !in reservedBookIds } // no está reservado
+
+        val page : Page<Book> = bookRepository.sortAndPage(filteredAndAvailable, pageable)
 
         val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
         val booksWithRatings : List<BookDTO> = calculateRatingAvg(booksWithBibliokarmasDTO)

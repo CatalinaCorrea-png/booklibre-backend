@@ -16,11 +16,10 @@ class BookRepository(): Repository<Book>() {
     fun findAllByUserId(userId: Int): List<Book> =
         this.repositoryObjects().filter { book -> book.owner.id == userId }
 
-    fun findAllByCriteria(criteria: BookSearchCriteria, reservedBookIds: Set<Int>, pageable: Pageable): Page<Book> {
+    fun findAllByCriteria(criteria: BookSearchCriteria): List<Book> {
 
         val filteredAndAvailable = this.repositoryObjects().filter { book ->
             book.owner.id != criteria.userId &&     // no me traigo mis propios libros
-                    book.id !in reservedBookIds &&          // no está reservado
                     // filtros de busqueda de libro
                     book.meetsSearchCriteria(criteria.title?.trim()!!) &&
                     (criteria.genders.isEmpty() ||
@@ -30,7 +29,11 @@ class BookRepository(): Repository<Book>() {
                     book.matchesPartiallyWith(criteria.ownersName?.trim()!!, book.owner.name)
         }
 
-        val sorted = sortInMemory(filteredAndAvailable, pageable.sort)
+        return filteredAndAvailable
+    }
+
+    fun sortAndPage(books: List<Book>, pageable: Pageable) : Page<Book> {
+        val sorted = sortInMemory(books, pageable.sort)
 
         val from = (pageable.pageNumber * pageable.pageSize).coerceAtMost(sorted.size) // primer libro de la pagina
         val to = (from + pageable.pageSize).coerceAtMost(sorted.size) // ultimo libro de la pagina
