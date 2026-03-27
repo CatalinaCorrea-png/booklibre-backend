@@ -101,8 +101,7 @@ class ReservationService(
         return reservationRepository.getFilteredAndSortedReservations(userId, userBooksIntoReservations, page, pageSize, filterCriteria, sortCriteria)
     }
 
-    private fun generateEmptyReservationsForNotReservedBooks(booksIds: List<Int>): List<Reservation> {
-        val books = bookRepository.getObjectsByIds(booksIds)
+    private fun generateEmptyReservationsForNotReservedBooks(books: List<Book>): List<Reservation> {
         return books.map { book ->
             Reservation(
                 book = book,
@@ -113,8 +112,8 @@ class ReservationService(
     }
 
     fun getUserOwnBooksIntoReservations(userId: Int): List<Reservation> {
-        val userOwnBookIds: List<Int> = bookRepository.findAllByUserId(userId).map { it.id }
-        val notReservedBooksIds: List<Int> = reservationRepository.filterNoReservedBooks(userOwnBookIds)
+        val userOwnBookIds: List<Book> = bookRepository.findAllByUserId(userId)
+        val notReservedBooksIds: List<Book> = reservationRepository.filterNoReservedBooks(userOwnBookIds)
 
         return generateEmptyReservationsForNotReservedBooks(notReservedBooksIds)
     }

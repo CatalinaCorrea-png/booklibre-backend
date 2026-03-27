@@ -52,8 +52,8 @@ class ReservationRepository: Repository<Reservation>() {
             .filter { it.pickUpDate.isAfter(LocalDate.now()) }
             .forEach { delete(it.id) }
 
-    fun filterNoReservedBooks(booksIds: List<Int>): List<Int> =
-        booksIds.filter { bookId -> this.repositoryObjects().none { reservation -> reservation.book.id == bookId } }
+    fun filterNoReservedBooks(books: List<Book>): List<Book> =
+        books.filter { book -> this.repositoryObjects().none { reservation -> reservation.book.id == book.id } }
 
     fun getFilteredAndSortedReservations(userId: Int, fictitiouslyGenReservations: List<Reservation>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
         val userReservations: List<Reservation> = this.findByOwnerId(userId)
