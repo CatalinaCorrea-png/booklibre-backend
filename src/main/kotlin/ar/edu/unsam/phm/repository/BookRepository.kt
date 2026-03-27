@@ -52,4 +52,7 @@ class BookRepository(): Repository<Book>() {
             books.sortedByDescending { field.selector(it) }
     }
 
+    fun getObjectsByIds(bookIds: List<Int>): List<Book> =
+        this.repositoryObjects().filter { book -> bookIds.any { id -> book.id == id } }
+
 }

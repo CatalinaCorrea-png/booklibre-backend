@@ -1,9 +1,9 @@
 package ar.edu.unsam.phm.repository
 
-import ar.edu.unsam.phm.domain.Book
-import ar.edu.unsam.phm.domain.BookSearchCriteria
-import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.dto.*
 import java.time.LocalDate
+import kotlin.math.ceil
 
 @org.springframework.stereotype.Repository
 class ReservationRepository: Repository<Reservation>() {
@@ -51,4 +51,31 @@ class ReservationRepository: Repository<Reservation>() {
         findByBookId(bookId)
             .filter { it.pickUpDate.isAfter(LocalDate.now()) }
             .forEach { delete(it.id) }
+
+    fun filterNoReservedBooks(booksIds: List<Int>): List<Int> =
+        booksIds.filter { bookId -> this.repositoryObjects().none { reservation -> reservation.book.id == bookId } }
+
+    fun getFilteredAndSortedReservations(userId: Int, fictitiouslyGenReservations: List<Reservation>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
+        val userReservations: List<Reservation> = this.findByOwnerId(userId)
+        val distAndSort: List<Reservation> = this.sortByDescAndDistinct(userReservations + fictitiouslyGenReservations)
+        return this.filterAndSortReservations(distAndSort, page, pageSize, filterCrit, sortCrit)
+
+    }
+
+    fun sortByDescAndDistinct(reservations: List<Reservation>) =
+        reservations.sortedByDescending { it.pickUpDate }.distinctBy { it.book.id }
+
+    fun filterAndSortReservations(reservations: List<Reservation>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
+        val filteredAndSortedBookList: List<ReservationProfileDTO> = reservations
+            .filter ( filterCrit.predicate ) // equiv. to { reservation -> filterCrit.predicate(reservation) }
+            .sortedWith ( sortCrit.comparator )
+            .map { it.toReservationProfileDTO() }
+
+        return PagedResult(
+            items = filteredAndSortedBookList.drop(page * pageSize).take(pageSize),
+            total = filteredAndSortedBookList.size,
+            totalPages = ceil(filteredAndSortedBookList.size.toDouble() / pageSize).toInt()
+        )
+    }
+
 }

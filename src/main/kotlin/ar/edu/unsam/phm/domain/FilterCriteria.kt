@@ -1,8 +1,7 @@
 package ar.edu.unsam.phm.domain
 
-import ar.edu.unsam.phm.dto.ReservationProfileDTO
 
-enum class FilterCriteria(val predicate: (ReservationProfileDTO) -> Boolean) {
+enum class FilterCriteria(val predicate: (Reservation) -> Boolean) {
     ALL({ reservation -> true }),
     AVAILABLE({ reservation -> reservation.state == State.RETURNED
                             || reservation.state == State.RESERVED

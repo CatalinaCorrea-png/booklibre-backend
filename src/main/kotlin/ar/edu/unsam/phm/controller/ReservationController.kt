@@ -61,8 +61,8 @@ class ReservationController(
         @PathVariable userId: Int,
         @RequestParam(defaultValue = "ALL") filterCriteria: FilterCriteria,
         @RequestParam(defaultValue = "DATE_DESC") sortCriteria: SortCriteria,
-        @RequestParam page: Int,
-        @RequestParam pageSize: Int
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "4") pageSize: Int
     ): PagedResult<ReservationProfileDTO> =
         reservationService.orchestrateFilterAndSortBooks(userId, page, pageSize, filterCriteria, sortCriteria)
 
