@@ -38,7 +38,7 @@ open class Repository <Type: RepositoryElement> {
         this.collection[index] = updatedObject
     }
 
-    private fun objectInCollection(id: Int): Boolean =
+    fun objectInCollection(id: Int): Boolean =
         this.collection.any { item -> item.id == id }
 
     private fun findObject(id: Int): Type =

@@ -96,10 +96,8 @@ fun Book.toProfileBookDTO(): ProfileBookDTO {
 //hago un DTO aparte para la creacion, ya que en el create no necesito ID, ni reservations ID ni owner
 data class BookCreateDTO(
     val title: String = "",
-    val bookType: String = "",
     val desc: String = "",
     val gender: String = "",
-    val book: String = "",
     val authorName: String = "",
     val authorAvatarUrl: String = "",
     val numPages: Int = 0,
@@ -109,28 +107,27 @@ data class BookCreateDTO(
     val publishDate: LocalDate? = null,
     val condition: String = "",
     val imageSrc: String = "",
-    val ownerId: Int = 0
+    val ownerId: Int = 0,
+    val book: Book
 )
 
-fun BookCreateDTO.createFromDTO(owner: User): Book {
-    val title = this.title
-    val desc = this.desc
-    val gender = Gender.entries.find { it.value == this.gender } ?: throw IllegalArgumentException("Genero invalido: ${this.gender}")
-    val author = Author(this.authorName, this.authorAvatarUrl)
-    val numPages = this.numPages
-    val isbn = this.isbn
-    val language = Language.entries.find { it.value == this.language } ?: throw IllegalArgumentException("Idioma invalido: ${this.language}")
-    val editorial = this.editorial
-    val publishDate = this.publishDate ?: LocalDate.now()
-    val condition = BookCondition.entries.find { it.value == this.condition } ?: throw IllegalArgumentException("Condicion invalida: ${this.language}")
-    val owner = owner
-    val imageSrc = this.imageSrc
+fun BookCreateDTO.createFromDTO(owner:User): Book = this.book.apply { this.owner = owner }
 
-    return when (this.bookType) {
-        "COMUN" -> Common(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, mutableListOf(), owner, imageSrc)
-        "CON DEDICATORIA" -> WithADedication(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, mutableListOf(), owner, imageSrc)
-        "COLECCIONABLE" -> Collectable(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, mutableListOf(), owner, imageSrc)
-        else -> throw ConflictException("Tipo de libro inválido: ${this.bookType}")
-    }
-}
+
+fun Book.toBookCreateDTO() = BookCreateDTO(
+    title        = this.title,
+    desc         = this.desc,
+    gender       = this.gender.value,
+    authorName   = this.author.name,
+    authorAvatarUrl = this.author.avatar,
+    numPages     = this.numPages,
+    isbn         = this.isbn,
+    language     = this.language.value,
+    editorial    = this.editorial,
+    publishDate  = this.publishDate,
+    condition    = this.condition.value,
+    imageSrc     = this.imageSrc,
+    ownerId      = this.owner.id,
+    book         = this                  // toma el bookType que Jackson serializa
+)
 

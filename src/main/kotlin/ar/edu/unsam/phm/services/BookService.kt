@@ -26,6 +26,9 @@ class BookService(
 ) {
 
     fun createBook(bookCreateDTO: BookCreateDTO){
+        if (!userRepository.objectInCollection(bookCreateDTO.ownerId)) {
+            throw NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}")
+        }
         val owner = userRepository.getObject(bookCreateDTO.ownerId)
         val newBook = bookCreateDTO.createFromDTO(owner)
         newBook.meetsCreationCriteria()
@@ -33,19 +36,22 @@ class BookService(
     }
 
     fun updateBook(id: Int, bookCreateDTO: BookCreateDTO) {
+        if (!userRepository.objectInCollection(bookCreateDTO.ownerId)) {
+            throw NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}")
+        }
+        if (!bookRepository.objectInCollection(id)) {
+            throw NotFoundException("No existe el libro con id: $id")
+        }
         val owner = userRepository.getObject(bookCreateDTO.ownerId)
         val newBook = bookCreateDTO.createFromDTO(owner)
         val existingBook = bookRepository.getObject(id)
         newBook.id = existingBook.id
         newBook.meetsCreationCriteria()
         bookRepository.update(newBook)
-
         reservationRepository.updateBookReference(newBook)
     }
 
     fun deleteBook(bookId: Int) {
-        if (reservationRepository.hasActiveReservations(bookId))
-            throw BusinessException("No se puede eliminar el libro porque tiene reservas activas")
         reservationRepository.deleteFutureReservations(bookId)
         bookRepository.delete(bookId)
     }
