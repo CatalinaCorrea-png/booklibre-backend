@@ -32,10 +32,7 @@ class UserController(private val userService: UserService) {
 
     @PostMapping("/register")
     fun createUser(@RequestBody request: AuthRegisterRequest): AuthResponse {
-        val user = User(
-            email = request.email,
-            password = request.password,
-            name = request.name
+        val user = User(email = request.email, password = request.password, name = request.name
         )
         userService.create(user)
         return AuthResponse(
