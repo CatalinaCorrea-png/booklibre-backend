@@ -35,17 +35,12 @@ class ReservationService(
             dropOffDate = reservation.dropOffDate
         )
         reservation.validate()
-        if (!canReserve(reservation)) throw BusinessException("Reserva no disponible en esa fecha")
+        if (!reservationRepository.hasOverlappingReservation(book.id, reservation)) {
+            throw BusinessException("Reserva no disponible en esa fecha")
+        }
         reservationRepository.create(reservation)
         user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas))
         book.addReservation(reservation.id)
-    }
-
-    // esto tiene que estar negado asi devuelve true si no hay solapamiento
-    fun canReserve(reservation: Reservation) : Boolean = reservationRepository.repositoryObjects().none { it.book.id == reservation.book.id && it.dateOverlaps(reservation) }
-
-    fun getAvailableReservations(reservation: Reservation) : MutableList<Reservation> {
-        return reservationRepository.repositoryObjects().filter { it.dateOverlaps(reservation) }.toMutableList()
     }
 
     fun getReservesByUserId(userId: Int, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
@@ -119,17 +114,13 @@ class ReservationService(
     }
 
     fun getBookReviews(bookId: Int, page: Int = 0, pageSize: Int = 2): List<Review> {
-        return reservationRepository.repositoryObjects()
-            .filter { it.book.id == bookId && it.review.notEmptyReview() }
-            .sortedByDescending { it.review.timestamp }
+        return reservationRepository.findReviewsByBookId(bookId)
             .drop(page * pageSize)
             .take(pageSize)
             .map { it.review }
     }
 
     fun getReservedDates(bookId: Int): List<ReservedPeriodDTO> =
-        reservationRepository.repositoryObjects()
-            .filter { it.book.id == bookId }
+        reservationRepository.findByBookId(bookId)
             .map { ReservedPeriodDTO(it.pickUpDate, it.dropOffDate) }
-
 }

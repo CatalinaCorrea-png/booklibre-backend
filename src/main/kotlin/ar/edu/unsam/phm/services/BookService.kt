@@ -98,7 +98,7 @@ class BookService(
     }
 
     fun getBookById(id: Int): Book =
-        bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")
+        bookRepository.getObject(id)
 
     fun recalculateBibliokarmas(bookId: Int, userId: Int, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
         val book = bookRepository.getObject(bookId)

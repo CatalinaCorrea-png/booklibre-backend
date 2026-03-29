@@ -67,4 +67,17 @@ class ReservationRepository: Repository<Reservation>() {
         )
     }
 
+    fun hasReservationsForBook(bookId: Int): Boolean =
+        repositoryObjects().any { it.book.id == bookId }
+
+    fun hasDateOverlap(reservation: Reservation): Boolean =
+        repositoryObjects().none { it.dateOverlaps(reservation) }
+
+    fun hasOverlappingReservation(bookId: Int, reservation: Reservation): Boolean =
+        repositoryObjects().none { hasReservationsForBook(bookId) && hasDateOverlap(reservation) }
+
+    fun findReviewsByBookId(bookId: Int): List<Reservation> =
+        findByBookId(bookId)
+            .filter { it.review.notEmptyReview() }
+            .sortedByDescending { it.review.timestamp }
 }
