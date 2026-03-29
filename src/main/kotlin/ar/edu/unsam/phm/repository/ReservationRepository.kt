@@ -37,19 +37,8 @@ class ReservationRepository: Repository<Reservation>() {
             .forEach { it.book = updatedBook }
     }
 
-
-    fun hasActiveReservations(bookId: Int): Boolean =
-        findByBookId(bookId).any { reservation ->
-            val today = LocalDate.now()
-            !today.isAfter(reservation.dropOffDate) && !today.isBefore(reservation.pickUpDate)
-        }
-
-    fun hasFutureReservations(bookId: Int): Boolean =
-        findByBookId(bookId).any { it.pickUpDate.isAfter(LocalDate.now()) }
-
-    fun deleteFutureReservations(bookId: Int) =
+    fun deleteAllReservationsByBookId(bookId: Int) =
         findByBookId(bookId)
-            .filter { it.pickUpDate.isAfter(LocalDate.now()) }
             .forEach { delete(it.id) }
 
     fun filterNoReservedBooks(books: List<Book>): List<Book> =

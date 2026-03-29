@@ -52,7 +52,7 @@ class BookService(
     }
 
     fun deleteBook(bookId: Int) {
-        reservationRepository.deleteFutureReservations(bookId)
+        reservationRepository.deleteAllReservationsByBookId(bookId)
         bookRepository.delete(bookId)
     }
 
