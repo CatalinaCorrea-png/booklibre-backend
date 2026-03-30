@@ -889,7 +889,8 @@ object ApplicationBootstrap {
 
         listOf(
             reservaEmiliaPasada1, reservaEmiliaPasada2, reservaEmiliaPasada3,
-            reservaLucianoPasada1, reservaLucianoPasada2, reservaLucianoPasada3,
+            //reservaLucianoPasada1, reservaLucianoPasada2, reservaLucianoPasada3,
+            reservaLucianoPasada1, reservaLucianoPasada2,
             reservaValentinaPasada1, reservaValentinaPasada2, reservaValentinaPasada3,
             reservaMateoPasada1, reservaMateoPasada2, reservaMateoPasada3,
             reservaElProceso2, reservaElProceso3,

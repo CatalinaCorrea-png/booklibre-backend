@@ -1,13 +1,13 @@
 spring:
   #   base de datos posta
   datasource:
-    url: jdbc:postgresql://0.0.0.0:5432/bookLibre
+    url: jdbc:postgresql://localhost:5432/booklibre
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    open-in-view: false
+    open-in-view: true
     show-sql: true
     hibernate:
       ddl-auto: create-drop

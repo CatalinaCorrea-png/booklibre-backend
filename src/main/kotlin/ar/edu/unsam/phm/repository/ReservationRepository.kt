@@ -2,10 +2,11 @@ package ar.edu.unsam.phm.repository
 
 import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.*
-import java.time.LocalDate
+import org.springframework.stereotype.Component
 import kotlin.math.ceil
 
-@org.springframework.stereotype.Repository
+//@org.springframework.stereotype.Repository
+@Component
 class ReservationRepository: Repository<Reservation>() {
 
     fun findByLectorId(userId: Int): List<Reservation> =
