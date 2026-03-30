@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:18-alpine
-    container_name: bookLibre_sql
+    container_name: booklibre_sql
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -14,7 +14,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin4_container_bookLibre
+    container_name: pgadmin4_container_booklibre
     restart: always
     ports:
       - "5050:80"
