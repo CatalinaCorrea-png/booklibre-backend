@@ -44,27 +44,20 @@ class ReservationService(
     }
 
     fun getReservesByUserId(userId: Int, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
-        val filtered = reservationRepository.findByLectorId(userId).filter { res ->
-            res.book.title.contains(search, ignoreCase = true) ||
-                    res.book.author.name.contains(search, ignoreCase = true)
-        }.map { it.toDTO()}
+        val result = reservationRepository.findByLectorIdFiltered(userId, search, page, pageSize)
         return PagedResult(
-            items = filtered.drop(page * pageSize).take(pageSize),
-            total = filtered.size,
-            totalPages = ceil(filtered.size.toDouble() / pageSize).toInt()
+            items = result.items.map { it.toDTO() },
+            total = result.total,
+            totalPages = result.totalPages
         )
     }
 
     fun getLoansMadeByUserId(userId: Int, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
-        val filtered = reservationRepository.findByOwnerId(userId).filter { res ->
-            res.book.title.contains(search, ignoreCase = true) ||
-                    res.book.author.name.contains(search, ignoreCase = true)
-        }.map { it.toDTO()}
-
+        val result = reservationRepository.findByOwnerIdFiltered(userId, search, page, pageSize)
         return PagedResult(
-            items = filtered.drop(page * pageSize).take(pageSize),
-            total = filtered.size,
-            totalPages = ceil(filtered.size.toDouble() / pageSize).toInt()
+            items = result.items.map { it.toDTO() },
+            total = result.total,
+            totalPages = result.totalPages
         )
     }
 

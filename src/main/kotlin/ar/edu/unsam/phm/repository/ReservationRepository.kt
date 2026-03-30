@@ -14,6 +14,34 @@ class ReservationRepository: Repository<Reservation>() {
     fun findByOwnerId(userId: Int): List<Reservation> =
         repositoryObjects().filter { it.book.owner.id == userId }
 
+    fun findByLectorIdFiltered(userId: Int, search: String, page: Int, pageSize: Int): PagedResult<Reservation> {
+        val filtered = findByLectorId(userId)
+            .filter { res ->
+                res.book.title.contains(search, ignoreCase = true) ||
+                        res.book.author.name.contains(search, ignoreCase = true)
+            }
+
+        return PagedResult(
+            items = filtered.drop(page * pageSize).take(pageSize),
+            total = filtered.size,
+            totalPages = ceil(filtered.size.toDouble() / pageSize).toInt()
+        )
+    }
+
+    fun findByOwnerIdFiltered(userId: Int, search: String, page: Int, pageSize: Int): PagedResult<Reservation> {
+        val filtered = findByOwnerId(userId)
+            .filter { res ->
+                res.book.title.contains(search, ignoreCase = true) ||
+                        res.book.author.name.contains(search, ignoreCase = true)
+            }
+
+        return PagedResult(
+            items = filtered.drop(page * pageSize).take(pageSize),
+            total = filtered.size,
+            totalPages = ceil(filtered.size.toDouble() / pageSize).toInt()
+        )
+    }
+
     fun findByBookId(bookId: Int): List<Reservation> {
         return this.repositoryObjects().filter { it.book.id == bookId }
     }
