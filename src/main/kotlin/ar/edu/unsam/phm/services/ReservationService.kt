@@ -82,14 +82,9 @@ class ReservationService(
         reservationRepository.update(reservation)
     }
 
-    fun getUserReservationsNumber(userId: Int): Int =
-        reservationRepository.repositoryObjects().filter { reservation ->
-            reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
+    fun getUserReservationsNumber(userId: Int): Int = reservationRepository.getUserReservationsNumber(userId)
 
-    fun getUserLentBooksNumber(userId: Int): Int =
-        reservationRepository.repositoryObjects().filter { reservation ->
-            reservation.bookOwnerId() == userId && (reservation.state == State.ACTIVE || reservation.state == State.BORROWED || reservation.state == State.SOON_TO_END)}.size
-
+    fun getUserLentBooksNumber(userId: Int): Int = reservationRepository.getUserLentBooksNumber(userId)
 
     fun orchestrateFilterAndSortBooks(userId: Int, page: Int, pageSize: Int, filterCriteria: FilterCriteria, sortCriteria: SortCriteria): PagedResult<ReservationProfileDTO> {
         val userBooksIntoReservations: List<Reservation> = this.getUserOwnBooksIntoReservations(userId)

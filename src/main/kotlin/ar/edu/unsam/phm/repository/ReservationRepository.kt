@@ -51,6 +51,12 @@ class ReservationRepository: Repository<Reservation>() {
 
     }
 
+    fun getUserReservationsNumber(userId: Int): Int = this.repositoryObjects().filter { reservation ->
+        reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
+
+    fun getUserLentBooksNumber(userId: Int): Int = this.repositoryObjects().filter { reservation ->
+            reservation.bookOwnerId() == userId && (reservation.state == State.ACTIVE || reservation.state == State.BORROWED || reservation.state == State.SOON_TO_END)}.size
+
     fun sortByDescAndDistinct(reservations: List<Reservation>) =
         reservations.sortedByDescending { it.pickUpDate }.distinctBy { it.book.id }
 
