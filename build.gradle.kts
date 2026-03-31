@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.serialization") version "1.9.0"
     kotlin("plugin.spring") version "1.9.24"
+    kotlin("plugin.jpa") version "1.9.24"
     jacoco
     war
 }
@@ -49,6 +50,10 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+
+    //para posgres y springboot
+    runtimeOnly("org.postgresql:postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }
 
 kotlin {

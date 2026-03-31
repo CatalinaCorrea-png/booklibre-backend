@@ -1,11 +1,10 @@
 package ar.edu.unsam.phm.dto
 import ar.edu.unsam.phm.domain.*
-import ar.edu.unsam.phm.errors.ConflictException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 data class BookDTO(
-    var id: Int,
+    var id: Long,
     var title: String,
     var bookType: String, // Para saber que clase instanciar (a chequear despues si usamos un jackson o algo de eso)
     var desc: String,
@@ -37,7 +36,7 @@ data class BookDTO(
             editorial= this.editorial,
             publishDate = this.publishDate,
             condition= BookCondition.valueOf(this.condition),
-            reservationsIds = this.reservationsIds, // Las pido acá... ??
+            reservationsIds = this.reservationsIds,
             owner= this.owner.fromDTO(),
             imageSrc = this.imageSrc,
 
@@ -50,7 +49,7 @@ data class BookDTO(
 
 fun Book.toDTO(): BookDTO{
     val bookDTO = BookDTO(
-        id = this.id,
+        id = this.id!!,
         title = this.title,
         desc = this.desc,
         gender = this.gender.value,
@@ -72,7 +71,7 @@ fun Book.toDTO(): BookDTO{
 
 
 data class ProfileBookDTO(
-    var id: Int,
+    var id: Long,
     var title: String,
     var authorName: String,
     var gender: String,
@@ -83,7 +82,7 @@ data class ProfileBookDTO(
 fun Book.toProfileBookDTO(): ProfileBookDTO {
     val formatter = DateTimeFormatter.ofPattern("d MMM, yyyy")
     val profileBookDTO = ProfileBookDTO(
-        id = this.id,
+        id = this.id!!,
         title = this.title,
         authorName = this.author.name,
         gender = this.gender.value,
@@ -107,7 +106,7 @@ data class BookCreateDTO(
     val publishDate: LocalDate? = null,
     val condition: String = "",
     val imageSrc: String = "",
-    val ownerId: Int = 0,
+    val ownerId: Long? = null,
     val book: Book
 )
 

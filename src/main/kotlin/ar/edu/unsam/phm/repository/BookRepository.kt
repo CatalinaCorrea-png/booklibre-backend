@@ -1,19 +1,17 @@
 package ar.edu.unsam.phm.repository
 
 import ar.edu.unsam.phm.domain.*
-import ar.edu.unsam.phm.dto.BookDTO
-import ar.edu.unsam.phm.dto.PageResponse
-import ar.edu.unsam.phm.dto.toDTO
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
-import kotlin.math.ceil
+import org.springframework.stereotype.Component
 
-@org.springframework.stereotype.Repository
+//@org.springframework.stereotype.Repository
+@Component
 class BookRepository(): Repository<Book>() {
 
-    fun findAllByUserId(userId: Int): List<Book> =
+    fun findAllByUserId(userId: Long): List<Book> =
         this.repositoryObjects().filter { book -> book.owner.id == userId }
 
     fun findAllByCriteria(criteria: BookSearchCriteria): List<Book> {
@@ -55,7 +53,7 @@ class BookRepository(): Repository<Book>() {
             books.sortedByDescending { field.selector(it) }
     }
 
-    fun getObjectsByIds(bookIds: List<Int>): List<Book> =
+    fun getObjectsByIds(bookIds: List<Long>): List<Book> =
         this.repositoryObjects().filter { book -> bookIds.any { id -> book.id == id } }
 
 }

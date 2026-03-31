@@ -6,7 +6,7 @@ import ar.edu.unsam.phm.domain.Reservation
 
 data class ReservationDTO(
     val book: BookDTO,
-    var id: Int,
+    var id: Long,
     var user: UserDTO,
     var review: ReviewDTO,
     var pickUpDate: LocalDate,
@@ -31,13 +31,11 @@ data class ReservationDTO(
 }
 
 fun Reservation.toDTO(): ReservationDTO {
-    //val currentState = this.state
-    //val canRate = currentState == State.RETURNED && this.review.rating == 0
     val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()
 
     return ReservationDTO(
         book        = this.book.toDTO(),
-        id          = this.id,
+        id          = this.id!!,
         user        = this.user.toUserDTO(),
         review      = this.review.toDTO(),
         pickUpDate  = this.pickUpDate,
@@ -54,9 +52,7 @@ fun LocalDate.isBetween(start: LocalDate, end: LocalDate): Boolean =
     this.isAfter(start) && this.isBefore(end)
 
 data class ReservationProfileDTO(
-    // Capaz se puede omitir el id de la reserva
-    // Pero tambien puede estar bueno que te lleve al libro reservado
-    val id: Int,
+    val id: Long,
     val book: ProfileBookDTO,
     var state: State
 )
@@ -64,7 +60,7 @@ data class ReservationProfileDTO(
 fun Reservation.toReservationProfileDTO(): ReservationProfileDTO {
 
     val reservationProfileDTO = ReservationProfileDTO(
-        id = this.id,
+        id = this.id!!,
         book = this.book.toProfileBookDTO(),
         state = this.state
     )

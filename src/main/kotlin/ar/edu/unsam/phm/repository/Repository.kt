@@ -4,12 +4,12 @@ import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 
 open class Repository <Type: RepositoryElement> {
-    private var idCounter: Int = 1
+    private var idCounter: Long = 1
     val collection: MutableList<Type> = mutableListOf()
 
-    private fun getIDs(): List<Int> = collection.map { it.id }
+    private fun getIDs(): List<Long> = collection.map { it.id!! }
 
-    private fun generateID(): Int = (this.getIDs().maxOrNull() ?: 0) + 1
+    private fun generateID(): Long = ((this.getIDs().maxOrNull() ?: 0) + 1).toLong()
 
     fun repositoryObjects(): List<Type> = this.collection
 
@@ -21,11 +21,11 @@ open class Repository <Type: RepositoryElement> {
         collection.add(repositoryObject)
     }
 
-    fun removeFromCollection(id: Int): Unit {
+    fun removeFromCollection(id: Long): Unit {
         collection.remove(this.getObject(id))
     }
 
-     fun findIndexInCollection(id: Int): Int {
+     fun findIndexInCollection(id: Long): Int {
         val index = this.collection.indexOfFirst { item -> item.id == id }
         if (index == -1) {
             throw NotFoundException("No existe un indice donde exista este elemento en el repositorio. ID: ${id}")
@@ -34,17 +34,17 @@ open class Repository <Type: RepositoryElement> {
     }
 
     fun update(updatedObject: Type): Unit {
-        val index = this.findIndexInCollection(updatedObject.id)
+        val index = this.findIndexInCollection(updatedObject.id!!)
         this.collection[index] = updatedObject
     }
 
-    fun objectInCollection(id: Int): Boolean =
+    fun objectInCollection(id: Long): Boolean =
         this.collection.any { item -> item.id == id }
 
-    private fun findObject(id: Int): Type =
+    private fun findObject(id: Long): Type =
         this.collection.find { item -> item.id == id }!!
 
-    fun getObject(id: Int): Type {
+    fun getObject(id: Long): Type {
         // println("getObject llamado con id: $id — tipo: ${collection.firstOrNull()?.javaClass?.simpleName} — colección: ${collection.map { it.id }}")
         if (!objectInCollection(id)) {
             throw NotFoundException("No existe el id: $id en el repositorio")
@@ -52,7 +52,7 @@ open class Repository <Type: RepositoryElement> {
         return this.findObject(id)
     }
 
-    fun delete(id: Int): Unit {
+    fun delete(id: Long): Unit {
         this.collection.remove(this.getObject(id))
     }
 

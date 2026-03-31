@@ -10,7 +10,6 @@ import ar.edu.unsam.phm.dto.ReservationDTO
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
 import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.dto.ReservedPeriodDTO
-import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
@@ -35,15 +34,15 @@ class ReservationService(
             dropOffDate = reservation.dropOffDate
         )
         reservation.validate()
-        if (!reservationRepository.hasOverlappingReservation(book.id, reservation)) {
+        if (!reservationRepository.hasOverlappingReservation(book.id!!, reservation)) {
             throw BusinessException("Reserva no disponible en esa fecha")
         }
         reservationRepository.create(reservation)
         user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas))
-        book.addReservation(reservation.id)
+        book.addReservation(reservation.id!!)
     }
 
-    fun getReservesByUserId(userId: Int, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
+    fun getReservesByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
         val result = reservationRepository.findByLectorIdFiltered(userId, search, page, pageSize)
         return PagedResult(
             items = result.items.map { it.toDTO() },
@@ -52,7 +51,7 @@ class ReservationService(
         )
     }
 
-    fun getLoansMadeByUserId(userId: Int, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
+    fun getLoansMadeByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
         val result = reservationRepository.findByOwnerIdFiltered(userId, search, page, pageSize)
         return PagedResult(
             items = result.items.map { it.toDTO() },
@@ -61,7 +60,7 @@ class ReservationService(
         )
     }
 
-    fun rateLoan(reservationId: Int, puntuacion: Int, comentario: String, userId: Int) {
+    fun rateLoan(reservationId: Long, puntuacion: Int, comentario: String, userId: Long) {
         val reservation = reservationRepository.getObject(reservationId)
 
         // le pongo la review desde aca, no se si esta bien
@@ -75,11 +74,11 @@ class ReservationService(
         reservationRepository.update(reservation)
     }
 
-    fun getUserReservationsNumber(userId: Int): Int = reservationRepository.getUserReservationsNumber(userId)
+    fun getUserReservationsNumber(userId: Long): Int = reservationRepository.getUserReservationsNumber(userId)
 
-    fun getUserLentBooksNumber(userId: Int): Int = reservationRepository.getUserLentBooksNumber(userId)
+    fun getUserLentBooksNumber(userId: Long): Int = reservationRepository.getUserLentBooksNumber(userId)
 
-    fun orchestrateFilterAndSortBooks(userId: Int, page: Int, pageSize: Int, filterCriteria: FilterCriteria, sortCriteria: SortCriteria): PagedResult<ReservationProfileDTO> {
+    fun orchestrateFilterAndSortBooks(userId: Long, page: Int, pageSize: Int, filterCriteria: FilterCriteria, sortCriteria: SortCriteria): PagedResult<ReservationProfileDTO> {
         val userBooksIntoReservations: List<Reservation> = this.getUserOwnBooksIntoReservations(userId)
         return reservationRepository.getFilteredAndSortedReservations(userId, userBooksIntoReservations, page, pageSize, filterCriteria, sortCriteria)
     }
@@ -94,21 +93,21 @@ class ReservationService(
         }
     }
 
-    fun getUserOwnBooksIntoReservations(userId: Int): List<Reservation> {
+    fun getUserOwnBooksIntoReservations(userId: Long): List<Reservation> {
         val userOwnBookIds: List<Book> = bookRepository.findAllByUserId(userId)
         val notReservedBooksIds: List<Book> = reservationRepository.filterNoReservedBooks(userOwnBookIds)
 
         return generateEmptyReservationsForNotReservedBooks(notReservedBooksIds)
     }
 
-    fun getBookReviews(bookId: Int, page: Int = 0, pageSize: Int = 2): List<Review> {
+    fun getBookReviews(bookId: Long, page: Int = 0, pageSize: Int = 2): List<Review> {
         return reservationRepository.findReviewsByBookId(bookId)
             .drop(page * pageSize)
             .take(pageSize)
             .map { it.review }
     }
 
-    fun getReservedDates(bookId: Int): List<ReservedPeriodDTO> =
+    fun getReservedDates(bookId: Long): List<ReservedPeriodDTO> =
         reservationRepository.findByBookId(bookId)
             .map { ReservedPeriodDTO(it.pickUpDate, it.dropOffDate) }
 }
