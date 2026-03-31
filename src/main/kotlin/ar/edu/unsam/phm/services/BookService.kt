@@ -2,20 +2,14 @@ package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.*
-import ar.edu.unsam.phm.errors.BusinessException
-import ar.edu.unsam.phm.services.UserService
-import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-import kotlin.math.ceil
 
 
 @Service
@@ -26,17 +20,17 @@ class BookService(
 ) {
 
     fun createBook(bookCreateDTO: BookCreateDTO){
-        if (!userRepository.objectInCollection(bookCreateDTO.ownerId)) {
+        if (!userRepository.objectInCollection(bookCreateDTO.ownerId!!)) {
             throw NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}")
         }
         val owner = userRepository.getObject(bookCreateDTO.ownerId)
         val newBook = bookCreateDTO.createFromDTO(owner)
-        newBook.meetsCreationCriteria()
+        newBook.validate()
         bookRepository.create(newBook)
     }
 
-    fun updateBook(id: Int, bookCreateDTO: BookCreateDTO) {
-        if (!userRepository.objectInCollection(bookCreateDTO.ownerId)) {
+    fun updateBook(id: Long, bookCreateDTO: BookCreateDTO) {
+        if (!userRepository.objectInCollection(bookCreateDTO.ownerId!!)) {
             throw NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}")
         }
         if (!bookRepository.objectInCollection(id)) {
@@ -46,18 +40,18 @@ class BookService(
         val newBook = bookCreateDTO.createFromDTO(owner)
         val existingBook = bookRepository.getObject(id)
         newBook.id = existingBook.id
-        newBook.meetsCreationCriteria()
+        newBook.validate()
         bookRepository.update(newBook)
         reservationRepository.updateBookReference(newBook)
     }
 
-    fun deleteBook(bookId: Int) {
+    fun deleteBook(bookId: Long) {
         reservationRepository.deleteAllReservationsByBookId(bookId)
         bookRepository.delete(bookId)
     }
 
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
-        val reservedBookIds : Set<Int> = reservationRepository.findReservedBookIds(searchCriteria)
+        val reservedBookIds : Set<Long> = reservationRepository.findReservedBookIds(searchCriteria)
         // no pasar ids al repo. Me traigo las dos listas y hago la dif aca (sacar las reservadas
         val filteredAndAvailable : List<Book> = bookRepository.findAllByCriteria(searchCriteria).filter { book -> book.id !in reservedBookIds } // no está reservado
 
@@ -76,7 +70,7 @@ class BookService(
 
     fun getBooksBibliokarmasDTO(books: List<Book>, criteria: BookSearchCriteria) : List<BookDTO> {
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
-        val user = userRepository.getObject(criteria.userId)
+        val user = userRepository.getObject(criteria.userId!!)
         val bookDTOs = books.map { book ->
             val bookDTO = book.toDTO()
             bookDTO.bookBibliokarmas = book.calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas)
@@ -93,14 +87,14 @@ class BookService(
         }
     }
 
-    fun getUser(id: Int): User {
+    fun getUser(id: Long): User {
         return userRepository.getObject(id)
     }
 
-    fun getBookById(id: Int): Book =
+    fun getBookById(id: Long): Book =
         bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")
 
-    fun recalculateBibliokarmas(bookId: Int, userId: Int, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
+    fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
         val book = bookRepository.getObject(bookId)
         val user = userRepository.getObject(userId)
         val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()

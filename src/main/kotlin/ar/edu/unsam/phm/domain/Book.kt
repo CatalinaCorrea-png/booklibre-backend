@@ -34,10 +34,10 @@ abstract class Book (
     var timestamp: LocalDate = LocalDate.now(),
     val bookType: String
 ): RepositoryElement {
-    override var id = 0
+    override var id: Long? = null
 
-    fun addReservation(reservationId: Int) {
-        reservationsIds.add(reservationId)
+    fun addReservation(reservationId: Long) {
+        reservationsIds.add(reservationId.toInt())
     }
 
     // Template Method Primitiva
@@ -46,7 +46,7 @@ abstract class Book (
     // different for every type of book
     abstract fun typeBibliokarmas(userBibliokarmas: Int) : Int
 
-    override fun meetsCreationCriteria() {
+    override fun validate() {
         if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
         if (!isNotEmpty(desc)) throw ConflictException("El libro tiene que tener descripcion")
         if (!isNotEmpty(author.toString())) throw ConflictException("El libro tiene que tener autor")

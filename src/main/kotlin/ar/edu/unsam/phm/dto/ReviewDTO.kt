@@ -4,7 +4,7 @@ import ar.edu.unsam.phm.domain.Review
 import java.time.LocalDate
 
 data class ReviewDTO(
-    var id: Int,
+    var id: Long,
     var reviewerName: String,
     var rating: Int,
     var review: String,
@@ -25,7 +25,7 @@ data class ReviewDTO(
 
 fun Review.toDTO(): ReviewDTO {
     return ReviewDTO(
-        id = this.id,
+        id = this.id!!,
         reviewerName = this.reviewerName,
         rating = this.rating,
         review = this.review,

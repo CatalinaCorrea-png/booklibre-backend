@@ -12,9 +12,10 @@ data class Reservation (
     var pickUpDate: LocalDate = LocalDate.now(),
     var dropOffDate: LocalDate = LocalDate.now(),
     var alreadyRated: Boolean = false,
-//    var state: State = State.AVAILABLE
+
 ): RepositoryElement {
-    override var id = 0
+    override var id: Long? = null
+
     val state: State get() = calculateState() // se recalcula cada vez que se accede, lo saco de el constructor
 
     fun reservationDays(): Int = ChronoUnit.DAYS.between(pickUpDate, dropOffDate).toInt() + 1
@@ -37,9 +38,9 @@ data class Reservation (
         }
     }
 
-    fun bookOwnerId(): Int = this.book.owner.id
+    fun bookOwnerId(): Long = this.book.owner.id!!
 
-    fun holderId(): Int = this.user.id
+    fun holderId(): Long = this.user.id!!
 
     private fun isPickUpNotBeforeToday(): Boolean {
         return if (this.pickUpDate.isBefore(LocalDate.now()))
@@ -57,11 +58,7 @@ data class Reservation (
         TODO("Not yet implemented")
     }
 
-    override fun meetsCreationCriteria() {
-        TODO("Not yet implemented")
-    }
-
-    fun validate(){
+    override fun validate() {
         isPickUpBeforeDropOff() && isPickUpNotBeforeToday()
     }
 

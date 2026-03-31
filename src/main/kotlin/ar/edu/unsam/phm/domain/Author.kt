@@ -7,9 +7,9 @@ data class Author(
     val avatar: String
 ): RepositoryElement {
 
-    override var id: Int = 0
+    override var id: Long? = null
 
-    override fun meetsCreationCriteria() {
+    override fun validate() {
         TODO("Not yet implemented")
     }
 

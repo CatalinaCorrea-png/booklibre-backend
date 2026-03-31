@@ -5,30 +5,29 @@ import ar.edu.unsam.phm.dto.*
 import org.springframework.stereotype.Component
 import kotlin.math.ceil
 
-//@org.springframework.stereotype.Repository
 @Component
 class ReservationRepository: Repository<Reservation>() {
 
-    fun findByLectorId(userId: Int): List<Reservation> =
+    fun findByLectorId(userId: Long): List<Reservation> =
         repositoryObjects().filter { it.user.id == userId }
 
-    fun findByOwnerId(userId: Int): List<Reservation> =
+    fun findByOwnerId(userId: Long): List<Reservation> =
         repositoryObjects().filter { it.book.owner.id == userId }
 
-    fun findByBookId(bookId: Int): List<Reservation> {
+    fun findByBookId(bookId: Long): List<Reservation> {
         return this.repositoryObjects().filter { it.book.id == bookId }
     }
 
-    fun findRatingsByBookId(bookId: Int): List<Int> {
+    fun findRatingsByBookId(bookId: Long): List<Int> {
         return this.repositoryObjects().filter { it.book.id == bookId }.map { it.review.rating }
     }
 
-    fun findReservedBookIds(criteria: BookSearchCriteria): Set<Int> {
+    fun findReservedBookIds(criteria: BookSearchCriteria): Set<Long> {
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
 
         return this.repositoryObjects()
             .filter { it.dateOverlaps(reservationTemp) }
-            .map { it.book.id }
+            .map { it.book.id!! }
             .toSet()
     }
 
@@ -38,14 +37,14 @@ class ReservationRepository: Repository<Reservation>() {
             .forEach { it.book = updatedBook }
     }
 
-    fun deleteAllReservationsByBookId(bookId: Int) =
+    fun deleteAllReservationsByBookId(bookId: Long) =
         findByBookId(bookId)
-            .forEach { delete(it.id) }
+            .forEach { delete(it.id!!) }
 
     fun filterNoReservedBooks(books: List<Book>): List<Book> =
         books.filter { book -> this.repositoryObjects().none { reservation -> reservation.book.id == book.id } }
 
-    fun getFilteredAndSortedReservations(userId: Int, fictitiouslyGenReservations: List<Reservation>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
+    fun getFilteredAndSortedReservations(userId: Long, fictitiouslyGenReservations: List<Reservation>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
         val userReservations: List<Reservation> = this.findByOwnerId(userId)
         val distAndSort: List<Reservation> = this.sortByDescAndDistinct(userReservations + fictitiouslyGenReservations)
         return this.filterAndSortReservations(distAndSort, page, pageSize, filterCrit, sortCrit)

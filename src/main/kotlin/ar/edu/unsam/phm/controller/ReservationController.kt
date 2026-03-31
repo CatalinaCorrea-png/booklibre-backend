@@ -25,8 +25,6 @@ import org.springframework.web.bind.annotation.*
 @CrossOrigin("*")
 class ReservationController(
     val reservationService: ReservationService,
-    val bookService: BookService,
-    val userService: UserService
 ) {
 
     @PostMapping("/create-reservation")
@@ -36,7 +34,7 @@ class ReservationController(
     // ESTAS SON LAS RESERVAS QUE VOS HICISTE
     @GetMapping("/lector/{userId}")
     fun getReservesByUserId(
-        @PathVariable userId: Int,
+        @PathVariable userId: Long,
         @RequestParam(defaultValue = "") search: String,
         @RequestParam page: Int,
         @RequestParam pageSize: Int): PagedResult<ReservationDTO> =
@@ -45,20 +43,20 @@ class ReservationController(
     // ESTAS SON LAS RESERVAS QUE TE HICIERON A VOS
     @GetMapping("/owner/{userId}")
     fun getLoansMadeByUserId(
-        @PathVariable userId: Int,
+        @PathVariable userId: Long,
         @RequestParam(defaultValue = "") search: String,
         @RequestParam page: Int,
         @RequestParam pageSize: Int): PagedResult<ReservationDTO>  =
         reservationService.getLoansMadeByUserId(userId, search, page, pageSize)
 
     @PatchMapping("/{reservationId}/calificar")
-    fun rateLoan(@PathVariable reservationId: Int, @RequestBody body: ReviewDTO, @RequestParam userId: Int) {
+    fun rateLoan(@PathVariable reservationId: Long, @RequestBody body: ReviewDTO, @RequestParam userId: Long) {
         reservationService.rateLoan(reservationId, body.rating, body.review, userId)
     }
 
     @GetMapping("/userOwnBooks/{userId}")
     fun getUserOwnBooks(
-        @PathVariable userId: Int,
+        @PathVariable userId: Long,
         @RequestParam(defaultValue = "ALL") filterCriteria: FilterCriteria,
         @RequestParam(defaultValue = "DATE_DESC") sortCriteria: SortCriteria,
         @RequestParam(defaultValue = "0") page: Int,
@@ -67,18 +65,18 @@ class ReservationController(
         reservationService.orchestrateFilterAndSortBooks(userId, page, pageSize, filterCriteria, sortCriteria)
 
     @GetMapping("/userReadBooks/{userId}")
-    fun getUserReadBooks(@PathVariable userId: Int): Int =
+    fun getUserReadBooks(@PathVariable userId: Long): Int =
         reservationService.getUserReservationsNumber(userId)
 
     @GetMapping("/userLentBooks/{userId}")
-    fun getUserLentBooks(@PathVariable userId: Int): Int =
+    fun getUserLentBooks(@PathVariable userId: Long): Int =
         reservationService.getUserLentBooksNumber(userId)
 
     @GetMapping("/book-review/{bookId}")
-    fun getBookReviews(@PathVariable bookId: Int, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
+    fun getBookReviews(@PathVariable bookId: Long, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
         reservationService.getBookReviews(bookId, page, pageSize).map { it.toDTO() }
 
     @GetMapping("/reservations/book/{bookId}/dates")
-    fun getReservedDatesByBook(@PathVariable bookId: Int): List<ReservedPeriodDTO> =
+    fun getReservedDatesByBook(@PathVariable bookId: Long): List<ReservedPeriodDTO> =
         reservationService.getReservedDates(bookId)
 }

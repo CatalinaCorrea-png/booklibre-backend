@@ -4,7 +4,7 @@ import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
 
 data class UserDTO(
-    val id: Int,
+    val id: Long,
     val name: String,
     val description: String,
     val email: String,
@@ -31,7 +31,7 @@ data class UserDTO(
 }
 
 data class UpdateUserProfileDTO(
-    val id: Int,
+    val id: Long,
     val name: String,
     val description: String,
     val email: String,
@@ -44,7 +44,7 @@ data class UpdateUserProfileDTO(
 
 fun User.toUserDTO(): UserDTO {
     return UserDTO(
-        id = this.id,
+        id = this.id!!,
         name = this.name,
         description = this.description,
         email = this.email,

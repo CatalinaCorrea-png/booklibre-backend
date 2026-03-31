@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class BookRepository(): Repository<Book>() {
 
-    fun findAllByUserId(userId: Int): List<Book> =
+    fun findAllByUserId(userId: Long): List<Book> =
         this.repositoryObjects().filter { book -> book.owner.id == userId }
 
     fun findAllByCriteria(criteria: BookSearchCriteria): List<Book> {
@@ -53,7 +53,7 @@ class BookRepository(): Repository<Book>() {
             books.sortedByDescending { field.selector(it) }
     }
 
-    fun getObjectsByIds(bookIds: List<Int>): List<Book> =
+    fun getObjectsByIds(bookIds: List<Long>): List<Book> =
         this.repositoryObjects().filter { book -> bookIds.any { id -> book.id == id } }
 
 }

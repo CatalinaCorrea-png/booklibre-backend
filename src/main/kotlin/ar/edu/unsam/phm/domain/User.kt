@@ -3,6 +3,7 @@ package ar.edu.unsam.phm.domain
 import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -15,7 +16,9 @@ class User(
     val name: String = "",
     val description: String = "",
     val email: String = "",
+    @Column(length = 10)
     val cel: String = "",
+    @Column(length = 14)
     val location: String = "",
     var userType: UserTypes = UserTypes.COMBINED,
     val timestamp: String = "",
@@ -26,7 +29,7 @@ class User(
 ): RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override var id = 0
+    override var id: Long? = null
 
     fun addBibliokarmas(bibliokarmas: Int){
         this.bibliokarmas += bibliokarmas
@@ -36,7 +39,7 @@ class User(
         matchesPartiallyWith(criteria, name) || matchesPartiallyWith(criteria, email)
 
 
-    override fun meetsCreationCriteria() {
+    override fun validate() {
         if (!isNotEmpty(name)) throw NotFoundException("El usuario tiene que tener un nombre")
         if (!isNotEmpty(email)) throw NotFoundException("El usuario tiene que tener email")
     }

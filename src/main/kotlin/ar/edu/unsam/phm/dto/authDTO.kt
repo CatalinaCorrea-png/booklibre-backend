@@ -10,22 +10,19 @@ data class AuthRequest(
 data class AuthResponse(
     val name: String,
     val email: String,
-    val id: Int
-//    val nombreLocal: String
+    val id: Long
 ) {}
 
 data class AuthRegisterRequest(
-    val name: String, // Agregar esto en register
+    val name: String,
     val email: String,
-//    val nombreLocal: String,
     val password: String
 ) {}
 
 
 data class AuthUserRegisterRequest(
-    val name: String = "nombre", // Agregar esto en register
+    val name: String = "nombre",
     var lastName: String = "apellido",
     val email: String,
-//    val nombreLocal: String,
     val password: String
 ) {}

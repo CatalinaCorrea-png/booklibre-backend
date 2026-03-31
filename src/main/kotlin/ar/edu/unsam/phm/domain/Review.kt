@@ -11,13 +11,13 @@ data class Review(
     var timestamp: LocalDate = LocalDate.now(),
 
     ): RepositoryElement {
-    override var id: Int = 0
+    override var id: Long? = null
 
     override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun meetsCreationCriteria() {
+    override fun validate() {
         TODO("Not yet implemented")
     }
 
