@@ -18,7 +18,7 @@ class User(
     val email: String = "",
     @Column(length = 10)
     val cel: String = "",
-    @Column(length = 14)
+    @Column(length = 50)
     val location: String = "",
     var userType: UserTypes = UserTypes.COMBINED,
     val timestamp: String = "",
@@ -37,7 +37,6 @@ class User(
 
     override fun meetsSearchCriteria(criteria: String) =
         matchesPartiallyWith(criteria, name) || matchesPartiallyWith(criteria, email)
-
 
     override fun validate() {
         if (!isNotEmpty(name)) throw NotFoundException("El usuario tiene que tener un nombre")
