@@ -3,7 +3,14 @@ package ar.edu.unsam.phm.domain
 import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
+@Entity
+@Table(name = "app_user")
 class User(
     val name: String = "",
     val description: String = "",
@@ -14,10 +21,11 @@ class User(
     val timestamp: String = "",
     var bibliokarmas: Int = 0,
     var password: String = "",
-//    var books: MutableList<Book> = mutableListOf<Book>(),
     var img: String = ""
 
 ): RepositoryElement {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     override var id = 0
 
     fun addBibliokarmas(bibliokarmas: Int){

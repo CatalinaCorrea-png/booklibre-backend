@@ -26,30 +26,30 @@ class UserController(private val userService: UserService) {
     @PostMapping("/login")
     fun getUser(@RequestBody request: AuthRequest) : AuthResponse {
         val user = User(email = request.email, password = request.password )
-        val userOK = userService.validate(user)
+        val userOK = userService.getUser(user.email)
         return AuthResponse(email= userOK.email, name= userOK.name, id= userOK.id)
     }
 
-    @PostMapping("/register")
-    fun createUser(@RequestBody request: AuthRegisterRequest): AuthResponse {
-        val user = User(email = request.email, password = request.password, name = request.name
-        )
-        userService.create(user)
-        return AuthResponse(
-            email = user.email,
-            name = user.name,
-            id = user.id
-        )
-    }
-
-    @GetMapping("/profile/{userId}")
-    fun getUserProfile(@PathVariable userId: Int): UserDTO =
-        userService.getUserProfile(userId)
-
-    @PutMapping("/updateProfile", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun updateUserProfile(
-        @RequestPart("userData") userData: UpdateUserProfileDTO,
-        @RequestPart("image", required = false) image: MultipartFile?
-    ): UserDTO =
-        userService.updateUserProfile(userData, image)
+//    @PostMapping("/register")
+//    fun createUser(@RequestBody request: AuthRegisterRequest): AuthResponse {
+//        val user = User(email = request.email, password = request.password, name = request.name
+//        )
+//        userService.create(user)
+//        return AuthResponse(
+//            email = user.email,
+//            name = user.name,
+//            id = user.id
+//        )
+//    }
+//
+//    @GetMapping("/profile/{userId}")
+//    fun getUserProfile(@PathVariable userId: Int): UserDTO =
+//        userService.getUserProfile(userId)
+//
+//    @PutMapping("/updateProfile", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+//    fun updateUserProfile(
+//        @RequestPart("userData") userData: UpdateUserProfileDTO,
+//        @RequestPart("image", required = false) image: MultipartFile?
+//    ): UserDTO =
+//        userService.updateUserProfile(userData, image)
 }
