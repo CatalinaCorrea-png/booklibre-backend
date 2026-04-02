@@ -1,7 +1,7 @@
 spring:
   #   base de datos posta
   datasource:
-    url: jdbc:postgresql://localhost:5432/booklibre
+    url: jdbc:postgresql://localhost:5433/booklibre
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
