@@ -43,6 +43,16 @@ class UserService(
         return persistedUser
     }
 
+    @Transactional(readOnly = true)
+    fun getUserProfile(userId: Long): User {
+        val persistedUser = userRepository
+            .findById(userId)
+            .orElseThrow {
+                NotFoundException("No se encuentra un usuario registrado con este ID: $userId")
+            }
+        return persistedUser
+    }
+
 //
 //    fun search( user: User) : User {
 //        val userMatch = userRepository.findByEmail(user.email)
@@ -60,15 +70,7 @@ class UserService(
 //        }  else {
 //            throw ConflictException("Email '${user.email}' ya se encuentra registrado")
 //    }}
-//
-//    fun getUserProfile(userId: Int): UserDTO {
-//        val user = userRepository.repositoryObjects().find { user -> user.id == userId }
-//        if (user == null) {
-//            throw NotFoundException("No se encontro un user con el id: $userId")
-//        }
-//        return user.toUserDTO()
-//    }
-//
+
 //    private fun saveImage(image: MultipartFile): String {
 //        val uploadDirectory: Path = Paths.get("uploads")
 //

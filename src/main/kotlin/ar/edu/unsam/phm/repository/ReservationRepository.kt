@@ -70,15 +70,13 @@ class ReservationRepository: Repository<Reservation>() {
         findByBookId(bookId)
             .forEach { delete(it.id!!) }
 
-    fun filterNoReservedBooks(books: List<Book>): List<Book> =
-        books.filter { book -> this.repositoryObjects().none { reservation -> reservation.book.id == book.id } }
+//    fun getFilteredAndSortedReservations(userId: Long, fictitiouslyGenReservations: List<Reservation>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
+//        val userReservations: List<Reservation> = this.findByOwnerId(userId)
+//        val distAndSort: List<Reservation> = this.sortByDescAndDistinct(userReservations + fictitiouslyGenReservations)
+//        return this.filterAndSortReservations(distAndSort, page, pageSize, filterCrit, sortCrit)
+//
+//    }
 
-    fun getFilteredAndSortedReservations(userId: Long, fictitiouslyGenReservations: List<Reservation>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
-        val userReservations: List<Reservation> = this.findByOwnerId(userId)
-        val distAndSort: List<Reservation> = this.sortByDescAndDistinct(userReservations + fictitiouslyGenReservations)
-        return this.filterAndSortReservations(distAndSort, page, pageSize, filterCrit, sortCrit)
-
-    }
     fun getUserReservationsNumber(userId: Long): Int = this.repositoryObjects().filter { reservation ->
         reservation.holderId() == userId && reservation.dropOffDate.isBefore(LocalDate.now()) }.size
 
@@ -87,19 +85,6 @@ class ReservationRepository: Repository<Reservation>() {
 
     fun sortByDescAndDistinct(reservations: List<Reservation>) =
         reservations.sortedByDescending { it.pickUpDate }.distinctBy { it.book.id }
-
-    fun filterAndSortReservations(reservations: List<Reservation>, page: Int, pageSize: Int, filterCrit: FilterCriteria, sortCrit: SortCriteria): PagedResult<ReservationProfileDTO> {
-        val filteredAndSortedBookList: List<ReservationProfileDTO> = reservations
-            .filter ( filterCrit.predicate ) // equiv. to { reservation -> filterCrit.predicate(reservation) }
-            .sortedWith ( sortCrit.comparator )
-            .map { it.toReservationProfileDTO() }
-
-        return PagedResult(
-            items = filteredAndSortedBookList.drop(page * pageSize).take(pageSize),
-            total = filteredAndSortedBookList.size,
-            totalPages = ceil(filteredAndSortedBookList.size.toDouble() / pageSize).toInt()
-        )
-    }
 
     fun hasReservationsForBook(bookId: Long): Boolean =
         repositoryObjects().any { it.book.id == bookId }

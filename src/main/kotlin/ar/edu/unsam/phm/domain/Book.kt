@@ -5,8 +5,12 @@ import ar.edu.unsam.phm.repository.RepositoryElement
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import jakarta.persistence.*
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import java.time.LocalDate
 
+@Entity
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
@@ -17,34 +21,64 @@ import java.time.LocalDate
     Type(value = WithADedication::class, name = "CON DEDICATORIA"),
     Type(value = Collectable::class, name = "COLECCIONABLE"),
 )
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 abstract class Book (
+    @Column(nullable = false)
     var title: String = "",
+
+    @Column(name = "description", length = 1000, nullable = false)
     var desc: String = "",
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     var gender: Gender = Gender.DRAMA,
+
+    @ManyToOne
     var author: Author = Author("", ""),
+
+    @Column(nullable = false)
     var numPages: Int = 0,
+
+    @Column(length = 17, nullable = false)
     var isbn: String = "978-3-16-148410-0",
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     var language: Language = Language.SPANISH,
+
+    @Column(nullable = false)
     var editorial: String = "",
+
+    @Column(nullable = false)
     var publishDate: LocalDate = LocalDate.now(),
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     var condition: BookCondition = BookCondition.EXCELLENT,
-    var reservationsIds: MutableList<Int> = mutableListOf(),
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     var owner: User = User(),
+
+    @Column(nullable = false)
     var imageSrc: String = "",
+
+    @Column(nullable = false)
     var timestamp: LocalDate = LocalDate.now(),
+
+    @Column(nullable = false)
     val bookType: String
 ): RepositoryElement {
+
+    @Id
+    @GeneratedValue
     override var id: Long? = null
 
-    fun addReservation(reservationId: Long) {
-        reservationsIds.add(reservationId.toInt())
-    }
-
     // Template Method Primitiva
-    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int) : Int = 5 * reservationDays + typeBibliokarmas(userBibliokarmas)
+    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int, numReservations: Int) : Int = 5 * reservationDays + typeBibliokarmas(userBibliokarmas, numReservations)
 
     // different for every type of book
-    abstract fun typeBibliokarmas(userBibliokarmas: Int) : Int
+    abstract fun typeBibliokarmas(userBibliokarmas: Int, numReservations: Int) : Int
 
     override fun validate() {
         if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")

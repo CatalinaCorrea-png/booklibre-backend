@@ -13,22 +13,10 @@ data class ReservationDTO(
     var dropOffDate: LocalDate,
     var state: State,
     var canRate: Boolean,
-    var bibliokarmas: Int,
+    var bibliokarmas: Int = 0,
     var loanedBy: String,
     var loanedTo: String,
-) {
-    fun fromDTO(): Reservation {
-        return Reservation(
-            user= this.user.fromDTO(),
-            book= this.book.fromDTO(),
-            review= this.review.fromDTO(),
-            pickUpDate= this.pickUpDate,
-            dropOffDate= this.dropOffDate,
-        ).apply {
-            id = this@ReservationDTO.id
-        }
-    }
-}
+)
 
 fun Reservation.toDTO(): ReservationDTO {
     val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()
@@ -37,12 +25,12 @@ fun Reservation.toDTO(): ReservationDTO {
         book        = this.book.toDTO(),
         id          = this.id!!,
         user        = this.user.toUserDTO(),
-        review      = this.review.toDTO(),
+        review      = this.review!!.toDTO(),
         pickUpDate  = this.pickUpDate,
         dropOffDate = this.dropOffDate,
         state       = this.state,
-        canRate = this.state == State.RETURNED && this.review.rating == 0,
-        bibliokarmas = this.book.calculateBibliokarmas(days, this.user.bibliokarmas),
+        canRate = this.state == State.RETURNED && this.review!!.rating == 0,
+//        bibliokarmas = this.book.calculateBibliokarmas(days, ),
         loanedBy    = this.book.owner.name,
         loanedTo    = this.user.name,
     )

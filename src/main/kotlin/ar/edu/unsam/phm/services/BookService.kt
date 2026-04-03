@@ -53,7 +53,7 @@ class BookService(
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
         val reservedBookIds : Set<Long> = reservationRepository.findReservedBookIds(searchCriteria)
         // no pasar ids al repo. Me traigo las dos listas y hago la dif aca (sacar las reservadas
-        val filteredAndAvailable : List<Book> = bookRepository.findAllByCriteria(searchCriteria).filter { book -> book.id !in reservedBookIds } // no está reservado
+        val filteredAndAvailable : List<Book> = bookRepository.findAllByCriteria(searchCriteria).filter { book -> book.id !in reservedBookIds } // no estÃ¡ reservado
 
         val page : Page<Book> = bookRepository.sortAndPage(filteredAndAvailable, pageable)
 
@@ -72,8 +72,9 @@ class BookService(
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
         val user = userRepository.getObject(criteria.userId!!)
         val bookDTOs = books.map { book ->
+            val bookReservationsNumber = reservationRepository.findByBookId(book.id!!).size
             val bookDTO = book.toDTO()
-            bookDTO.bookBibliokarmas = book.calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas)
+            bookDTO.bookBibliokarmas = book.calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas, bookReservationsNumber)
             bookDTO
         }
         return bookDTOs
@@ -97,7 +98,8 @@ class BookService(
     fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
         val book = bookRepository.getObject(bookId)
         val user = userRepository.getObject(userId)
+        val bookReservationsNumber = reservationRepository.findByBookId(bookId).size
         val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()
-        return book.calculateBibliokarmas(days, user.bibliokarmas)
+        return book.calculateBibliokarmas(days, user.bibliokarmas, bookReservationsNumber)
     }
 }

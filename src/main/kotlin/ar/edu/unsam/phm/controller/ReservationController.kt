@@ -27,32 +27,32 @@ class ReservationController(
     val reservationService: ReservationService,
 ) {
 
-    @PostMapping("/create-reservation")
-    fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
-        reservationService.createReservation(reservationDTO)
-    }
-    // ESTAS SON LAS RESERVAS QUE VOS HICISTE
-    @GetMapping("/lector/{userId}")
-    fun getReservesByUserId(
-        @PathVariable userId: Long,
-        @RequestParam(defaultValue = "") search: String,
-        @RequestParam page: Int,
-        @RequestParam pageSize: Int): PagedResult<ReservationDTO> =
-        reservationService.getReservesByUserId(userId, search, page, pageSize)
-
-    // ESTAS SON LAS RESERVAS QUE TE HICIERON A VOS
-    @GetMapping("/owner/{userId}")
-    fun getLoansMadeByUserId(
-        @PathVariable userId: Long,
-        @RequestParam(defaultValue = "") search: String,
-        @RequestParam page: Int,
-        @RequestParam pageSize: Int): PagedResult<ReservationDTO>  =
-        reservationService.getLoansMadeByUserId(userId, search, page, pageSize)
-
-    @PatchMapping("/{reservationId}/calificar")
-    fun rateLoan(@PathVariable reservationId: Long, @RequestBody body: ReviewDTO, @RequestParam userId: Long) {
-        reservationService.rateLoan(reservationId, body.rating, body.review, userId)
-    }
+//    @PostMapping("/create-reservation")
+//    fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
+//        reservationService.createReservation(reservationDTO)
+//    }
+//    // ESTAS SON LAS RESERVAS QUE VOS HICISTE
+//    @GetMapping("/lector/{userId}")
+//    fun getReservesByUserId(
+//        @PathVariable userId: Long,
+//        @RequestParam(defaultValue = "") search: String,
+//        @RequestParam page: Int,
+//        @RequestParam pageSize: Int): PagedResult<ReservationDTO> =
+//        reservationService.getReservesByUserId(userId, search, page, pageSize)
+//
+//    // ESTAS SON LAS RESERVAS QUE TE HICIERON A VOS
+//    @GetMapping("/owner/{userId}")
+//    fun getLoansMadeByUserId(
+//        @PathVariable userId: Long,
+//        @RequestParam(defaultValue = "") search: String,
+//        @RequestParam page: Int,
+//        @RequestParam pageSize: Int): PagedResult<ReservationDTO>  =
+//        reservationService.getLoansMadeByUserId(userId, search, page, pageSize)
+//
+//    @PatchMapping("/{reservationId}/calificar")
+//    fun rateLoan(@PathVariable reservationId: Long, @RequestBody body: ReviewDTO, @RequestParam userId: Long) {
+//        reservationService.rateLoan(reservationId, body.rating, body.review, userId)
+//    }
 
     @GetMapping("/userOwnBooks/{userId}")
     fun getUserOwnBooks(
@@ -64,19 +64,19 @@ class ReservationController(
     ): PagedResult<ReservationProfileDTO> =
         reservationService.orchestrateFilterAndSortBooks(userId, page, pageSize, filterCriteria, sortCriteria)
 
-    @GetMapping("/userReadBooks/{userId}")
-    fun getUserReadBooks(@PathVariable userId: Long): Int =
-        reservationService.getUserReservationsNumber(userId)
-
-    @GetMapping("/userLentBooks/{userId}")
-    fun getUserLentBooks(@PathVariable userId: Long): Int =
-        reservationService.getUserLentBooksNumber(userId)
-
-    @GetMapping("/book-review/{bookId}")
-    fun getBookReviews(@PathVariable bookId: Long, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
-        reservationService.getBookReviews(bookId, page, pageSize).map { it.toDTO() }
-
-    @GetMapping("/reservations/book/{bookId}/dates")
-    fun getReservedDatesByBook(@PathVariable bookId: Long): List<ReservedPeriodDTO> =
-        reservationService.getReservedDates(bookId)
+//    @GetMapping("/userReadBooks/{userId}")
+//    fun getUserReadBooks(@PathVariable userId: Long): Int =
+//        reservationService.getUserReservationsNumber(userId)
+//
+//    @GetMapping("/userLentBooks/{userId}")
+//    fun getUserLentBooks(@PathVariable userId: Long): Int =
+//        reservationService.getUserLentBooksNumber(userId)
+//
+//    @GetMapping("/book-review/{bookId}")
+//    fun getBookReviews(@PathVariable bookId: Long, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
+//        reservationService.getBookReviews(bookId, page, pageSize).map { it.toDTO() }
+//
+//    @GetMapping("/reservations/book/{bookId}/dates")
+//    fun getReservedDatesByBook(@PathVariable bookId: Long): List<ReservedPeriodDTO> =
+//        reservationService.getReservedDates(bookId)
 }

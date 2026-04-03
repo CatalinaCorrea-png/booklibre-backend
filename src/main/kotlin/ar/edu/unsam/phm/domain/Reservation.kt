@@ -2,18 +2,32 @@ package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.RepositoryElement
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToOne
+
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
+@Entity
 data class Reservation (
+    @ManyToOne
     var user: User = User(),
+    @ManyToOne
     var book: Book = Common(),
+    @OneToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
     var review: Review = Review(),
     var pickUpDate: LocalDate = LocalDate.now(),
     var dropOffDate: LocalDate = LocalDate.now(),
     var alreadyRated: Boolean = false,
 
 ): RepositoryElement {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     override var id: Long? = null
 
     val state: State get() = calculateState() // se recalcula cada vez que se accede, lo saco de el constructor

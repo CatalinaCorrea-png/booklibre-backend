@@ -17,35 +17,11 @@ data class BookDTO(
     var editorial: String,
     var publishDate: LocalDate,
     var condition: String,
-    var reservationsIds: MutableList<Int>,
     var owner: UserDTO,
     var imageSrc: String,
     var bookBibliokarmas: Int = 0,
     var rating: Double = 0.0
-    ) {
-
-    fun fromDTO(): Book {
-        return Common(
-            title= this.title,
-            desc= this.desc,
-            gender= Gender.valueOf(this.gender),
-            author= Author(this.authorName, this.authorAvatarUrl),
-            numPages = this.numPages,
-            isbn=  this.isbn,
-            language = Language.valueOf(this.language),
-            editorial= this.editorial,
-            publishDate = this.publishDate,
-            condition= BookCondition.valueOf(this.condition),
-            reservationsIds = this.reservationsIds,
-            owner= this.owner.fromDTO(),
-            imageSrc = this.imageSrc,
-
-        ).apply {
-            id = this@BookDTO.id
-        }
-    }
-
-}
+)
 
 fun Book.toDTO(): BookDTO{
     val bookDTO = BookDTO(
@@ -61,7 +37,6 @@ fun Book.toDTO(): BookDTO{
         editorial = this.editorial,
         publishDate = this.publishDate,
         condition = this.condition.value,
-        reservationsIds = this.reservationsIds,
         owner = this.owner.toUserDTO(),
         imageSrc = this.imageSrc,
         bookType =  this.bookType
@@ -129,4 +104,3 @@ fun Book.toBookCreateDTO() = BookCreateDTO(
     ownerId      = this.owner.id,
     book         = this                  // toma el bookType que Jackson serializa
 )
-
