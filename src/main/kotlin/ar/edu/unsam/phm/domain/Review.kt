@@ -10,7 +10,7 @@ import java.time.LocalDate
 @Entity
 data class Review(
     var reviewerName: String = "",
-    var rating: Int = 0,
+    var rating: Int = 1,
     var review: String = "",
     var timestamp: LocalDate = LocalDate.now(),
 
@@ -27,5 +27,5 @@ data class Review(
         TODO("Not yet implemented")
     }
 
-    fun notEmptyReview(): Boolean = this.rating > 0
+    fun notEmptyReview(): Boolean = this.rating > 1
 }

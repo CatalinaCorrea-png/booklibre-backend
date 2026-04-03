@@ -50,7 +50,6 @@ class BookController(
     fun calculateBibliokarmas(@PathVariable id: Long, @RequestParam userId: Long, @RequestParam pickUpDate: LocalDate, @RequestParam dropOffDate: LocalDate): Int =
         bookService.recalculateBibliokarmas(id, userId, pickUpDate, dropOffDate)
 
-
     @GetMapping("/book-genders")
     fun getBookGenders() = Gender.entries
 }

@@ -25,7 +25,7 @@ data class Reservation (
     var dropOffDate: LocalDate = LocalDate.now(),
     var alreadyRated: Boolean = false,
 
-): RepositoryElement {
+    ): RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     override var id: Long? = null

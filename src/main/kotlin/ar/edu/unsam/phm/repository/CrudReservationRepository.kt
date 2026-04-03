@@ -1,6 +1,7 @@
 package ar.edu.unsam.phm.repository
 
 import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.Review
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -34,4 +35,11 @@ interface CrudReservationRepository: CrudRepository<Reservation, Long> {
     ): Boolean
 
     fun findAllByBookId(bookId: Long): List<Reservation>
+
+    @Query("""
+    SELECT r.review
+    FROM Reservation r
+    WHERE r.book.id = :bookId
+    """)
+    fun findAllReviewsByBookId(@Param("bookId") bookId: Long): List<Review>
 }

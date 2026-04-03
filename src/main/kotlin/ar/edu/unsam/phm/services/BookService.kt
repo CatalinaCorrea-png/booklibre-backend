@@ -113,9 +113,15 @@ class BookService(
         }
 
     fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
-        val book = bookRepository.getObject(bookId)
-        val user = userRepository.getObject(userId)
-        val bookReservationsNumber = reservationRepository.findByBookId(bookId).size
+        val book = crudBookRepository.findById(bookId)
+            .orElseThrow {
+                NotFoundException("No se encuentra un libro registrado con el id: $bookId")
+            }
+        val user = crudUserRepository.findById(userId)
+            .orElseThrow {
+                NotFoundException("No se encuentra un usuario registrado con el id: $userId")
+            }
+        val bookReservationsNumber = crudReservationRepository.findAllByBookId(bookId).size
         val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()
         return book.calculateBibliokarmas(days, user.bibliokarmas, bookReservationsNumber)
     }

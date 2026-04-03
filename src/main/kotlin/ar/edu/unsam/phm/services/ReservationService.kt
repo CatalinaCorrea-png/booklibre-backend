@@ -165,14 +165,13 @@ class ReservationService(
 //            .filterNoReservedBooks(booksIds)
 //    }
 
-//    fun getBookReviews(bookId: Long, page: Int = 0, pageSize: Int = 2): List<Review> {
-//        return reservationRepository.findReviewsByBookId(bookId)
-//            .drop(page * pageSize)
-//            .take(pageSize)
-//            .map { it.review }
-//    }
-//
-//    fun getReservedDates(bookId: Long): List<ReservedPeriodDTO> =
-//        reservationRepository.findByBookId(bookId)
-//            .map { ReservedPeriodDTO(it.pickUpDate, it.dropOffDate) }
+    fun getBookReviews(bookId: Long, page: Int = 0, pageSize: Int = 2): List<Review> {
+        return reservationRepository.findAllReviewsByBookId(bookId)
+            .drop(page * pageSize)
+            .take(pageSize)
+    }
+
+    fun getReservedDates(bookId: Long): List<ReservedPeriodDTO> =
+        reservationRepository.findAllByBookId(bookId)
+            .map { ReservedPeriodDTO(it.pickUpDate, it.dropOffDate) }
 }
