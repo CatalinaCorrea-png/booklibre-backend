@@ -3,9 +3,8 @@ package ar.edu.unsam.phm.services
 import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.NotFoundException
-import ar.edu.unsam.phm.repository.BookRepository
-import ar.edu.unsam.phm.repository.ReservationRepository
-import ar.edu.unsam.phm.repository.UserRepository
+import ar.edu.unsam.phm.repository.*
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -14,6 +13,12 @@ import java.time.LocalDate
 
 @Service
 class BookService(
+    @Autowired
+    val crudBookRepository: CrudBookRepository,
+    @Autowired
+    val crudReservationRepository: CrudReservationRepository,
+    @Autowired
+    val crudUserRepository: CrudUserRepository,
     val bookRepository: BookRepository,
     val reservationRepository: ReservationRepository,
     private val userRepository: UserRepository,
@@ -51,12 +56,21 @@ class BookService(
     }
 
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
-        val reservedBookIds : Set<Long> = reservationRepository.findReservedBookIds(searchCriteria)
-        // no pasar ids al repo. Me traigo las dos listas y hago la dif aca (sacar las reservadas
-        val filteredAndAvailable : List<Book> = bookRepository.findAllByCriteria(searchCriteria).filter { book -> book.id !in reservedBookIds } // no estÃ¡ reservado
-
-        val page : Page<Book> = bookRepository.sortAndPage(filteredAndAvailable, pageable)
-
+//        println("Criteria: $searchCriteria")
+//        println("Pageable: $pageable")
+        val page : Page<Book> = crudBookRepository.findAllByCriteria(
+            userId = searchCriteria.userId,
+            title = searchCriteria.title,
+            genders = searchCriteria.genders,
+            pagesRangeMin = searchCriteria.pagesRangeMin,
+            pagesRangeMax = searchCriteria.pagesRangeMax,
+            pickUpDate = searchCriteria.pickUpDate,
+            dropOffDate = searchCriteria.dropOffDate,
+            isbn = searchCriteria.isbn,
+            ownersName = searchCriteria.ownersName,
+            pageable = pageable
+        )
+//        println("Results: ${page.totalElements}")
         val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
         val booksWithRatings : List<BookDTO> = calculateRatingAvg(booksWithBibliokarmasDTO)
         return PageResponse(
@@ -70,9 +84,9 @@ class BookService(
 
     fun getBooksBibliokarmasDTO(books: List<Book>, criteria: BookSearchCriteria) : List<BookDTO> {
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
-        val user = userRepository.getObject(criteria.userId!!)
+        val user = crudUserRepository.findById(criteria.userId!!).orElseThrow{ NotFoundException("No existe user con id: ${criteria.userId}") }
         val bookDTOs = books.map { book ->
-            val bookReservationsNumber = reservationRepository.findByBookId(book.id!!).size
+            val bookReservationsNumber = crudReservationRepository.findByBookId(book.id!!).size
             val bookDTO = book.toDTO()
             bookDTO.bookBibliokarmas = book.calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas, bookReservationsNumber)
             bookDTO
@@ -82,7 +96,7 @@ class BookService(
 
     fun calculateRatingAvg(booksDTO: List<BookDTO>) : List<BookDTO> {
         return booksDTO.map { bookDTO ->
-            val ratings = reservationRepository.findRatingsByBookId(bookDTO.id).filter { !(it <= 0.0) }
+            val ratings = crudReservationRepository.findRatingsByBookId(bookDTO.id).filter { !(it <= 0.0) }
             bookDTO.rating = if (ratings.isEmpty()) 0.0 else ratings.average()
             bookDTO
         }
