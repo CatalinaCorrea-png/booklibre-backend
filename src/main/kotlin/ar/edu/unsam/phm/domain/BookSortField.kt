@@ -4,10 +4,10 @@ enum class BookSortField(val property: String) {
     TITLE("title") {
         override fun selector(book: Book) = book.title
     },
-    AUTHOR("author") {
+    AUTHOR("author.name") {
         override fun selector(book: Book) = book.author.name
     },
-    OWNER("owner") {
+    OWNER("owner.name") {
         override fun selector(book: Book) = book.owner.name
     };
 

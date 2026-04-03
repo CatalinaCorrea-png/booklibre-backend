@@ -11,6 +11,14 @@ interface CrudReservationRepository: CrudRepository<Reservation, Long> {
 
     fun findAllByBookOwnerId(userId: Long): Optional<List<Reservation>>
 
+    fun findByBookId(bookId: Long): List<Reservation>
+
+    @Query("""
+        SELECT r.review.rating
+        FROM Reservation r
+        WHERE r.book.id = :bookId
+    """)
+    fun findRatingsByBookId(bookId: Long): List<Int>
     @Query("""
     SELECT COUNT(r) > 0
     FROM Reservation r
