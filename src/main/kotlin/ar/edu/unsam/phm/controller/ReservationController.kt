@@ -27,10 +27,10 @@ class ReservationController(
     val reservationService: ReservationService,
 ) {
 
-//    @PostMapping("/create-reservation")
-//    fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
-//        reservationService.createReservation(reservationDTO)
-//    }
+    @PostMapping("/create-reservation")
+    fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
+        reservationService.createReservation(reservationDTO)
+    }
 //    // ESTAS SON LAS RESERVAS QUE VOS HICISTE
 //    @GetMapping("/lector/{userId}")
 //    fun getReservesByUserId(

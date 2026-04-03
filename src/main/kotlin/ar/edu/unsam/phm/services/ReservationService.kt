@@ -15,34 +15,46 @@ import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
+import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.UserRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import kotlin.math.ceil
+import kotlin.math.sign
 
 @Service
 class ReservationService(
+    @Autowired
     val reservationRepository: CrudReservationRepository,
+    @Autowired
     val bookRepository: CrudBookRepository,
-    val userRepository: UserRepository
+    @Autowired
+    val userRepository: CrudUserRepository
 ){
-//    fun createReservation(reservation: CreateReservationDTO) {
-//        val book = bookRepository.getObject(reservation.bookId)
-//        val user = userRepository.getObject(reservation.sessionId)
-//        val reservation = Reservation(
-//            book = book,
-//            user = user,
-//            pickUpDate = reservation.pickUpDate,
-//            dropOffDate = reservation.dropOffDate
-//        )
-//        reservation.validate()
-//        if (!reservationRepository.hasOverlappingReservation(book.id!!, reservation)) {
-//            throw BusinessException("Reserva no disponible en esa fecha")
-//        }
-//        reservationRepository.create(reservation)
-//        user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas))
+    fun createReservation(reservation: CreateReservationDTO) {
+        val book = bookRepository.findById(reservation.bookId)
+            .orElseThrow { NotFoundException("No existe el libro con id: ${reservation.bookId}") }
+
+        val user = userRepository.findById(reservation.sessionId)
+            .orElseThrow { NotFoundException("No existe el usuario con id: ${reservation.sessionId}") }
+
+        val reservation = Reservation(
+            book = book,
+            user = user,
+            pickUpDate = reservation.pickUpDate,
+            dropOffDate = reservation.dropOffDate
+        )
+        reservation.validate()
+        if (reservationRepository.hasOverlappingReservation(book.id!!, reservation.pickUpDate, reservation.dropOffDate)) {
+            throw BusinessException("Reserva no disponible en esa fecha")
+        }
+        reservationRepository.save(reservation)
+        val bookReservationsNumber = reservationRepository.findAllByBookId(book.id!!).size
+        user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas, bookReservationsNumber))
+        userRepository.save(user)
 //        book.addReservation(reservation.id!!)
-//    }
+    }
 //
 //    fun getReservesByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
 //        val result = reservationRepository.findByLectorIdFiltered(userId, search, page, pageSize)

@@ -4,6 +4,7 @@ import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.BookRepository
+import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.ReservationRepository
 import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.data.domain.Page
@@ -15,6 +16,7 @@ import java.time.LocalDate
 @Service
 class BookService(
     val bookRepository: BookRepository,
+    val bookRepository1: CrudBookRepository,
     val reservationRepository: ReservationRepository,
     private val userRepository: UserRepository,
 ) {
@@ -92,8 +94,11 @@ class BookService(
         return userRepository.getObject(id)
     }
 
-    fun getBookById(id: Long): Book =
-        bookRepository.getObject(id) ?: throw NotFoundException("Can not find the book <$id>")
+    fun getBookById(id: Long): Book = bookRepository1
+        .findById(id)
+        .orElseThrow {
+            NotFoundException("No se encuentra un libro registrado con el id: $id")
+        }
 
     fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
         val book = bookRepository.getObject(bookId)
