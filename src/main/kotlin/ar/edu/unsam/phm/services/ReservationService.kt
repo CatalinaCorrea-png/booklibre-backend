@@ -115,7 +115,7 @@ class ReservationService(
     fun orchestrateFilterAndSortBooks(userId: Long, page: Int, pageSize: Int, filterCriteria: FilterCriteria, sortCriteria: SortCriteria): PagedResult<ReservationProfileDTO> {
         val fictitiousReservations: List<Reservation> = this.getUserOwnBooksIntoReservations(userId)
         val realReservations: List<Reservation> = this.getUserReservedBooks(userId)
-        val merged: List<Reservation> = realReservations + fictitiousReservations
+        val merged: List<Reservation> = this.sortAndDistinct(realReservations + fictitiousReservations)
         return filteredAndSortReservations(merged, page, pageSize, filterCriteria, sortCriteria) // -> armar un objeto con los ultimos 4 parametros
     }
 
@@ -128,6 +128,9 @@ class ReservationService(
             )
         }
     }
+
+    private fun sortAndDistinct(reservations: List<Reservation>): List<Reservation> =
+        reservations.sortedByDescending { it.pickUpDate }.distinctBy { it.book.id }
 
     fun getUserOwnBooksIntoReservations(userId: Long): List<Reservation> {
         val notReservedBooks: List<Book> = this.getUserNotReservedBooks(userId)

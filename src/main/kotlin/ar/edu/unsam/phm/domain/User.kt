@@ -15,6 +15,7 @@ import jakarta.persistence.Table
 class User(
     val name: String = "",
     val description: String = "",
+    @Column(length = 50)
     val email: String = "",
     @Column(length = 10)
     val cel: String = "",
