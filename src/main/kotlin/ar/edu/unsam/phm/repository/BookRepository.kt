@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class BookRepository(): Repository<Book>() {
 
+
     fun findAllByUserId(userId: Long): List<Book> =
         this.repositoryObjects().filter { book -> book.owner.id == userId }
 

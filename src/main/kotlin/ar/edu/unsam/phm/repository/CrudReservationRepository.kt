@@ -8,4 +8,6 @@ interface CrudReservationRepository: CrudRepository<Reservation, Long> {
 
     fun findAllByBookOwnerId(userId: Long): Optional<List<Reservation>>
 
+    //para traer las reservas que tengan ese libro
+    fun findByBookId(bookId: Long): List<Reservation>
 }

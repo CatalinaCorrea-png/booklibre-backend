@@ -1,25 +1,13 @@
 package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.domain.UserTypes
-import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
-import ar.edu.unsam.phm.dto.UserDTO
-import ar.edu.unsam.phm.dto.toUserDTO
 import ar.edu.unsam.phm.errors.NotFoundException
-import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.stereotype.Service
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
-
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
-import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 
