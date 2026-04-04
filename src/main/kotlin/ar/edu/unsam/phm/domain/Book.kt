@@ -67,12 +67,22 @@ abstract class Book (
     var timestamp: LocalDate = LocalDate.now(),
 
     @Column(nullable = false)
-    val bookType: String
+    val bookType: String,
+
+    //agrego esta columna para el delete logico
+    @Column(name = "deleted_at")
+    var deletedAt: LocalDate? = null,
+
 ): RepositoryElement {
 
     @Id
     @GeneratedValue
     override var id: Long? = null
+
+    //para borrado logico del libro
+    fun isDeleted() = deletedAt != null
+
+    fun logicDelete() { deletedAt = LocalDate.now() }
 
     // Template Method Primitiva
     fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int, numReservations: Int) : Int = 5 * reservationDays + typeBibliokarmas(userBibliokarmas, numReservations)
