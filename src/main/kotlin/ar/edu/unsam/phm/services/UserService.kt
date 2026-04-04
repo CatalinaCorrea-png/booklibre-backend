@@ -12,7 +12,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import java.util.UUID
 
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.ConflictException
@@ -21,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
+import java.util.*
 
 
 @Service
@@ -62,14 +62,15 @@ class UserService(
 //            return userMatch
 //        }
 //    }
-//    fun create(user: User) {
-//        val existingUser: List<User> = userRepository.search(user.email)
-//        if (existingUser.isEmpty()) {
-//            user.meetsCreationCriteria()
-//            userRepository.create(user)
-//        }  else {
-//            throw ConflictException("Email '${user.email}' ya se encuentra registrado")
-//    }}
+    @Transactional
+    fun create(user: User): User {
+        val existingUser: Optional<User> = userRepository.findByEmail(user.email)
+        if (existingUser.isEmpty) {
+            user.validate()
+            return userRepository.save(user)
+        }  else {
+            throw ConflictException("Email '${user.email}' ya se encuentra registrado")
+    }}
 
 //    private fun saveImage(image: MultipartFile): String {
 //        val uploadDirectory: Path = Paths.get("uploads")
