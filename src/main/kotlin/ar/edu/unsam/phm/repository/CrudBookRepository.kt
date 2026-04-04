@@ -18,5 +18,5 @@ interface CrudBookRepository: CrudRepository<Book, Int> {
             WHERE r.book = b
         )
     """)
-    fun findBooksWithoutReservations(userId: Long): Optional<List<Book>>
+    fun findAllBooksWithoutReservations(userId: Long): List<Book>
 }

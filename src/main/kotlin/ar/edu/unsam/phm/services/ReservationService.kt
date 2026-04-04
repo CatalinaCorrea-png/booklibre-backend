@@ -2,17 +2,11 @@ package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.*
-import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.dto.PagedResult
-import ar.edu.unsam.phm.dto.ReservationDTO
+import ar.edu.unsam.phm.dto.ProfilePageable
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
-import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.dto.toReservationProfileDTO
-import ar.edu.unsam.phm.dto.ReservedPeriodDTO
-import ar.edu.unsam.phm.errors.BusinessException
-import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.UserRepository
@@ -91,32 +85,32 @@ class ReservationService(
 //        reservationRepository.update(reservation)
 //    }
 //
-//    fun getUserReservationsNumber(userId: Long): Int = reservationRepository.getUserReservationsNumber(userId)
-//
-//    fun getUserLentBooksNumber(userId: Long): Int = reservationRepository.getUserLentBooksNumber(userId)
+    fun getUserLentBooksNumber(userId: Long): Long = reservationRepository.countUserReservedBooks(userId)
 
-    fun filteredAndSortReservations(reservations: List<Reservation>, page: Int, pageSize: Int, filterCriteria: FilterCriteria, sortCriteria: SortCriteria): PagedResult<ReservationProfileDTO> {
+    fun getUserReadBooksNumber(userId: Long): Long = reservationRepository.countUserReadBooksNumber(userId)
+
+    fun filteredAndSortReservations(reservations: List<Reservation>, pageableObject: ProfilePageable): PagedResult<ReservationProfileDTO> {
 
         //         Spring Data JPA parses all method names in a repository interface to derive queries,
         //         including default methods. The name filterAndSortReservations was parsed as a query for a filter property, which doesn't exist on Reservation.
 
         val filteredAndSortedList: List<ReservationProfileDTO> = reservations
-            .filter(filterCriteria.predicate)
-            .sortedWith(sortCriteria.comparator)
+            .filter(pageableObject.filterCriteria.predicate)
+            .sortedWith(pageableObject.sortCriteria.comparator)
             .map { it.toReservationProfileDTO() }
 
         return PagedResult(
-            items = filteredAndSortedList.drop(page * pageSize).take(pageSize),
+            items = filteredAndSortedList.drop(pageableObject.page * pageableObject.pageSize).take(pageableObject.pageSize),
             total = filteredAndSortedList.size,
-            totalPages = ceil(filteredAndSortedList.size.toDouble() / pageSize).toInt()
+            totalPages = ceil(filteredAndSortedList.size.toDouble() / pageableObject.pageSize).toInt()
         )
     }
 
-    fun orchestrateFilterAndSortBooks(userId: Long, page: Int, pageSize: Int, filterCriteria: FilterCriteria, sortCriteria: SortCriteria): PagedResult<ReservationProfileDTO> {
+    fun orchestrateFilterAndSortBooks(userId: Long, pageableObject: ProfilePageable): PagedResult<ReservationProfileDTO> {
         val fictitiousReservations: List<Reservation> = this.getUserOwnBooksIntoReservations(userId)
         val realReservations: List<Reservation> = this.getUserReservedBooks(userId)
         val merged: List<Reservation> = this.sortAndDistinct(realReservations + fictitiousReservations)
-        return filteredAndSortReservations(merged, page, pageSize, filterCriteria, sortCriteria) // -> armar un objeto con los ultimos 4 parametros
+        return filteredAndSortReservations(merged, pageableObject) // -> armar un objeto con los ultimos 4 parametros
     }
 
     private fun generateEmptyReservationsForNotReservedBooks(books: List<Book>): List<Reservation> {
@@ -139,17 +133,11 @@ class ReservationService(
 
     fun getUserNotReservedBooks(userId: Long): List<Book> =
         bookRepository
-            .findBooksWithoutReservations(userId)
-            .orElseThrow {
-                NotFoundException("No se encontraron libros con este ID de usuario $userId") // Esto puede llegar a romper para un user nuevo? ->
-            }
+            .findAllBooksWithoutReservations(userId)
 
     fun getUserReservedBooks(userId: Long): List<Reservation> =
         reservationRepository
             .findAllByBookOwnerId(userId)
-            .orElseThrow {
-                NotFoundException("No se encontraron libros con este ID de usuario $userId") // Esto puede llegar a romper para un user nuevo? ->
-            }
 
 //    fun filterNoReservedBooks(booksIds: List<Long>) {
 //        reservationRepository

@@ -5,6 +5,7 @@ import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.SortCriteria
 import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.dto.PagedResult
+import ar.edu.unsam.phm.dto.ProfilePageable
 import ar.edu.unsam.phm.dto.ReservationDTO
 import ar.edu.unsam.phm.services.BookService
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
@@ -57,20 +58,18 @@ class ReservationController(
     @GetMapping("/userOwnBooks/{userId}")
     fun getUserOwnBooks(
         @PathVariable userId: Long,
-        @RequestParam(defaultValue = "ALL") filterCriteria: FilterCriteria,
-        @RequestParam(defaultValue = "DATE_DESC") sortCriteria: SortCriteria,
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "4") pageSize: Int
-    ): PagedResult<ReservationProfileDTO> =
-        reservationService.orchestrateFilterAndSortBooks(userId, page, pageSize, filterCriteria, sortCriteria)
+        @ModelAttribute pageableObject: ProfilePageable
+    ): PagedResult<ReservationProfileDTO> {
+        return reservationService.orchestrateFilterAndSortBooks(userId, pageableObject)
+    }
 
-//    @GetMapping("/userReadBooks/{userId}")
-//    fun getUserReadBooks(@PathVariable userId: Long): Int =
-//        reservationService.getUserReservationsNumber(userId)
-//
-//    @GetMapping("/userLentBooks/{userId}")
-//    fun getUserLentBooks(@PathVariable userId: Long): Int =
-//        reservationService.getUserLentBooksNumber(userId)
+    @GetMapping("/userReadBooks/{userId}")
+    fun getUserReadBooks(@PathVariable userId: Long): Long =
+        reservationService.getUserReadBooksNumber(userId)
+
+    @GetMapping("/userLentBooks/{userId}")
+    fun getUserLentBooks(@PathVariable userId: Long): Long =
+        reservationService.getUserLentBooksNumber(userId)
 //
 //    @GetMapping("/book-review/{bookId}")
 //    fun getBookReviews(@PathVariable bookId: Long, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =

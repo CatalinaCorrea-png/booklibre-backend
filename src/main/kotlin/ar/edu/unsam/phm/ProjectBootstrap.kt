@@ -139,6 +139,7 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var reservaValentina2: Reservation
     private lateinit var reservaMateo1: Reservation
     private lateinit var reservaMateo2: Reservation
+    private lateinit var reservaActivaMateo: Reservation
 
     // ═════════════════════════════════════════════════════════════════════════
     // Metodos de creacion
@@ -507,6 +508,7 @@ class ProjectBootstrap : InitializingBean {
             pickUpDate = LocalDate.of(2026, 1, 1),
             dropOffDate = LocalDate.of(2026, 2, 1),
         )
+
 //
 //        // ─── Reservas pasadas ─────────────────────────────────────────────────
 //
@@ -579,11 +581,19 @@ class ProjectBootstrap : InitializingBean {
             pickUpDate = LocalDate.of(2026, 4, 7), dropOffDate = LocalDate.of(2026, 4, 21),
         )
 
+        reservaActivaMateo = Reservation(
+            user = mateoLopez,
+            book = huckFinn,
+            review = Review(),
+            pickUpDate = LocalDate.of(2026, 4, 2),
+            dropOffDate = LocalDate.of(2026, 4, 5)
+        )
+
         listOf(
             reservaEmilia1, reservaEmilia2,
             reservaLuciano1, reservaLuciano2,
             reservaValentina1, reservaValentina2,
-            reservaMateo1, reservaMateo2,
+            reservaMateo1, reservaMateo2, reservaActivaMateo
         ).forEach { createReservation(it) }
     }
     fun createReservation(reservation: Reservation) {
