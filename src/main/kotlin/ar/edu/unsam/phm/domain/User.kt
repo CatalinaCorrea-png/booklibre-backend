@@ -41,6 +41,8 @@ class User(
     override fun validate() {
         if (!isNotEmpty(name)) throw NotFoundException("El usuario tiene que tener un nombre")
         if (!isNotEmpty(email)) throw NotFoundException("El usuario tiene que tener email")
+        if (!isNotEmpty(password)) throw NotFoundException("El usuario tiene que tener password")
+        if (password.length < 8) throw NotFoundException("El password debe tener al menos 8 caracteres")
     }
 
     companion object {
