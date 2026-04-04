@@ -46,6 +46,7 @@ class BookController(
     fun getBookById(@PathVariable id: Long) =
         bookService.getBookById(id).orElseThrow { NoSuchElementException("Libro no encontrado") }.toDTO()
 
+    //este endpoint lo cree solo para poder ver si traia los creados/eliminados
     @GetMapping("/books")
     fun getAllBooks() = bookService.getAllBooks().map { it.toDTO() }
 
