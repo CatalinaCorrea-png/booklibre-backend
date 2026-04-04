@@ -16,7 +16,6 @@ import java.util.*
 
 @Service
 class BookService(
-    @Autowired
     val bookRepository: CrudBookRepository,
     val reservationRepository: CrudReservationRepository,
     private val userRepository: CrudUserRepository,
