@@ -6,4 +6,5 @@ import java.util.Optional
 
 interface CrudAuthorRepository: CrudRepository<Author, Int> {
     fun findByName(name: String): Optional<Author>
+
 }

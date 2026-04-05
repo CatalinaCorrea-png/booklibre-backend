@@ -17,15 +17,15 @@ import java.time.LocalDate
 class BookController(
     val bookService: BookService,
 ) {
-    @GetMapping("/filtered-books")
-    fun getFilteredBooks(
-        @ModelAttribute criteria: BookSearchCriteria,
-
-    ): PageResponse<BookDTO> {
-        val direction = if (criteria.ascending) Sort.Direction.ASC else Sort.Direction.DESC
-        val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
-        return bookService.searchBooks(criteria, pageable)
-    }
+//    @GetMapping("/filtered-books")
+//    fun getFilteredBooks(
+//        @ModelAttribute criteria: BookSearchCriteria,
+//
+//    ): PageResponse<BookDTO> {
+//        val direction = if (criteria.ascending) Sort.Direction.ASC else Sort.Direction.DESC
+//        val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
+//        return bookService.searchBooks(criteria, pageable)
+//    }
 
     @PostMapping("/create-book")
     fun createBook(@RequestBody bookCreateDTO: BookCreateDTO) {
@@ -44,13 +44,17 @@ class BookController(
 
     @GetMapping("/book-detail/{id}")
     fun getBookById(@PathVariable id: Long) =
-        bookService.getBookById(id).toDTO()
+        bookService.getBookById(id).orElseThrow { NoSuchElementException("Libro no encontrado") }.toDTO()
 
-    @GetMapping("/book-detail/{id}/bibliokarmas")
-    fun calculateBibliokarmas(@PathVariable id: Long, @RequestParam userId: Long, @RequestParam pickUpDate: LocalDate, @RequestParam dropOffDate: LocalDate): Int =
-        bookService.recalculateBibliokarmas(id, userId, pickUpDate, dropOffDate)
+    //este endpoint lo cree solo para poder ver si traia los creados/eliminados
+    @GetMapping("/books")
+    fun getAllBooks() = bookService.getAllBooks().map { it.toDTO() }
 
-
-    @GetMapping("/book-genders")
-    fun getBookGenders() = Gender.entries
+//    @GetMapping("/book-detail/{id}/bibliokarmas")
+//    fun calculateBibliokarmas(@PathVariable id: Long, @RequestParam userId: Long, @RequestParam pickUpDate: LocalDate, @RequestParam dropOffDate: LocalDate): Int =
+//        bookService.recalculateBibliokarmas(id, userId, pickUpDate, dropOffDate)
+//
+//
+//    @GetMapping("/book-genders")
+//    fun getBookGenders() = Gender.entries
 }

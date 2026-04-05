@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import java.util.Optional
 
-interface CrudBookRepository: CrudRepository<Book, Int> {
+interface CrudBookRepository: CrudRepository<Book, Long> {
     fun findByIsbn(isbn: String): Optional<Book>
 
     @Query("""
@@ -19,4 +19,8 @@ interface CrudBookRepository: CrudRepository<Book, Int> {
         )
     """)
     fun findAllBooksWithoutReservations(userId: Long): List<Book>
+
+    //trae todos los libros que no tienen el borrado logico, es decir todos los libros que no fueron borrados
+    //hay que usar este metodo sino va a traer libros que puede que hayan sido borrados ojooo
+    fun findAllByDeletedAtIsNull(): List<Book>
 }
