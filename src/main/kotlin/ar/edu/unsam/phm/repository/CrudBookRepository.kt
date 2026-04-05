@@ -8,15 +8,17 @@ import java.util.Optional
 interface CrudBookRepository: CrudRepository<Book, Long> {
     fun findByIsbn(isbn: String): Optional<Book>
 
+    //agrego filtro de que traiga lo que no fue eliminado
     @Query("""
-        SELECT b
-        FROM Book b
-        WHERE b.owner.id = :userId
-        AND NOT EXISTS (
-            SELECT r
-            FROM Reservation r
-            WHERE r.book = b
-        )
+    SELECT b
+    FROM Book b
+    WHERE b.owner.id = :userId
+    AND b.deletedAt IS NULL
+    AND NOT EXISTS (
+        SELECT r
+        FROM Reservation r
+        WHERE r.book = b
+    )
     """)
     fun findAllBooksWithoutReservations(userId: Long): List<Book>
 

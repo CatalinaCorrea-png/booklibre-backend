@@ -75,6 +75,7 @@ class BookService(
             .forEach { reservationRepository.delete(it) }
 
         book.logicDelete()
+        println("deletedAt después de logicDelete: ${book.deletedAt}")
         bookRepository.save(book)  // guarda el libro con el delete logico, no lo borra de la coleccion
     }
 

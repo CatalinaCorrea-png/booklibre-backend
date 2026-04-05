@@ -5,7 +5,14 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
 interface CrudReservationRepository: CrudRepository<Reservation, Long> {
-
+//aca agrego query por que necesito filtrar que solo traiga los libros que no fueron eliminados
+    @Query("""
+    SELECT r
+    FROM Reservation r
+    JOIN r.book b
+    WHERE b.owner.id = :userId
+    AND b.deletedAt IS NULL
+""")
     fun findAllByBookOwnerId(userId: Long): List<Reservation>
 
     //para traer las reservas que tengan ese libro
