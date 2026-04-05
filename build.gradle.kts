@@ -61,6 +61,13 @@ kotlin {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
 }
+// Solves this WARNING when boot "Getter methods of lazy classes cannot be final: ar.edu.unsam.phm.domain.Book#getAuthor..."
+// ~"...In Kotlin, all classes and methods are final by default. Hibernate needs to create proxy subclasses of your @Entity classes
+// to support lazy loading — but it can't subclass or override final methods..."
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
+}
 
 tasks.withType<Test> {
     useJUnitPlatform()

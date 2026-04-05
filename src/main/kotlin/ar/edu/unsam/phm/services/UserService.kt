@@ -1,6 +1,8 @@
 package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.User
+import ar.edu.unsam.phm.domain.UserTypes
+import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
 import ar.edu.unsam.phm.errors.NotFoundException
 import org.springframework.stereotype.Service
 import ar.edu.unsam.phm.errors.BusinessException
@@ -60,54 +62,31 @@ class UserService(
             throw ConflictException("Email '${user.email}' ya se encuentra registrado")
     }}
 
-//    private fun saveImage(image: MultipartFile): String {
-//        val uploadDirectory: Path = Paths.get("uploads")
-//
-//        if (!Files.exists(uploadDirectory)) {
-//            Files.createDirectories(uploadDirectory)
-//        }
-//
-//        val originalFilename = image.originalFilename ?: "image"
-//        val extension = originalFilename.substringAfterLast(".", "")
-//        val uniqueFilename = if (extension.isNotBlank()) {
-//            "${UUID.randomUUID()}.$extension"
-//        } else {
-//            UUID.randomUUID().toString()
-//        }
-//
-//        val targetPath = uploadDirectory.resolve(uniqueFilename)
-//        Files.copy(image.inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING)
-//
-//        return "uploads/$uniqueFilename"
-//    }
-//
-//    fun updateUserProfile(userData: UpdateUserProfileDTO, image: MultipartFile?): UserDTO {
-//        val existingUser = userRepository.getObject(userData.id)
-//
-//        val finalImagePath = if (image != null && !image.isEmpty) {
-//           saveImage(image)
-//        } else {
-//            existingUser.img
-//        }
-//
-//        val updatedUser = User(
-//            name = userData.name,
-//            description = userData.description,
-//            email = userData.email,
-//            cel = userData.cel,
-//            location = userData.location,
-//            userType = UserTypes.fromValue(userData.userType),
-//            timestamp = userData.timestamp,
-//            bibliokarmas = userData.bibliokarmas,
-//            password = existingUser.password,
-//            img = finalImagePath
-//        ).apply {
-//            id = existingUser.id
-//        }
-//
-//        userRepository.update(updatedUser)
-//
-//        return updatedUser.toUserDTO()
-//    }
+    fun updateUserProfile(userData: UpdateUserProfileDTO): User {
+        val existingUser = userRepository
+            .findById(userData.id)
+            .orElseThrow {
+                NotFoundException("No se encuentra un usuario registrado con ese ID ${userData.id}")
+            }
+
+        val updatedUser = User(
+            name = userData.name,
+            description = userData.description,
+            email = userData.email,
+            cel = userData.cel,
+            location = userData.location,
+            userType = UserTypes.fromValue(userData.userType),
+            timestamp = userData.timestamp,
+            bibliokarmas = userData.bibliokarmas,
+            password = existingUser.password,
+            img = userData.img
+        ).apply {
+            id = existingUser.id
+        }
+
+        userRepository.save(updatedUser)
+
+        return updatedUser
+    }
 
 }

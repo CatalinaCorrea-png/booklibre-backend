@@ -34,6 +34,7 @@ data class UpdateUserProfileDTO(
     val id: Long,
     val name: String,
     val description: String,
+    val img: String,
     val email: String,
     val cel: String,
     val location: String,

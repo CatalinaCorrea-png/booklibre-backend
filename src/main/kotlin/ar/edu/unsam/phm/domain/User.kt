@@ -1,6 +1,7 @@
 package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
+import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import jakarta.persistence.Column
@@ -44,6 +45,14 @@ class User(
         if (!isNotEmpty(email)) throw NotFoundException("El usuario tiene que tener email")
         if (!isNotEmpty(password)) throw NotFoundException("El usuario tiene que tener password")
         if (password.length < 8) throw NotFoundException("El password debe tener al menos 8 caracteres")
+    }
+
+    fun validateProfileUpdate() {
+        if(!isNotEmpty(name)) throw BusinessException("Debe ingresar un nombre valido")
+        if(name.length <= 1) throw BusinessException("El nombre debe contener 2 o mas caracteres")
+        if(name.length >= 25) throw BusinessException("El nombre no puede tener mas de 25 caracteres")
+        if(!isNotEmpty(location)) throw BusinessException("Debe añadir una ubicacion valida")
+        if(!isNotEmpty(email)) throw BusinessException("Debe ingrese un email valido")
     }
 
     companion object {
