@@ -40,7 +40,7 @@ fun LocalDate.isBetween(start: LocalDate, end: LocalDate): Boolean =
     this.isAfter(start) && this.isBefore(end)
 
 data class ReservationProfileDTO(
-    val id: Long,
+    val id: Long?, //lo hago nullable para que no revienten las reservas ficticias
     val book: ProfileBookDTO,
     var state: State
 )
@@ -48,7 +48,7 @@ data class ReservationProfileDTO(
 fun Reservation.toReservationProfileDTO(): ReservationProfileDTO {
 
     val reservationProfileDTO = ReservationProfileDTO(
-        id = this.id!!,
+        id = this.id,
         book = this.book.toProfileBookDTO(),
         state = this.state
     )
