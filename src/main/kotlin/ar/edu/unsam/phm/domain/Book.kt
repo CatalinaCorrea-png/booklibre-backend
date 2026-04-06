@@ -34,7 +34,7 @@ abstract class Book (
     var gender: Gender = Gender.DRAMA,
 
     @ManyToOne
-    var author: Author = Author("", ""),
+    open var author: Author = Author("", ""),
 
     @Column(nullable = false)
     var numPages: Int = 0,
@@ -70,8 +70,8 @@ abstract class Book (
     val bookType: String,
 
     //agrego esta columna para el delete logico
-    @Column(name = "deleted_at")
-    var deletedAt: LocalDate? = null,
+    @Column(name = "deleted")
+    var deleted: Boolean = false,
 
 ): RepositoryElement {
 
@@ -79,10 +79,8 @@ abstract class Book (
     @GeneratedValue
     override var id: Long? = null
 
-    //para borrado logico del libro
-    fun isDeleted() = deletedAt != null
 
-    fun logicDelete() { deletedAt = LocalDate.now() }
+    fun logicDelete() { deleted = true }
 
     // Template Method Primitiva
     fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int, numReservations: Int) : Int = 5 * reservationDays + typeBibliokarmas(userBibliokarmas, numReservations)

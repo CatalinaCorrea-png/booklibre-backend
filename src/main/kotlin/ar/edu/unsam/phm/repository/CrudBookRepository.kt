@@ -13,7 +13,7 @@ interface CrudBookRepository: CrudRepository<Book, Long> {
     SELECT b
     FROM Book b
     WHERE b.owner.id = :userId
-    AND b.deletedAt IS NULL
+    AND b.deleted = false
     AND NOT EXISTS (
         SELECT r
         FROM Reservation r
@@ -24,5 +24,5 @@ interface CrudBookRepository: CrudRepository<Book, Long> {
 
     //trae todos los libros que no tienen el borrado logico, es decir todos los libros que no fueron borrados
     //hay que usar este metodo sino va a traer libros que puede que hayan sido borrados ojooo
-    fun findAllByDeletedAtIsNull(): List<Book>
+    fun findAllByDeletedIsFalse(): List<Book>
 }

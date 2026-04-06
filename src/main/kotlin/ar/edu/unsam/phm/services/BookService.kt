@@ -28,8 +28,8 @@ class BookService(
         val owner = userRepository.findById(bookCreateDTO.ownerId!!)
             .orElseThrow { NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}") }
 
-        val author: Author = authorRepository.findByName(bookCreateDTO.authorName)
-            .orElseGet { authorRepository.save(Author(name = bookCreateDTO.authorName, avatar = bookCreateDTO.authorAvatarUrl)) }
+        val author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)
+            .orElseGet { authorRepository.save(Author(name = bookCreateDTO.book.author.name, avatar = bookCreateDTO.book.author.avatar)) }
 
         val newBook = bookCreateDTO.createFromDTO(owner)
         newBook.author = author
@@ -45,12 +45,12 @@ class BookService(
         val existingBook = bookRepository.findById(id)
             .orElseThrow { NotFoundException("No existe el libro con id: $id") }
 
-        if (existingBook.isDeleted()) {
+        if (existingBook.deleted) {
             throw ConflictException("No se puede modificar un libro eliminado")
         }
 
-        val author: Author = authorRepository.findByName(bookCreateDTO.authorName)
-            .orElseGet { authorRepository.save(Author(name = bookCreateDTO.authorName, avatar = bookCreateDTO.authorAvatarUrl)) }
+        val author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)
+            .orElseGet { authorRepository.save(Author(name = bookCreateDTO.book.author.name, avatar = bookCreateDTO.book.author.avatar)) }
 
         val newBook = bookCreateDTO.createFromDTO(owner)
         newBook.id = existingBook.id
@@ -75,7 +75,6 @@ class BookService(
             .forEach { reservationRepository.delete(it) }
 
         book.logicDelete()
-        println("deletedAt después de logicDelete: ${book.deletedAt}")
         bookRepository.save(book)  // guarda el libro con el delete logico, no lo borra de la coleccion
     }
 
@@ -127,7 +126,7 @@ class BookService(
         bookRepository.findById(id) ?: throw NotFoundException("Can not find the book <$id>")
 
 //trae todos los libros menos los que fueron eliminados logicamente IMPORTANTE USAR ESTE METODO SINO VA A TRAER LIBROS QUE FUERON BORRADOS LOGICAMENTEEEE
-    fun getAllBooks(): List<Book> = bookRepository.findAllByDeletedAtIsNull()
+    fun getAllBooks(): List<Book> = bookRepository.findAllByDeletedIsFalse()
 
 //    fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
 //        val book = bookRepository.getObject(bookId)

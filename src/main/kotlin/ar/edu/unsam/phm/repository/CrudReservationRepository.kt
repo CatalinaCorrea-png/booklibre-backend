@@ -11,7 +11,7 @@ interface CrudReservationRepository: CrudRepository<Reservation, Long> {
     FROM Reservation r
     JOIN r.book b
     WHERE b.owner.id = :userId
-    AND b.deletedAt IS NULL
+    AND b.deleted = false
 """)
     fun findAllByBookOwnerId(userId: Long): List<Reservation>
 
