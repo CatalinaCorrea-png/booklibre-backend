@@ -126,7 +126,7 @@ class BookService(
         bookRepository.findById(id) ?: throw NotFoundException("Can not find the book <$id>")
 
 //trae todos los libros menos los que fueron eliminados logicamente IMPORTANTE USAR ESTE METODO SINO VA A TRAER LIBROS QUE FUERON BORRADOS LOGICAMENTEEEE
-    fun getAllBooks(): List<Book> = bookRepository.findAllByDeletedIsNull()
+    fun getAllBooks(): List<Book> = bookRepository.findAllByDeletedIsFalse()
 
 //    fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
 //        val book = bookRepository.getObject(bookId)

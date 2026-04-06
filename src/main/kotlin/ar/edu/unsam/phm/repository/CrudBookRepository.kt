@@ -24,5 +24,5 @@ interface CrudBookRepository: CrudRepository<Book, Long> {
 
     //trae todos los libros que no tienen el borrado logico, es decir todos los libros que no fueron borrados
     //hay que usar este metodo sino va a traer libros que puede que hayan sido borrados ojooo
-    fun findAllByDeletedIsNull(): List<Book>
+    fun findAllByDeletedIsFalse(): List<Book>
 }
