@@ -11,6 +11,7 @@ import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import kotlin.math.ceil
 
@@ -106,6 +107,7 @@ class ReservationService(
         )
     }
 
+    @Transactional(readOnly = true)
     fun orchestrateFilterAndSortBooks(userId: Long, pageableObject: ProfilePageable): PagedResult<ReservationProfileDTO> {
         val fictitiousReservations: List<Reservation> = this.getUserOwnBooksIntoReservations(userId)
         val realReservations: List<Reservation> = this.getUserReservedBooks(userId)

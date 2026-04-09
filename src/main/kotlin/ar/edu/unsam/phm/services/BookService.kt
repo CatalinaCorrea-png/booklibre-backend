@@ -122,10 +122,14 @@ class BookService(
 //        return userRepository.getObject(id)
 //    }
 //
-    fun getBookById(id: Long): Optional<Book> =
-        bookRepository.findById(id) ?: throw NotFoundException("Can not find the book <$id>")
+    @Transactional(readOnly = true)
+    fun getBookById(id: Long): BookDTO =
+        bookRepository.findById(id)
+            .orElseThrow { NotFoundException("No existe el libro con id: $id") }
+            .toDTO()
 
 //trae todos los libros menos los que fueron eliminados logicamente IMPORTANTE USAR ESTE METODO SINO VA A TRAER LIBROS QUE FUERON BORRADOS LOGICAMENTEEEE
+    @Transactional(readOnly = true)
     fun getAllBooks(): List<Book> = bookRepository.findAllByDeletedIsFalse()
 
 //    fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
