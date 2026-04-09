@@ -30,7 +30,7 @@ fun Reservation.toDTO(): ReservationDTO {
         dropOffDate = this.dropOffDate,
         state       = this.state,
         canRate = this.state == State.RETURNED && this.review!!.rating == 0,
-//        bibliokarmas = this.book.calculateBibliokarmas(days, ),
+        //bibliokarmas = this.book.calculateBibliokarmas(days, user.bibliokarmas, ), //todo: arreglar esto...
         loanedBy    = this.book.owner.name,
         loanedTo    = this.user.name,
     )

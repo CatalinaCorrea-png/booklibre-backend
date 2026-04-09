@@ -3,9 +3,12 @@ package ar.edu.unsam.phm.services
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.dto.PagedResult
 import ar.edu.unsam.phm.dto.ProfilePageable
+import ar.edu.unsam.phm.dto.ReservationDTO
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
+import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.dto.toReservationProfileDTO
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
@@ -50,6 +53,24 @@ class ReservationService(
 //            totalPages = result.totalPages
 //        )
 //    }
+
+    // esto quiza esta de mas
+    @Transactional(readOnly = true)
+    fun getReservesByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
+        val reservations = reservationRepository.findByLectorIdFiltered(userId, search)
+        return paginateReservations(reservations, page, pageSize)
+    }
+
+    //segun dodine el mapeo lo hace el controller
+    private fun paginateReservations(reservations: List<Reservation>, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
+        val dtos = reservations.map { it.toDTO() }
+        return PagedResult(
+            items = dtos.drop(page * pageSize).take(pageSize),
+            total = dtos.size,
+            totalPages = ceil(dtos.size.toDouble() / pageSize).toInt()
+        )
+    }
+
 //
 //    fun getLoansMadeByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
 //        val result = reservationRepository.findByOwnerIdFiltered(userId, search, page, pageSize)

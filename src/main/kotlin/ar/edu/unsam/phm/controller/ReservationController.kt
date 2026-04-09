@@ -32,15 +32,18 @@ class ReservationController(
 //    fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
 //        reservationService.createReservation(reservationDTO)
 //    }
-//    // ESTAS SON LAS RESERVAS QUE VOS HICISTE
-//    @GetMapping("/lector/{userId}")
-//    fun getReservesByUserId(
-//        @PathVariable userId: Long,
-//        @RequestParam(defaultValue = "") search: String,
-//        @RequestParam page: Int,
-//        @RequestParam pageSize: Int): PagedResult<ReservationDTO> =
-//        reservationService.getReservesByUserId(userId, search, page, pageSize)
-//
+
+    // ESTAS SON LAS RESERVAS QUE VOS HICISTE
+    @GetMapping("/lector/{userId}")
+    fun getReservesByUserId(
+        @PathVariable userId: Long,
+        @RequestParam(defaultValue = "") search: String,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "4") pageSize: Int
+    ): PagedResult<ReservationDTO> =
+        reservationService.getReservesByUserId(userId, search, page, pageSize)
+
+
 //    // ESTAS SON LAS RESERVAS QUE TE HICIERON A VOS
 //    @GetMapping("/owner/{userId}")
 //    fun getLoansMadeByUserId(
