@@ -2,18 +2,12 @@ package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.dto.*
-import ar.edu.unsam.phm.dto.PagedResult
-import ar.edu.unsam.phm.dto.ProfilePageable
-import ar.edu.unsam.phm.dto.ReservationDTO
-import ar.edu.unsam.phm.dto.ReservationProfileDTO
-import ar.edu.unsam.phm.dto.toDTO
-import ar.edu.unsam.phm.dto.toReservationProfileDTO
-import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -46,9 +40,10 @@ class ReservationService(
     // esto quiza esta de mas, supongo que regla de negocio?
     @Transactional(readOnly = true)
     fun getReservesByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
-        val reservations = reservationRepository.findByLectorIdFiltered(userId, search)
-        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservations)
-        return paginate(reservationsDTOs, page, pageSize)
+        val pageable = PageRequest.of(page, pageSize)
+        val reservationsPage = reservationRepository.findByLectorIdFiltered(userId, search, pageable)
+        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content)
+        return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages )
     }
 
     @Transactional(readOnly = true)
@@ -58,16 +53,33 @@ class ReservationService(
         return paginate(reservationsDTOs, page, pageSize)
     }
 
-    private fun getReservationsWithBibliokarmasDTO(reservations: List<Reservation>): List<ReservationDTO> =
-        reservations.map { reservation ->
-            val numReservations = reservationRepository.countByBookId(reservation.book.id!!)
+    private fun getReservationsWithBibliokarmasDTO(reservations: List<Reservation>): List<ReservationDTO> {
+        val bookIds = reservations.map { it.book.id!! }
+        val countMap = reservationRepository.countByBookIds(bookIds)
+            .associate { row -> (row[0] as Long) to (row[1] as Long) }
+
+        return reservations.map { reservation ->
+            val numReservations = countMap[reservation.book.id!!] ?: 0L
             reservation.toDTO().apply {
-                 bibliokarmas = reservation.book.calculateBibliokarmas(
-                reservation.reservationDays(),
-                reservation.user.bibliokarmas,
-                numReservations)
+                bibliokarmas = reservation.book.calculateBibliokarmas(
+                    reservation.reservationDays(),
+                    reservation.user.bibliokarmas,
+                    numReservations.toInt()
+                )
             }
         }
+    }
+
+//    private fun getReservationsWithBibliokarmasDTO(reservations: List<Reservation>): List<ReservationDTO> =
+//        reservations.map { reservation ->
+//            val numReservations = reservationRepository.countByBookId(reservation.book.id!!)
+//            reservation.toDTO().apply {
+//                 bibliokarmas = reservation.book.calculateBibliokarmas(
+//                reservation.reservationDays(),
+//                reservation.user.bibliokarmas,
+//                numReservations)
+//            }
+//        }
 
     //segun dodine el mapeo lo hace el controller
     private fun paginate(dtos: List<ReservationDTO>, page: Int, pageSize: Int): PagedResult<ReservationDTO> =
