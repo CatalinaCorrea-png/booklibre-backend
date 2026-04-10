@@ -26,7 +26,24 @@ interface CrudReservationRepository: CrudRepository<Reservation, Long> {
         @Param("search") search: String
     ): List<Reservation>
 
-
+    // Reservas donde el usuario es el OWNER
+    // Si vas a usar un campo en el WHERE, siempre asignale un alias en el JOIN
+    @Query("""
+        SELECT r FROM Reservation r
+        JOIN FETCH r.book b
+        JOIN FETCH b.owner o
+        JOIN FETCH b.owner
+        WHERE o.id = :userId
+        AND b.deleted = false
+        AND (
+            LOWER(b.title) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(b.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+    """)
+    fun findByOwnerIdFiltered(
+        @Param("userId") userId: Long,
+        @Param("search") search: String
+    ): List<Reservation>
 
 //aca agrego query por que necesito filtrar que solo traiga los libros que no fueron eliminados
     @Query("""
@@ -40,6 +57,11 @@ interface CrudReservationRepository: CrudRepository<Reservation, Long> {
 
     //para traer las reservas que tengan ese libro
     fun findByBookId(bookId: Long): List<Reservation>
+
+    // lo hago asi, para no traer to.do a memoria para hacer un .size en el service y para delegar responsabilidades
+    // JPQL retorna long por defecto supuestamente
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.book.id = :bookId")
+    fun countByBookId(@Param("bookId") bookId: Long): Int
 
     @Query("""
          SELECT count(r)
