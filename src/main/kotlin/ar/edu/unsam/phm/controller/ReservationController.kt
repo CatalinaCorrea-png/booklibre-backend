@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.*
 class ReservationController(
     val reservationService: ReservationService,
 ) {
-//    @PostMapping("/create-reservation")
-//    fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
-//        reservationService.createReservation(reservationDTO)
-//    }
+
+    @PostMapping("/create-reservation")
+    fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
+        reservationService.createReservation(reservationDTO)
+    }
 
     // ESTAS SON LAS RESERVAS QUE VOS HICISTE
     @GetMapping("/lector/{userId}")
@@ -55,11 +56,11 @@ class ReservationController(
     fun getUserLentBooks(@PathVariable userId: Long): Long =
         reservationService.getUserLentBooksNumber(userId)
 //
-//    @GetMapping("/book-review/{bookId}")
-//    fun getBookReviews(@PathVariable bookId: Long, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
-//        reservationService.getBookReviews(bookId, page, pageSize).map { it.toDTO() }
-//
-//    @GetMapping("/reservations/book/{bookId}/dates")
-//    fun getReservedDatesByBook(@PathVariable bookId: Long): List<ReservedPeriodDTO> =
-//        reservationService.getReservedDates(bookId)
+    @GetMapping("/book-review/{bookId}")
+    fun getBookReviews(@PathVariable bookId: Long, @RequestParam page: Int, @RequestParam pageSize: Int): List<ReviewDTO> =
+        reservationService.getBookReviews(bookId, page, pageSize).map { it.toDTO() }
+
+    @GetMapping("/reservations/book/{bookId}/dates")
+    fun getReservedDatesByBook(@PathVariable bookId: Long): List<ReservedPeriodDTO> =
+        reservationService.getReservedDates(bookId)
 }

@@ -33,7 +33,7 @@ abstract class Book (
     @Column(nullable = false)
     var gender: Gender = Gender.DRAMA,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     var author: Author = Author("", ""),
 
     @Column(nullable = false)
@@ -56,7 +56,7 @@ abstract class Book (
     @Column(nullable = false)
     var condition: BookCondition = BookCondition.EXCELLENT,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     var owner: User = User(),
 

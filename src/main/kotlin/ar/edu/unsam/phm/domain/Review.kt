@@ -27,5 +27,5 @@ data class Review(
         TODO("Not yet implemented")
     }
 
-    fun notEmptyReview(): Boolean = this.rating > 0
+    fun notEmptyReview(): Boolean = this.rating > 1
 }

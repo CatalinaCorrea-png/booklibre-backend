@@ -15,7 +15,6 @@ import java.util.*
 
 @Service
 class UserService(
-
     @Autowired
     val userRepository: CrudUserRepository
 ) {
