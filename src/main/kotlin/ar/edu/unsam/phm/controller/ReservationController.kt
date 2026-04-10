@@ -1,25 +1,7 @@
 package ar.edu.unsam.phm.controller
 
-import ar.edu.unsam.phm.domain.FilterCriteria
-import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.SortCriteria
-import ar.edu.unsam.phm.dto.CreateReservationDTO
-import ar.edu.unsam.phm.dto.PagedResult
-import ar.edu.unsam.phm.dto.ProfilePageable
-import ar.edu.unsam.phm.dto.ReservationDTO
-import ar.edu.unsam.phm.services.BookService
-import ar.edu.unsam.phm.dto.ReservationProfileDTO
-import ar.edu.unsam.phm.dto.ReservedPeriodDTO
-import ar.edu.unsam.phm.dto.ReviewDTO
-import ar.edu.unsam.phm.dto.toReservationProfileDTO
-import ar.edu.unsam.phm.dto.toDTO
+import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.services.ReservationService
-import ar.edu.unsam.phm.services.UserService
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -27,7 +9,6 @@ import org.springframework.web.bind.annotation.*
 class ReservationController(
     val reservationService: ReservationService,
 ) {
-
 //    @PostMapping("/create-reservation")
 //    fun createReservation(@RequestBody reservationDTO: CreateReservationDTO) {
 //        reservationService.createReservation(reservationDTO)
@@ -50,7 +31,7 @@ class ReservationController(
         @RequestParam(defaultValue = "") search: String,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "4") pageSize: Int
-    ): PagedResult<ReservationDTO>  =
+    ): PagedResult<ReservationDTO> =
         reservationService.getLoansMadeByUserId(userId, search, page, pageSize)
 
     @PatchMapping("/{reservationId}/calificar")

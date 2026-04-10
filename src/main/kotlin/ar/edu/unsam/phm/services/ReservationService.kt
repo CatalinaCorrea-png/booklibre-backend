@@ -8,6 +8,7 @@ import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -18,7 +19,7 @@ class ReservationService(
     val reservationRepository: CrudReservationRepository,
     val bookRepository: CrudBookRepository,
     val userRepository: CrudUserRepository,
-){
+) {
 //    fun createReservation(reservation: CreateReservationDTO) {
 //        val book = bookRepository.getObject(reservation.bookId)
 //        val user = userRepository.getObject(reservation.sessionId)
@@ -40,24 +41,25 @@ class ReservationService(
     // esto quiza esta de mas, supongo que regla de negocio?
     @Transactional(readOnly = true)
     fun getReservesByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
-        val pageable = PageRequest.of(page, pageSize)
+        val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
         val reservationsPage = reservationRepository.findByLectorIdFiltered(userId, search, pageable)
         val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content)
-        return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages )
+        return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
     }
 
     @Transactional(readOnly = true)
     fun getLoansMadeByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
-        val reservations = reservationRepository.findByOwnerIdFiltered(userId, search)
-        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservations)
-        return paginate(reservationsDTOs, page, pageSize)
+        val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
+        val reservationsPage = reservationRepository.findByOwnerIdFiltered(userId, search, pageable)
+        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content)
+        return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
     }
 
     private fun getReservationsWithBibliokarmasDTO(reservations: List<Reservation>): List<ReservationDTO> {
         val bookIds = reservations.map { it.book.id!! }
         val countMap = reservationRepository.countByBookIds(bookIds)
             .associate { row -> (row[0] as Long) to (row[1] as Long) }
-
+        // todo: segun dodine el mapeo lo hace el controller
         return reservations.map { reservation ->
             val numReservations = countMap[reservation.book.id!!] ?: 0L
             reservation.toDTO().apply {
@@ -70,31 +72,12 @@ class ReservationService(
         }
     }
 
-//    private fun getReservationsWithBibliokarmasDTO(reservations: List<Reservation>): List<ReservationDTO> =
-//        reservations.map { reservation ->
-//            val numReservations = reservationRepository.countByBookId(reservation.book.id!!)
-//            reservation.toDTO().apply {
-//                 bibliokarmas = reservation.book.calculateBibliokarmas(
-//                reservation.reservationDays(),
-//                reservation.user.bibliokarmas,
-//                numReservations)
-//            }
-//        }
-
-    //segun dodine el mapeo lo hace el controller
-    private fun paginate(dtos: List<ReservationDTO>, page: Int, pageSize: Int): PagedResult<ReservationDTO> =
-        PagedResult(
-            items = dtos.drop(page * pageSize).take(pageSize),
-            total = dtos.size,
-            totalPages = ceil(dtos.size.toDouble() / pageSize).toInt()
-        )
-
     @Transactional
     fun rateLoan(reservationId: Long, rating: Int, comment: String, userId: Long) {
         val reservation = reservationRepository.findById(reservationId).get()
-            //.orElseThrow { NotFoundException("Reserva $reservationId no encontrada") }
+        //.orElseThrow { NotFoundException("Reserva $reservationId no encontrada") }
         val reviewer = userRepository.findById(userId).get()
-            //.orElseThrow { NotFoundException("Usuario $userId no encontrado") }
+        //.orElseThrow { NotFoundException("Usuario $userId no encontrado") }
 
         reservation.review = Review(
             rating = rating,
@@ -107,7 +90,10 @@ class ReservationService(
 
     fun getUserReadBooksNumber(userId: Long): Long = reservationRepository.countUserReadBooksNumber(userId)
 
-    fun filteredAndSortReservations(reservations: List<Reservation>, pageableObject: ProfilePageable): PagedResult<ReservationProfileDTO> {
+    fun filteredAndSortReservations(
+        reservations: List<Reservation>,
+        pageableObject: ProfilePageable
+    ): PagedResult<ReservationProfileDTO> {
         //  Spring Data JPA parses all method names in a repository interface to derive queries,
         // including default methods. The name filterAndSortReservations was parsed as a query for a filter property, which doesn't exist on Reservation.
 
@@ -117,14 +103,18 @@ class ReservationService(
             .map { it.toReservationProfileDTO() }
 
         return PagedResult(
-            items = filteredAndSortedList.drop(pageableObject.page * pageableObject.pageSize).take(pageableObject.pageSize),
+            items = filteredAndSortedList.drop(pageableObject.page * pageableObject.pageSize)
+                .take(pageableObject.pageSize),
             total = filteredAndSortedList.size,
             totalPages = ceil(filteredAndSortedList.size.toDouble() / pageableObject.pageSize).toInt()
         )
     }
 
     @Transactional(readOnly = true)
-    fun orchestrateFilterAndSortBooks(userId: Long, pageableObject: ProfilePageable): PagedResult<ReservationProfileDTO> {
+    fun orchestrateFilterAndSortBooks(
+        userId: Long,
+        pageableObject: ProfilePageable
+    ): PagedResult<ReservationProfileDTO> {
         val fictitiousReservations: List<Reservation> = this.getUserOwnBooksIntoReservations(userId)
         val realReservations: List<Reservation> = this.getUserReservedBooks(userId)
         val merged: List<Reservation> = this.sortAndDistinct(realReservations + fictitiousReservations)

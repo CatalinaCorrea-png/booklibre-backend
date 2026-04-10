@@ -9,14 +9,14 @@ data class ReviewDTO(
     var rating: Int = 0,
     var review: String = "",
     var timestamp: String = ""
-){
+) {
 
     fun fromDTO(): Review {
         return Review(
             reviewerName = this.reviewerName,
             rating = this.rating,
             review = this.review,
-            timestamp= LocalDate.parse(this.timestamp),
+            timestamp = LocalDate.parse(this.timestamp),
         ).apply {
             id = this@ReviewDTO.id
         }
