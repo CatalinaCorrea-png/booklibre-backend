@@ -47,9 +47,9 @@ class ReservationRepository: Repository<Reservation>() {
         return this.repositoryObjects().filter { it.book.id == bookId }
     }
 
-    fun findRatingsByBookId(bookId: Long): List<Int> {
-        return this.repositoryObjects().filter { it.book.id == bookId }.map { it.review.rating }
-    }
+//    fun findRatingsByBookId(bookId: Long): List<Int> {
+//        return this.repositoryObjects().filter { it.book.id == bookId }.map { it.review.rating }
+//    }
 
     fun findReservedBookIds(criteria: BookSearchCriteria): Set<Long> {
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
@@ -95,8 +95,8 @@ class ReservationRepository: Repository<Reservation>() {
     fun hasOverlappingReservation(bookId: Long, reservation: Reservation): Boolean =
         repositoryObjects().none { hasReservationsForBook(bookId) && hasDateOverlap(reservation) }
 
-    fun findReviewsByBookId(bookId: Long): List<Reservation> =
-        findByBookId(bookId)
-            .filter { it.review.notEmptyReview() }
-            .sortedByDescending { it.review.timestamp }
+//    fun findReviewsByBookId(bookId: Long): List<Reservation> =
+//        findByBookId(bookId)
+//            .filter { it.review.notEmptyReview() }
+//            .sortedByDescending { it.review.timestamp }
 }

@@ -4,11 +4,11 @@ import ar.edu.unsam.phm.domain.Review
 import java.time.LocalDate
 
 data class ReviewDTO(
-    var id: Long,
-    var reviewerName: String,
-    var rating: Int,
-    var review: String,
-    var timestamp: String
+    var id: Long = 0,
+    var reviewerName: String = "",
+    var rating: Int = 0,
+    var review: String = "",
+    var timestamp: String = ""
 ){
 
     fun fromDTO(): Review {

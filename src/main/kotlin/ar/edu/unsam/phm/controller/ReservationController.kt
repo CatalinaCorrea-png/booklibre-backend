@@ -52,11 +52,11 @@ class ReservationController(
         @RequestParam(defaultValue = "4") pageSize: Int
     ): PagedResult<ReservationDTO>  =
         reservationService.getLoansMadeByUserId(userId, search, page, pageSize)
-//
-//    @PatchMapping("/{reservationId}/calificar")
-//    fun rateLoan(@PathVariable reservationId: Long, @RequestBody body: ReviewDTO, @RequestParam userId: Long) {
-//        reservationService.rateLoan(reservationId, body.rating, body.review, userId)
-//    }
+
+    @PatchMapping("/{reservationId}/calificar")
+    fun rateLoan(@PathVariable reservationId: Long, @RequestBody body: ReviewDTO, @RequestParam userId: Long) {
+        reservationService.rateLoan(reservationId, body.rating, body.review, userId)
+    }
 
     @GetMapping("/userOwnBooks/{userId}")
     fun getUserOwnBooks(

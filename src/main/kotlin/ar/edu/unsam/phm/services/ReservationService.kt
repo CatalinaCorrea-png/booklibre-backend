@@ -10,9 +10,10 @@ import ar.edu.unsam.phm.dto.ReservationDTO
 import ar.edu.unsam.phm.dto.ReservationProfileDTO
 import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.dto.toReservationProfileDTO
+import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
-import ar.edu.unsam.phm.repository.UserRepository
+import ar.edu.unsam.phm.repository.CrudUserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -22,7 +23,7 @@ import kotlin.math.ceil
 class ReservationService(
     val reservationRepository: CrudReservationRepository,
     val bookRepository: CrudBookRepository,
-    val userRepository: UserRepository
+    val userRepository: CrudUserRepository,
 ){
 //    fun createReservation(reservation: CreateReservationDTO) {
 //        val book = bookRepository.getObject(reservation.bookId)
@@ -76,20 +77,20 @@ class ReservationService(
             totalPages = ceil(dtos.size.toDouble() / pageSize).toInt()
         )
 
-//    fun rateLoan(reservationId: Long, puntuacion: Int, comentario: String, userId: Long) {
-//        val reservation = reservationRepository.getObject(reservationId)
-//
-//        // le pongo la review desde aca, no se si esta bien
-//        reservation.review.apply {
-//            this.rating = puntuacion
-//            this.review = comentario
-//            this.reviewerName = userRepository.getObject(userId).name
-//        }
-//
-//        //! acordate de actualizarlo bobo
-//        reservationRepository.update(reservation)
-//    }
-//
+    @Transactional
+    fun rateLoan(reservationId: Long, rating: Int, comment: String, userId: Long) {
+        val reservation = reservationRepository.findById(reservationId).get()
+            //.orElseThrow { NotFoundException("Reserva $reservationId no encontrada") }
+        val reviewer = userRepository.findById(userId).get()
+            //.orElseThrow { NotFoundException("Usuario $userId no encontrado") }
+
+        reservation.review = Review(
+            rating = rating,
+            review = comment,
+            reviewerName = reviewer.name
+        )
+    }
+
     fun getUserLentBooksNumber(userId: Long): Long = reservationRepository.countUserReservedBooks(userId)
 
     fun getUserReadBooksNumber(userId: Long): Long = reservationRepository.countUserReadBooksNumber(userId)
