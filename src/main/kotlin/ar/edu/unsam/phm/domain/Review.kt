@@ -1,11 +1,7 @@
 package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.repository.RepositoryElement
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
@@ -18,7 +14,7 @@ data class Review(
     var review: String = "",
     @Column
     var timestamp: LocalDate = LocalDate.now(),
-    ) : RepositoryElement {
+) : RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     override var id: Long? = null

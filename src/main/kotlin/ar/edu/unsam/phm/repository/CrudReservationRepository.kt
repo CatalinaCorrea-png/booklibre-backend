@@ -1,59 +1,66 @@
 package ar.edu.unsam.phm.repository
 
 import ar.edu.unsam.phm.domain.Reservation
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 
-interface CrudReservationRepository: CrudRepository<Reservation, Long> {
-
-
+interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     // Reservas donde el usuario es el LECTOR
-    @Query("""
-        SELECT r FROM Reservation r
-        JOIN FETCH r.book b
-        JOIN FETCH b.owner
-        JOIN FETCH r.user u
-        WHERE u.id = :userId
-        AND b.deleted = false
-        AND (
-            LOWER(b.title) LIKE LOWER(CONCAT('%', :search, '%'))
-            OR LOWER(b.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
-        )
-    """)
+    // esta es la solucion de dodino para el problema de N + 1 Querys
+    @EntityGraph(
+        attributePaths = [
+            "book",
+            "book.owner", // esto por que el dto necesita el nombre
+            "book.author", // esto por el nombre de el autor para el filtro
+            "review", // la review para el can rate
+            "user"]
+    )
+    @Query(
+        """
+    SELECT r FROM Reservation r
+    WHERE r.user.id = :userId
+    AND r.book.deleted = false
+    AND (
+        LOWER(r.book.title) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(r.book.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
+    )"""
+    )
     fun findByLectorIdFiltered(
         @Param("userId") userId: Long,
-        @Param("search") search: String
-    ): List<Reservation>
+        @Param("search") search: String,
+        pageable: Pageable
+    ): Page<Reservation> // todo: !important la tercera query es por esto
+    // estos son de spring Data, lo tengo que usar si o si por que page me devuleve la cantidad de elementos y la cantidad de paginas segun el tamaño de la pagina
 
     // Reservas donde el usuario es el OWNER
     // Si vas a usar un campo en el WHERE, siempre asignale un alias en el JOIN
-    @Query("""
+    @EntityGraph(
+        attributePaths = [
+            "book",
+            "book.owner",
+            "book.author",
+            "review",
+            "user"]
+    )
+    @Query(
+        """
         SELECT r FROM Reservation r
-        JOIN FETCH r.book b
-        JOIN FETCH b.owner o
-        JOIN FETCH b.owner
-        WHERE o.id = :userId
-        AND b.deleted = false
+        WHERE r.book.owner.id = :userId
+        AND r.book.deleted = false
         AND (
-            LOWER(b.title) LIKE LOWER(CONCAT('%', :search, '%'))
-            OR LOWER(b.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
-        )
-    """)
+            LOWER(r.book.title) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(r.book.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
+        )"""
+    )
     fun findByOwnerIdFiltered(
         @Param("userId") userId: Long,
-        @Param("search") search: String
-    ): List<Reservation>
-
-//aca agrego query por que necesito filtrar que solo traiga los libros que no fueron eliminados
-    @Query("""
-    SELECT r
-    FROM Reservation r
-    JOIN r.book b
-    WHERE b.owner.id = :userId
-    AND b.deleted = false
-""")
-    fun findAllByBookOwnerId(userId: Long): List<Reservation>
+        @Param("search") search: String,
+        pageable: Pageable
+    ): Page<Reservation>
 
     //para traer las reservas que tengan ese libro
     fun findByBookId(bookId: Long): List<Reservation>
@@ -63,20 +70,39 @@ interface CrudReservationRepository: CrudRepository<Reservation, Long> {
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.book.id = :bookId")
     fun countByBookId(@Param("bookId") bookId: Long): Int
 
-    @Query("""
+    @Query("SELECT r.book.id, COUNT(r) FROM Reservation r WHERE r.book.id IN :bookIds GROUP BY r.book.id")
+    fun countByBookIds(@Param("bookIds") bookIds: List<Long>): List<Array<Any>>
+
+    //aca agrego query por que necesito filtrar que solo traiga los libros que no fueron eliminados
+    @Query(
+        """
+    SELECT r
+    FROM Reservation r
+    JOIN r.book b
+    WHERE b.owner.id = :userId
+    AND b.deleted = false
+"""
+    )
+    fun findAllByBookOwnerId(userId: Long): List<Reservation>
+
+    @Query(
+        """
          SELECT count(r)
          FROM Reservation r
          WHERE r.book.owner.id = :userId
          AND r.pickUpDate <= CURRENT_DATE
          AND r.dropOffDate >= CURRENT_DATE 
-    """)
+    """
+    )
     fun countUserReservedBooks(userId: Long): Long
 
-    @Query("""
+    @Query(
+        """
         SELECT count(r)
         FROM Reservation r
         WHERE r.user.id = :userId
         AND r.dropOffDate < CURRENT_DATE
-    """)
+    """
+    )
     fun countUserReadBooksNumber(userId: Long): Long
 }
