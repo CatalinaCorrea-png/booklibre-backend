@@ -5,13 +5,10 @@ import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.*
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
-import java.util.*
 
 
 @Service
@@ -78,7 +75,18 @@ class BookService(
         bookRepository.save(book)  // guarda el libro con el delete logico, no lo borra de la coleccion
     }
 
-
+    @Transactional(readOnly = true)
+    fun getAllUserBooks(
+        userId: Long,
+        pageableObject: ProfileBookPageable
+    ): PagedResult<ProfileBookDTO> {
+        val pageable: PageRequest = pageableObject.toPageRequest()
+        println(pageable)
+        val booksPage: Page<ProfileBookDTO> = bookRepository.getAllUserBooks(userId, pageable, pageableObject.filterCriteria.name)
+        println(booksPage)
+        val booksPageContent = booksPage.content // No se que clase es esto (Mutable)List<ProfileBookDTO!>
+        return PagedResult(booksPageContent, booksPage.size, booksPage.totalPages)
+    }
 
 //    fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
 //        val reservedBookIds : Set<Long> = reservationRepository.findReservedBookIds(searchCriteria)

@@ -73,18 +73,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     @Query("SELECT r.book.id, COUNT(r) FROM Reservation r WHERE r.book.id IN :bookIds GROUP BY r.book.id")
     fun countByBookIds(@Param("bookIds") bookIds: List<Long>): List<Array<Any>>
 
-    //aca agrego query por que necesito filtrar que solo traiga los libros que no fueron eliminados
-    @Query(
-        """
-    SELECT r
-    FROM Reservation r
-    JOIN r.book b
-    WHERE b.owner.id = :userId
-    AND b.deleted = false
-"""
-    )
-    fun findAllByBookOwnerId(userId: Long): List<Reservation>
-
     @Query(
         """
          SELECT count(r)

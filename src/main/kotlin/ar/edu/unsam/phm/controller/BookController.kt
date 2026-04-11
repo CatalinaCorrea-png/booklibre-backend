@@ -1,15 +1,9 @@
 package ar.edu.unsam.phm.controller
 
 
-import ar.edu.unsam.phm.domain.BookSearchCriteria
-import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.Gender
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.services.BookService
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
 
 
 @RestController
@@ -49,6 +43,15 @@ class BookController(
     //este endpoint lo cree solo para poder ver si traia los creados/eliminados
     @GetMapping("/books")
     fun getAllBooks() = bookService.getAllBooks().map { it.toDTO() }
+
+    @GetMapping("/userOwnBooks/{userId}")
+    fun getAllUserBooks(
+        @PathVariable userId: Long,
+        @ModelAttribute pageableObject: ProfileBookPageable
+    ): PagedResult<ProfileBookDTO> {
+        println(pageableObject)
+        return bookService.getAllUserBooks(userId, pageableObject)
+    }
 
 //    @GetMapping("/book-detail/{id}/bibliokarmas")
 //    fun calculateBibliokarmas(@PathVariable id: Long, @RequestParam userId: Long, @RequestParam pickUpDate: LocalDate, @RequestParam dropOffDate: LocalDate): Int =

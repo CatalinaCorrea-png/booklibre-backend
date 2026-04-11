@@ -39,14 +39,6 @@ class ReservationController(
         reservationService.rateLoan(reservationId, body.rating, body.review, userId)
     }
 
-    @GetMapping("/userOwnBooks/{userId}")
-    fun getUserOwnBooks(
-        @PathVariable userId: Long,
-        @ModelAttribute pageableObject: ProfilePageable
-    ): PagedResult<ReservationProfileDTO> {
-        return reservationService.orchestrateFilterAndSortBooks(userId, pageableObject)
-    }
-
     @GetMapping("/userReadBooks/{userId}")
     fun getUserReadBooks(@PathVariable userId: Long): Long =
         reservationService.getUserReadBooksNumber(userId)

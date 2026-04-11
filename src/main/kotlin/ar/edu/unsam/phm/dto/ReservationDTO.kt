@@ -36,22 +36,3 @@ fun Reservation.toDTO(): ReservationDTO {
         loanedTo = this.user.name,
     )
 }
-
-fun LocalDate.isBetween(start: LocalDate, end: LocalDate): Boolean =
-    this.isAfter(start) && this.isBefore(end)
-
-data class ReservationProfileDTO(
-    val id: Long?, //lo hago nullable para que no revienten las reservas ficticias
-    val book: ProfileBookDTO,
-    var state: State
-)
-
-fun Reservation.toReservationProfileDTO(): ReservationProfileDTO {
-
-    val reservationProfileDTO = ReservationProfileDTO(
-        id = this.id,
-        book = this.book.toProfileBookDTO(),
-        state = this.state
-    )
-    return reservationProfileDTO
-}
