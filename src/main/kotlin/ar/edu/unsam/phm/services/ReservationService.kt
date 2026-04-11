@@ -42,15 +42,18 @@ class ReservationService(
             pickUpDate = reservation.pickUpDate,
             dropOffDate = reservation.dropOffDate
         )
+
         reservation.validate()
+
         if (reservationRepository.hasOverlappingReservation(book.id!!, reservation.pickUpDate, reservation.dropOffDate)) {
             throw BusinessException("Reserva no disponible en esa fecha")
         }
-        reservationRepository.save(reservation)
+
         val bookReservationsNumber = reservationRepository.findAllByBookId(book.id!!).size
         user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas, bookReservationsNumber))
+
         userRepository.save(user)
-//        book.addReservation(reservation.id!!)
+        reservationRepository.save(reservation)
     }
 
     // esto quiza esta de mas, supongo que regla de negocio?
