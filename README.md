@@ -145,7 +145,7 @@ CREATE TRIGGER trg_puntaje_libro
 
 ```
 
-3. Saber qué usuarios tienen más de N reservas.
+### 3. Saber qué usuarios tienen más de N reservas.
 ``` sql
 CREATE OR REPLACE FUNCTION obtener_usuarios_con_n_reservas(n INT)  
 RETURNS TABLE ( 
