@@ -97,6 +97,7 @@ abstract class Book (
         if (!isNotEmpty(isbn)) throw ConflictException("El libro tiene que tener ISBN")
         if (!isNotEmpty(editorial)) throw ConflictException("El libro tiene que tener editorial")
         if (!isNotEmpty(imageSrc)) throw ConflictException("El libro tiene que tener imagen de referencia")
+        if (imageSrc.length >= 255) throw ConflictException("La imagen del libro tiene demasiados caracteres. Max. 255")
     }
 
     override fun meetsSearchCriteria(criteria: String) : Boolean =
