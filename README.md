@@ -145,6 +145,24 @@ CREATE TRIGGER trg_puntaje_libro
 
 ```
 
+3. Saber qué usuarios tienen más de N reservas.
+``` sql
+CREATE OR REPLACE FUNCTION obtener_usuarios_con_n_reservas(n INT)  
+RETURNS TABLE ( 
+	id INT, 
+	name TEXT 
+) 
+AS $$ 
+BEGIN 
+	RETURN QUERY  
+	SELECT u.id, u.name 
+	FROM app_user u 
+	JOIN reservation r ON r.user_id = u.id -- La reserva conoce al usuario
+	GROUP BY u.id, u.name 
+	HAVING COUNT(r.id) > n 
+END; 
+$$ LANGUAGE plpgsql;
+```
 ---
 
 ##  Tutor
