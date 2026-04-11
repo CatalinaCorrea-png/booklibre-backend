@@ -1,10 +1,10 @@
 package ar.edu.unsam.phm.domain
 
-import ar.edu.unsam.phm.dto.ReservationProfileDTO
+import org.springframework.data.domain.Sort
 
-enum class SortCriteria(val comparator: Comparator<Reservation>) {
-    DATE_ASC(compareBy{ reservation -> reservation.book.timestamp }),
-    DATE_DESC(compareByDescending { reservation -> reservation.book.timestamp }),
-    ALPHABETICAL_ASC(compareBy{ reservation -> reservation.book.title }),
-    ALPHABETICAL_DESC(compareByDescending{ reservation -> reservation.book.title })
+enum class SortCriteria(val sortBy: Sort) {
+    DATE_ASC(Sort.by(Sort.Direction.ASC, "timestamp")),
+    DATE_DESC(Sort.by(Sort.Direction.DESC, "timestamp")),
+    ALPHABETICAL_ASC(Sort.by(Sort.Direction.ASC, "title")),
+    ALPHABETICAL_DESC(Sort.by(Sort.Direction.DESC, "title"))
 }

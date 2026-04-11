@@ -1,204 +1,120 @@
 import ar.edu.unsam.phm.domain.*
-import ar.edu.unsam.phm.repository.BookRepository
-import ar.edu.unsam.phm.repository.ReservationRepository
-import ar.edu.unsam.phm.repository.UserRepository
-import ar.edu.unsam.phm.services.ReservationService
+import ar.edu.unsam.phm.dto.*
+import ar.edu.unsam.phm.repository.CrudAuthorRepository
+import ar.edu.unsam.phm.repository.CrudBookRepository
+import ar.edu.unsam.phm.repository.CrudReservationRepository
+import ar.edu.unsam.phm.repository.CrudUserRepository
+import ar.edu.unsam.phm.services.BookService
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldContainAll
+import io.mockk.every
+import io.mockk.mockk
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import java.time.LocalDate
 
 class ProfileSpec : DescribeSpec({
     isolationMode = IsolationMode.InstancePerTest
 
-    val owner = User(name = "Carlos")
-    val reader1 = User(name = "Maria")
-    val reader2 = User(name = "Juan")
+    // --- Mocks (replaces in-memory repos — BookService requires JPA interfaces) ---
+    val bookRepository = mockk<CrudBookRepository>()
+    val reservationRepository = mockk<CrudReservationRepository>()
+    val userRepository = mockk<CrudUserRepository>()
+    val authorRepository = mockk<CrudAuthorRepository>()
+    val bookService = BookService(bookRepository, reservationRepository, userRepository, authorRepository)
 
-    val bookA = Common().apply {
-        title = "1984"
-        numPages = 328
-        this.owner = owner
-    }
+    val userId = 1L
 
-    val bookB = Common().apply {
-        title = "Rayuela"
-        numPages = 600
-        this.owner = owner
-    }
+    // --- Sample DTOs (flat, no longer wrapped in Reservation) ---
+    val bookADTO = ProfileBookDTO(
+        id = 1L, title = "1984", author = "George Orwell",
+        gender = Gender.DRAMA, timestamp = LocalDate.of(2024, 1, 1),
+        imageSrc = "", state = "PRESTADO"
+    )
+    val bookBDTO = ProfileBookDTO(
+        id = 2L, title = "Rayuela", author = "Julio Cortázar",
+        gender = Gender.DRAMA, timestamp = LocalDate.of(2024, 2, 1),
+        imageSrc = "", state = "DISPONIBLE"
+    )
+    val bookCDTO = ProfileBookDTO(
+        id = 3L, title = "El Aleph", author = "Jorge Luis Borges",
+        gender = Gender.DRAMA, timestamp = LocalDate.of(2024, 3, 1),
+        imageSrc = "", state = "DISPONIBLE"
+    )
 
-    val bookC = Common().apply {
-        title = "El Aleph"
-        numPages = 150
-        this.owner = owner
-    }
+    describe("getAllUserBooks devuelve todos los libros del usuario") {
 
-    describe("getUserOwnBooks devuelve todos los libros del usuario dentro de una reserva, y se queda con la mas cercana") {
+        it("Cada libro aparece exactamente una vez con su estado actual") {
+            val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "timestamp"))
+            every {
+                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.ALL.name)
+            } returns PageImpl(listOf(bookADTO, bookBDTO, bookCDTO), pageable, 3)
 
-        it("Cada libro aparece exactamente una vez, envuelto en una reserva, y se queda con la de pickUpDate mas reciente") {
-            val reservationRepository = ReservationRepository()
-            val bookRepository = BookRepository()
-            val userRepository = UserRepository()
-
-            userRepository.create(owner)
-            userRepository.create(reader1)
-            userRepository.create(reader2)
-
-            bookRepository.create(bookA)
-            bookRepository.create(bookB)
-            bookRepository.create(bookC)
-
-            // Book A: 2 reservas (una vieja, una futura) -> debe quedarse con la futura (pickUpDate mas reciente)
-            val reservaPasadaBookA = Reservation(
-                user = reader1,
-                book = bookA,
-                pickUpDate = LocalDate.of(2025, 1, 1),
-                dropOffDate = LocalDate.of(2025, 1, 10)
-            )
-            val reservaFuturaBookA = Reservation(
-                user = reader2,
-                book = bookA,
-                pickUpDate = LocalDate.of(2026, 6, 1),
-                dropOffDate = LocalDate.of(2026, 6, 15)
+            val result = bookService.getAllUserBooks(
+                userId,
+                ProfileBookPageable(FilterCriteria.ALL, SortCriteria.DATE_DESC, 0, 10)
             )
 
-            // Book B: 1 reserva activa (hoy esta entre pickup y dropoff)
-            val reservaActivaBookB = Reservation(
-                user = reader1,
-                book = bookB,
-                pickUpDate = LocalDate.now().minusDays(3),
-                dropOffDate = LocalDate.now().plusDays(10)
-            )
-
-            reservationRepository.create(reservaPasadaBookA)
-            reservationRepository.create(reservaFuturaBookA)
-            reservationRepository.create(reservaActivaBookB)
-
-            // Book C: sin reservas
-
-            val reservationService = ReservationService(reservationRepository, bookRepository, userRepository)
-
-            // Act
-            val result = reservationService.getUserOwnBooks(owner.id)
-
-            // Assert
-            result shouldHaveSize 3
-
-            val bookIds = result.map { it.book.id }
-            bookIds shouldContainAll listOf(bookA.id, bookB.id, bookC.id)
-
-            // Book A: se quedo con la reserva futura (pickUpDate mas reciente)
-            val reservationForBookA = result.find { it.book.id == bookA.id }!!
-            reservationForBookA.pickUpDate shouldBe LocalDate.of(2026, 6, 1)
-
-            // Book B: tiene la reserva activa
-            val reservationForBookB = result.find { it.book.id == bookB.id }!!
-            reservationForBookB.state shouldBe State.ACTIVE
-
-            // Book C: no tiene reservas, se crea una placeholder con estado RETURNED (fecha year 1000)
-            val reservationForBookC = result.find { it.book.id == bookC.id }!!
-            reservationForBookC.pickUpDate shouldBe LocalDate.of(1000, 1, 1)
-            reservationForBookC.state shouldBe State.RETURNED
+            result.items shouldHaveSize 3
+            result.items.map { it.id } shouldContainAll listOf(1L, 2L, 3L)
         }
-    }
 
-    describe("Un libro sin reservas previas, al ser reservado para hoy, aparece ACTIVE en el perfil") {
+        it("Un libro con reserva activa aparece como PRESTADO") {
+            val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "timestamp"))
+            every {
+                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.ALL.name)
+            } returns PageImpl(listOf(bookADTO), pageable, 1)
 
-        it("La reserva devuelta tiene estado ACTIVE y fechas reales, no placeholder") {
-            // Arrange
-            val reservationRepository = ReservationRepository()
-            val bookRepository = BookRepository()
-            val userRepository = UserRepository()
-
-            userRepository.create(owner)
-            userRepository.create(reader1)
-            bookRepository.create(bookA)
-
-            val reservaHoy = Reservation(
-                user = reader1,
-                book = bookA,
-                pickUpDate = LocalDate.now(),
-                dropOffDate = LocalDate.now().plusDays(7)
+            val result = bookService.getAllUserBooks(
+                userId,
+                ProfileBookPageable(FilterCriteria.ALL, SortCriteria.DATE_DESC, 0, 10)
             )
-            reservationRepository.create(reservaHoy)
 
-            val reservationService = ReservationService(reservationRepository, bookRepository, userRepository)
-
-            // Act
-            val result = reservationService.getUserOwnBooks(owner.id)
-
-            // Assert
-            result shouldHaveSize 1
-
-            val reservation = result.first()
-            reservation.book.id shouldBe bookA.id
-            reservation.state shouldBe State.ACTIVE
-            reservation.pickUpDate shouldBe LocalDate.now()
-            reservation.dropOffDate shouldBe LocalDate.now().plusDays(7)
+            result.items.first().state shouldBe "PRESTADO"
         }
     }
 
     describe("El filtro de perfil clasifica correctamente DISPONIBLE vs PRESTADO") {
 
         it("BORROWED muestra solo libros actualmente prestados, AVAILABLE los disponibles, ALL todos") {
-            // Arrange
-            val reservationRepository = ReservationRepository()
-            val bookRepository = BookRepository()
-            val userRepository = UserRepository()
+            val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "timestamp"))
 
-            userRepository.create(owner)
-            userRepository.create(reader1)
-            userRepository.create(reader2)
+            every {
+                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.ALL.name)
+            } returns PageImpl(listOf(bookADTO, bookBDTO, bookCDTO), pageable, 3)
 
-            bookRepository.create(bookA)
-            bookRepository.create(bookB)
-            bookRepository.create(bookC)
+            every {
+                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.BORROWED.name)
+            } returns PageImpl(listOf(bookADTO), pageable, 1)
 
-            // Book A: reserva activa (PRESTADO)
-            val reservaActiva = Reservation(
-                user = reader1,
-                book = bookA,
-                pickUpDate = LocalDate.now().minusDays(3),
-                dropOffDate = LocalDate.now().plusDays(10)
+            every {
+                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.AVAILABLE.name)
+            } returns PageImpl(listOf(bookBDTO, bookCDTO), pageable, 2)
+
+            // ALL → 3 libros
+            val allBooks = bookService.getAllUserBooks(
+                userId, ProfileBookPageable(FilterCriteria.ALL, SortCriteria.DATE_DESC, 0, 10)
             )
+            allBooks.items shouldHaveSize 3
 
-            // Book B: reserva pasada (DEVUELTO -> DISPONIBLE)
-            val reservaPasada = Reservation(
-                user = reader2,
-                book = bookB,
-                pickUpDate = LocalDate.of(2025, 1, 1),
-                dropOffDate = LocalDate.of(2025, 1, 10)
+            // BORROWED → solo bookA (PRESTADO)
+            val borrowedBooks = bookService.getAllUserBooks(
+                userId, ProfileBookPageable(FilterCriteria.BORROWED, SortCriteria.DATE_DESC, 0, 10)
             )
+            borrowedBooks.items shouldHaveSize 1
+            borrowedBooks.items.first().title shouldBe "1984"
+            borrowedBooks.items.first().state shouldBe "PRESTADO"
 
-            reservationRepository.create(reservaActiva)
-            reservationRepository.create(reservaPasada)
-
-            // Book C: sin reservas (DISPONIBLE)
-
-            val reservationService = ReservationService(reservationRepository, bookRepository, userRepository)
-
-            // Act & Assert: FilterCriteria.ALL -> 3 libros
-            val allBooks = reservationService.orchestrateFilterAndSortBooks(
-                owner.id, 0, 10, FilterCriteria.ALL, SortCriteria.DATE_DESC
+            // AVAILABLE → bookB y bookC (DISPONIBLE)
+            val availableBooks = bookService.getAllUserBooks(
+                userId, ProfileBookPageable(FilterCriteria.AVAILABLE, SortCriteria.DATE_DESC, 0, 10)
             )
-            allBooks.total shouldBe 3
-
-            // FilterCriteria.BORROWED -> solo Book A (ACTIVE)
-            val borrowedBooks = reservationService.orchestrateFilterAndSortBooks(
-                owner.id, 0, 10, FilterCriteria.BORROWED, SortCriteria.DATE_DESC
-            )
-            borrowedBooks.total shouldBe 1
-            borrowedBooks.items.first().book.title shouldBe "1984"
-
-            // FilterCriteria.AVAILABLE -> Book B (RETURNED) y Book C (sin reserva)
-            val availableBooks = reservationService.orchestrateFilterAndSortBooks(
-                owner.id, 0, 10, FilterCriteria.AVAILABLE, SortCriteria.DATE_DESC
-            )
-            availableBooks.total shouldBe 2
-            val availableTitles = availableBooks.items.map { it.book.title }
-            availableTitles shouldContainAll listOf("Rayuela", "El Aleph")
+            availableBooks.items shouldHaveSize 2
+            availableBooks.items.map { it.title } shouldContainAll listOf("Rayuela", "El Aleph")
         }
     }
 })

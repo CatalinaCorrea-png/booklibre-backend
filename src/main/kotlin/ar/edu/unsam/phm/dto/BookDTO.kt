@@ -44,29 +44,6 @@ fun Book.toDTO(): BookDTO{
     return bookDTO
 }
 
-
-data class ProfileBookDTO(
-    var id: Long,
-    var title: String,
-    var authorName: String,
-    var gender: String,
-    var timestamp: LocalDate,
-    var imageSrc: String
-)
-
-fun Book.toProfileBookDTO(): ProfileBookDTO {
-    val formatter = DateTimeFormatter.ofPattern("d MMM, yyyy")
-    val profileBookDTO = ProfileBookDTO(
-        id = this.id!!,
-        title = this.title,
-        authorName = this.author.name,
-        gender = this.gender.value,
-        timestamp = this.timestamp,
-        imageSrc = this.imageSrc
-    )
-    return profileBookDTO
-}
-
 //hago un DTO aparte para la creacion, ya que en el create no necesito ID, ni reservations ID ni owner
 data class BookCreateDTO(
     val title: String = "",
