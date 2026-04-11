@@ -128,11 +128,15 @@ class BookService(
         }
     }
 
-    fun getBookById(id: Long): Book = bookRepository
+    // la sesión vive hasta que termina el metodo
+    @Transactional(readOnly = true)
+    fun getBookById(id: Long): BookDTO = bookRepository
         .findById(id)
         .orElseThrow {
             NotFoundException("No se encuentra un libro registrado con el id: $id")
         }
+        .toDTO()
+
     //trae todos los libros menos los que fueron eliminados logicamente IMPORTANTE USAR ESTE METODO SINO VA A TRAER LIBROS QUE FUERON BORRADOS LOGICAMENTEEEE
     @Transactional(readOnly = true)
     fun getAllBooks(): List<Book> = bookRepository.findAllByDeletedIsFalse()

@@ -33,7 +33,8 @@ abstract class Book (
     @Column(nullable = false)
     var gender: Gender = Gender.DRAMA,
 
-    @ManyToOne
+    // le decís a JPA: "no cargues esta relación hasta que alguien la pida explícitamente"
+    @ManyToOne(fetch = FetchType.LAZY)
     var author: Author = Author("", ""),
 
     @Column(nullable = false)
@@ -56,7 +57,7 @@ abstract class Book (
     @Column(nullable = false)
     var condition: BookCondition = BookCondition.EXCELLENT,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     var owner: User = User(),
 

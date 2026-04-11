@@ -44,7 +44,7 @@ class BookController(
 
     @GetMapping("/book-detail/{id}")
     fun getBookById(@PathVariable id: Long) =
-        bookService.getBookById(id).toDTO()
+        bookService.getBookById(id)
 
     //este endpoint lo cree solo para poder ver si traia los creados/eliminados
     @GetMapping("/books")
