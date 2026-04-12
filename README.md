@@ -91,28 +91,33 @@ TODO
 
 ```sql
 --  Query function
-CREATE OR REPLACE FUNCTION get_user_reservations_current_year(p_user_id INT)
+CREATE OR REPLACE FUNCTION get_user_reservations(p_user_id INT)
 RETURNS TABLE (
-    name VARCHAR,
-    title VARCHAR,
-    pick_up_date DATE,
-    drop_off_date DATE
+	name VARCHAR,
+	title VARCHAR,
+	pick_up_date DATE,
+	drop_off_date DATE
 )
+
 LANGUAGE plpgsql
 AS $$
-    BEGIN
-        IF p_user_id <= 0 THEN
-            RAISE EXCEPTION 'ID de usuario inválido: %', p_user_id;
-        END IF;
+BEGIN
+    IF p_user_id <= 0
+        THEN RAISE EXCEPTION 'El ID no puede ser cero o negativo: %', p_user_id;
+    END IF;
     
-        RETURN QUERY
-            SELECT u.name, b.title, r.pick_up_date, r.drop_off_date
-            FROM Reservation r
-            INNER JOIN app_user u ON u.id = r.user_id
-            INNER JOIN book b ON b.id = r.book_id
-            WHERE EXTRACT(YEAR FROM r.pick_up_date) = EXTRACT(YEAR FROM CURRENT_DATE)
-            AND r.user_id = p_user_id;
-    END;
+    IF NOT EXISTS( SELECT 1 FROM app_user u WHERE u.id = p_user_id )
+        THEN RAISE EXCEPTION 'No existe un usuario con ese ID: %', p_user_id;
+    END IF;
+
+    RETURN QUERY
+        SELECT u.name, b.title, r.pick_up_date, r.drop_off_date
+        FROM Reservation r
+        INNER JOIN app_user u ON u.id = r.user_id
+        INNER JOIN book b ON b.id = r.book_id
+        WHERE EXTRACT( YEAR FROM r.pick_up_date ) = EXTRACT( YEAR FROM CURRENT_DATE )
+        AND u.id = p_user_id;
+END;
 $$;
 
 -- Function call
