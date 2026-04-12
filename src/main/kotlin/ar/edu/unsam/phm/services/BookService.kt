@@ -67,7 +67,7 @@ class BookService(
 
         val reservations = reservationRepository.findByBookId(bookId)
 
-        if (reservations.any { it.state == State.BORROWED }) {
+        if (reservations.any { it.state == State.BORROWED || State.RESERVED == it.state || State.ACTIVE == it.state || State.SOON_TO_END == it.state}) {
             throw ConflictException("No se puede eliminar un libro que está prestado")
         }
 
