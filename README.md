@@ -101,36 +101,12 @@ CREATE TABLE historial_puntaje_libro (
 );
 
 -- LA FUNCION DE INSERT AL HISTORIAL
-CREATE OR REPLACE FUNCTION registrar_cambio()
+CREATE OR REPLACE FUNCTION registrar_cambio_puntaje()
 RETURNS TRIGGER AS $$
-DECLARE
-    viejo_rating NUMERIC;
-    nuevo_rating NUMERIC;
 BEGIN
-	-- Calculo el puntaje viejo
-    SELECT AVG(rev.rating)
-    INTO viejo_rating
-    FROM review rev
-    INNER JOIN reservation res
-    ON res.review_id = rev.id
-    WHERE rev.rating > 0
-    AND NEW.id != rev.id -- sin la review nueva
-    AND NEW.id = res.review_id;
-
-    -- Calculo puntaje nuevo
-    SELECT AVG(rev.rating)
-    INTO nuevo_rating
-    FROM review rev
-    INNER JOIN reservation res
-    ON res.review_id = rev.id
-    WHERE rev.rating > 0
-    AND NEW.id = res.review_id;
-    
     -- Guardo todo en el historial con timestamp
     INSERT INTO historial_puntaje_libro (id_libro, fecha_actualizacion, valor_viejo, valor_nuevo)
-    SELECT res.book_id, NOW(), viejo_rating, nuevo_rating
-    FROM reservation res
-    WHERE NEW.id = res.review_id;
+    VALUES (NEW.id, NOW(), OLD.ratingAvg, NEW.ratingAvg);
     
     RETURN NEW;
 END;
@@ -139,9 +115,9 @@ $$ LANGUAGE plpgsql;
 -- EL TRIGGER ESCUCHA A UN UPDATE DE RATING EN REVIEW
    -- ESTO CAMBIARA A UN INSERT EN REVIEW
 CREATE TRIGGER trg_puntaje_libro
-    AFTER UPDATE OF rating ON review
+    AFTER UPDATE OF ratingAvg ON book
     FOR EACH ROW
-    EXECUTE FUNCTION registrar_cambio();
+    EXECUTE FUNCTION registrar_cambio_puntaje();
 
 ```
 

@@ -1,6 +1,5 @@
 package ar.edu.unsam.phm.services
 
-import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.dto.*
@@ -11,13 +10,9 @@ import ar.edu.unsam.phm.repository.CrudReservationRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import ar.edu.unsam.phm.repository.CrudUserRepository
-import ar.edu.unsam.phm.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
-import kotlin.math.ceil
-import kotlin.math.sign
 
 @Service
 class ReservationService(
@@ -49,8 +44,7 @@ class ReservationService(
             throw BusinessException("Reserva no disponible en esa fecha")
         }
 
-        val bookReservationsNumber = reservationRepository.findAllByBookId(book.id!!).size
-        user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas, bookReservationsNumber))
+        user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas))
 
         userRepository.save(user)
         reservationRepository.save(reservation)
@@ -75,16 +69,15 @@ class ReservationService(
 
     private fun getReservationsWithBibliokarmasDTO(reservations: List<Reservation>): List<ReservationDTO> {
         val bookIds = reservations.map { it.book.id!! }
-        val countMap = reservationRepository.countByBookIds(bookIds)
-            .associate { row -> (row[0] as Long) to (row[1] as Long) }
+//        val countMap = reservationRepository.countByBookIds(bookIds)
+//            .associate { row -> (row[0] as Long) to (row[1] as Long) }
         // todo: segun dodine el mapeo lo hace el controller
         return reservations.map { reservation ->
-            val numReservations = countMap[reservation.book.id!!] ?: 0L
+//            val numReservations = countMap[reservation.book.id!!] ?: 0L
             reservation.toDTO().apply {
                 bibliokarmas = reservation.book.calculateBibliokarmas(
                     reservation.reservationDays(),
-                    reservation.user.bibliokarmas,
-                    numReservations.toInt()
+                    reservation.user.bibliokarmas
                 )
             }
         }

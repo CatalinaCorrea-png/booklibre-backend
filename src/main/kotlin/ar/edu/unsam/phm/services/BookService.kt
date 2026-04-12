@@ -110,9 +110,8 @@ class BookService(
         )
 //        println("Results: ${page.totalElements}")
         val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
-        val booksWithRatings : List<BookDTO> = calculateRatingAvg(booksWithBibliokarmasDTO)
         return PageResponse(
-            content = booksWithRatings,
+            content = booksWithBibliokarmasDTO,
             page = page.number,
             pageSize = page.size,
             totalElements = page.totalElements.toInt(),
@@ -124,20 +123,11 @@ class BookService(
         val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
         val user = userRepository.findById(criteria.userId!!).orElseThrow{ NotFoundException("No existe user con id: ${criteria.userId}") }
         val bookDTOs = books.map { book ->
-            val bookReservationsNumber = reservationRepository.findByBookId(book.id!!).size
             val bookDTO = book.toDTO()
-            bookDTO.bookBibliokarmas = book.calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas, bookReservationsNumber)
+            bookDTO.bookBibliokarmas = book.calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas)
             bookDTO
         }
         return bookDTOs
-    }
-
-    fun calculateRatingAvg(booksDTO: List<BookDTO>) : List<BookDTO> {
-        return booksDTO.map { bookDTO ->
-            val ratings = reservationRepository.findRatingsByBookId(bookDTO.id).filter { !(it <= 0.0) }
-            bookDTO.rating = if (ratings.isEmpty()) 0.0 else ratings.average()
-            bookDTO
-        }
     }
 
     // la sesión vive hasta que termina el metodo
@@ -163,8 +153,7 @@ class BookService(
             .orElseThrow {
                 NotFoundException("No se encuentra un usuario registrado con el id: $userId")
             }
-        val bookReservationsNumber = reservationRepository.findAllByBookId(bookId).size
         val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()
-        return book.calculateBibliokarmas(days, user.bibliokarmas, bookReservationsNumber)
+        return book.calculateBibliokarmas(days, user.bibliokarmas)
     }
 }

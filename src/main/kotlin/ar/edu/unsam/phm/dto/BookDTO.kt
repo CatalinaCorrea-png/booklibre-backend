@@ -39,7 +39,8 @@ fun Book.toDTO(): BookDTO{
         condition = this.condition.value,
         owner = this.owner.toUserDTO(),
         imageSrc = this.imageSrc,
-        bookType =  this.bookType
+        bookType =  this.bookType,
+        rating = this.ratingAvg
     )
     return bookDTO
 }

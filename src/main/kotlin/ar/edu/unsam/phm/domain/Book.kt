@@ -6,8 +6,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.persistence.*
-import org.hibernate.annotations.OnDelete
-import org.hibernate.annotations.OnDeleteAction
 import java.time.LocalDate
 
 @Entity
@@ -58,7 +56,7 @@ abstract class Book (
     var condition: BookCondition = BookCondition.EXCELLENT,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+//    @OnDelete(action = OnDeleteAction.CASCADE)
     var owner: User = User(),
 
     @Column(nullable = false)
@@ -74,20 +72,42 @@ abstract class Book (
     @Column(name = "deleted")
     var deleted: Boolean = false,
 
-): RepositoryElement {
+    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL]) // Lo cascadeo porque es esta implementación funciona asi...
+    val reviews: MutableList<Review> = mutableListOf(),
+
+    @Column
+    var ratingAvg: Double = 0.0,
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    val reservationsIds: MutableList<Long> = mutableListOf(),
+
+    ): RepositoryElement {
 
     @Id
     @GeneratedValue
     override var id: Long? = null
 
-
     fun logicDelete() { deleted = true }
 
     // Template Method Primitiva
-    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int, numReservations: Int) : Int = 5 * reservationDays + typeBibliokarmas(userBibliokarmas, numReservations)
+    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int) : Int = 5 * reservationDays + typeBibliokarmas(userBibliokarmas)
 
     // different for every type of book
-    abstract fun typeBibliokarmas(userBibliokarmas: Int, numReservations: Int) : Int
+    abstract fun typeBibliokarmas(userBibliokarmas: Int) : Int
+
+    fun addReservation(id: Long) {
+        reservationsIds.add(id)
+    }
+
+    fun addReview(review: Review) {
+        if (review.rating !in 1..5) throw ConflictException("Ingrese una calificaión entre 1 y 5")
+        reviews.add(review)
+        updateRating()
+    }
+
+    private fun updateRating() {
+        this.ratingAvg = reviews.map { it.rating }.average()
+    }
 
     override fun validate() {
         if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")

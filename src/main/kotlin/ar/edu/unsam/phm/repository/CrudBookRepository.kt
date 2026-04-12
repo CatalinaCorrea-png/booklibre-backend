@@ -17,6 +17,7 @@ interface CrudBookRepository: CrudRepository<Book, Long> {
         SELECT b
         FROM Book b
         WHERE (:userId <> b.owner.id)
+        AND b.deleted = false
         AND (:title IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%')))
         AND (:ownersName IS NULL OR LOWER(b.owner.name) LIKE LOWER(CONCAT('%', :ownersName, '%')))
         AND (:isbn IS NULL OR LOWER(b.isbn) LIKE LOWER(CONCAT('%', :isbn, '%')))
