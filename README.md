@@ -87,6 +87,38 @@ TODO
 
 ## Componentes en la Base de Datos
 
+### 1. Conocer los Libros que reservó un determinado usuario en el corriente año.
+
+```sql
+--  Query function
+CREATE OR REPLACE FUNCTION get_user_reservations_current_year(p_user_id INT)
+RETURNS TABLE (
+    name VARCHAR,
+    title VARCHAR,
+    pick_up_date DATE,
+    drop_off_date DATE
+)
+LANGUAGE plpgsql
+AS $$
+    BEGIN
+        IF p_user_id <= 0 THEN
+            RAISE EXCEPTION 'ID de usuario inválido: %', p_user_id;
+        END IF;
+    
+        RETURN QUERY
+            SELECT u.name, b.title, r.pick_up_date, r.drop_off_date
+            FROM Reservation r
+            INNER JOIN app_user u ON u.id = r.user_id
+            INNER JOIN book b ON b.id = r.book_id
+            WHERE EXTRACT(YEAR FROM r.pick_up_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+            AND r.user_id = p_user_id;
+    END;
+$$;
+
+-- Function call
+SELECT * get_user_reservations_current_year(1)
+```
+
 ### 2. Llevar un control de las veces que un libro actualizó su puntaje, de manera de saber: a) la fecha en la que se actualizó, b) el nuevo valor y el anterior.
 
 ```sql
