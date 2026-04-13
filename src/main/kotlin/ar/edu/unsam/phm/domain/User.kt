@@ -24,6 +24,7 @@ class User(
     val location: String = "",
     var userType: UserTypes = UserTypes.COMBINED,
     val timestamp: String = "",
+    @Column(nullable = false)
     var bibliokarmas: Int = 0,
     var password: String = "",
     var img: String = ""
