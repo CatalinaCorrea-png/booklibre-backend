@@ -12,12 +12,12 @@ data class Reservation(
     var user: User = User(),
     @ManyToOne
     var book: Book = Common(),
-    @OneToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
-    var review: Review = Review(),
+    //@OneToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+    var rate: Int = 0, // algo asi ponele
+    var canRateReview: Boolean = true,
     var pickUpDate: LocalDate = LocalDate.now(),
     var dropOffDate: LocalDate = LocalDate.now(),
-    var alreadyRated: Boolean = false,
-    ) : RepositoryElement {
+) : RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     override var id: Long? = null
@@ -43,6 +43,10 @@ data class Reservation(
             dropOffDate.minusDays(2) <= today -> State.SOON_TO_END
             else -> State.ACTIVE
         }
+    }
+
+    fun rateReview() {
+        canRateReview = false
     }
 
     fun bookOwnerId(): Long = this.book.owner.id!!

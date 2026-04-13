@@ -20,7 +20,7 @@ import java.time.LocalDate
     Type(value = Collectable::class, name = "COLECCIONABLE"),
 )
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-abstract class Book (
+abstract class Book(
     @Column(nullable = false)
     var title: String = "",
 
@@ -72,7 +72,10 @@ abstract class Book (
     @Column(name = "deleted")
     var deleted: Boolean = false,
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL]) // Lo cascadeo porque es esta implementación funciona asi...
+    @OneToMany(
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.ALL]
+    ) // Lo cascadeo porque es esta implementación funciona asi...
     val reviews: MutableList<Review> = mutableListOf(),
 
     @Column
@@ -81,19 +84,22 @@ abstract class Book (
     @ElementCollection(fetch = FetchType.LAZY)
     val reservationsIds: MutableList<Long> = mutableListOf(),
 
-    ): RepositoryElement {
+    ) : RepositoryElement {
 
     @Id
     @GeneratedValue
     override var id: Long? = null
 
-    fun logicDelete() { deleted = true }
+    fun logicDelete() {
+        deleted = true
+    }
 
     // Template Method Primitiva
-    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int) : Int = 5 * reservationDays + typeBibliokarmas(userBibliokarmas)
+    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int): Int =
+        5 * reservationDays + typeBibliokarmas(userBibliokarmas)
 
     // different for every type of book
-    abstract fun typeBibliokarmas(userBibliokarmas: Int) : Int
+    abstract fun typeBibliokarmas(userBibliokarmas: Int): Int
 
     fun addReservation(id: Long) {
         reservationsIds.add(id)
@@ -103,6 +109,7 @@ abstract class Book (
         if (review.rating !in 1..5) throw ConflictException("Ingrese una calificaión entre 1 y 5")
         reviews.add(review)
         updateRating()
+
     }
 
     private fun updateRating() {
@@ -120,7 +127,7 @@ abstract class Book (
         if (imageSrc.length >= 255) throw ConflictException("La imagen del libro tiene demasiados caracteres. Max. 255")
     }
 
-    override fun meetsSearchCriteria(criteria: String) : Boolean =
+    override fun meetsSearchCriteria(criteria: String): Boolean =
         criteria.isBlank() ||
                 this.title.contains(criteria.trim(), ignoreCase = true)
 //              || this.author.name.contains(criteria.trim(), ignoreCase = true)

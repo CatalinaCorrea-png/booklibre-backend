@@ -7,10 +7,10 @@ import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,7 +22,7 @@ class ReservationService(
     val bookRepository: CrudBookRepository,
     @Autowired
     val userRepository: CrudUserRepository
-){
+) {
     @Transactional
     fun createReservation(reservation: CreateReservationDTO) {
         val book = bookRepository.findById(reservation.bookId)
@@ -40,7 +40,12 @@ class ReservationService(
 
         reservation.validate()
 
-        if (reservationRepository.hasOverlappingReservation(book.id!!, reservation.pickUpDate, reservation.dropOffDate)) {
+        if (reservationRepository.hasOverlappingReservation(
+                book.id!!,
+                reservation.pickUpDate,
+                reservation.dropOffDate
+            )
+        ) {
             throw BusinessException("Reserva no disponible en esa fecha")
         }
 
@@ -90,11 +95,14 @@ class ReservationService(
         val reviewer = userRepository.findById(userId).get()
         //.orElseThrow { NotFoundException("Usuario $userId no encontrado") }
 
-        reservation.review = Review(
+        reservation.book.addReview(Review(
             rating = rating,
             review = comment,
             reviewerName = reviewer.name
-        )
+        ))
+
+//        reservation.rateReview()
+//        reservation.rate = rating
     }
 
     @Transactional(readOnly = true)

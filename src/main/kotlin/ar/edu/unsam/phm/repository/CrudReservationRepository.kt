@@ -19,7 +19,7 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
             "book",
             "book.owner", // esto por que el dto necesita el nombre
             "book.author", // esto por el nombre de el autor para el filtro
-            "review", // la review para el can rate
+            //"review", // la review para el can rate
             "user"]
     )
     @Query(
@@ -46,7 +46,7 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
             "book",
             "book.owner",
             "book.author",
-            "review",
+            //"review",
             "user"]
     )
     @Query(
@@ -68,12 +68,13 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     //para traer las reservas que tengan ese libro
     fun findByBookId(bookId: Long): List<Reservation>
 
-    @Query("""
-        SELECT r.review.rating
-        FROM Reservation r
-        WHERE r.book.id = :bookId
-    """)
-    fun findRatingsByBookId(bookId: Long): List<Int>
+//    @Query("""
+//        SELECT r.review.rating
+//        FROM Reservation r
+//        WHERE r.book.id = :bookId
+//    """)
+//    fun findRatingsByBookId(bookId: Long): List<Int>
+
     @Query("""
     SELECT COUNT(r) > 0
     FROM Reservation r
@@ -81,7 +82,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     AND r.pickUpDate < :dropOffDate
     AND r.dropOffDate > :pickUpDate
     """)
-
     fun hasOverlappingReservation(
         @Param("bookId") bookId: Long,
         @Param("pickUpDate") pickUpDate: LocalDate,
@@ -91,9 +91,9 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     fun findAllByBookId(bookId: Long): List<Reservation>
 
     @Query("""
-    SELECT r.review
-    FROM Reservation r
-    WHERE r.book.id = :bookId
+    SELECT b.reviews
+    FROM Book b
+    WHERE b.id = :bookId
     """)
     fun findAllReviewsByBookId(@Param("bookId") bookId: Long): List<Review>
     // lo hago asi, para no traer to.do a memoria para hacer un .size en el service y para delegar responsabilidades

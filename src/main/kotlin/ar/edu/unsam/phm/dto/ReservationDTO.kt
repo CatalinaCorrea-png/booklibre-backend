@@ -8,7 +8,7 @@ data class ReservationDTO(
     val book: BookDTO,
     var id: Long,
     var user: UserDTO,
-    var review: ReviewDTO,
+    var review: Int,
     var pickUpDate: LocalDate,
     var dropOffDate: LocalDate,
     var state: State,
@@ -25,11 +25,11 @@ fun Reservation.toDTO(): ReservationDTO {
         book = this.book.toDTO(),
         id = this.id!!,
         user = this.user.toUserDTO(),
-        review = this.review.toDTO(),
+        review = this.rate,
         pickUpDate = this.pickUpDate,
         dropOffDate = this.dropOffDate,
         state = this.state,
-        canRate = (this.state == State.RETURNED && this.review!!.rating == 0) && this.user.id != this.book.owner.id, // cambiar a que se pueda calificar cuando sea null
+        canRate = this.canRateReview, // cambiar a que se pueda calificar cuando sea null
         bibliokarmas = 0, // this.book.calculateBibliokarmas(days, user.bibliokarmas, ), //todo: arreglar esto...
         // se pisa en el service con el valor correcto
         loanedBy = this.book.owner.name,
