@@ -4,7 +4,6 @@ import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.State
 import java.time.LocalDate
 
-
 data class ReservationDTO(
     val book: BookDTO,
     var id: Long,
@@ -27,7 +26,7 @@ fun Reservation.toDTO(
         book = this.book.toDTO(),
         id = this.id!!,
         user = this.user.toUserDTO(),
-        review = this.rate,
+        review = 0, // se pisa en el service
         pickUpDate = this.pickUpDate,
         dropOffDate = this.dropOffDate,
         state = this.state,

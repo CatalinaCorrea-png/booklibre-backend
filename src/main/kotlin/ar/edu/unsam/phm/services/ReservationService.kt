@@ -9,7 +9,6 @@ import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
-import ar.edu.unsam.phm.repository.ReservationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -72,22 +71,33 @@ class ReservationService(
     fun getLoansMadeByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
         val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
         val reservationsPage = reservationRepository.findByOwnerIdFiltered(userId, search, pageable)
-        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content)
+        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content, true)
         return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
     }
 
-    private fun getReservationsWithBibliokarmasDTO(reservations: List<Reservation>): List<ReservationDTO> {
+    private fun getReservationsWithBibliokarmasDTO(
+        reservations: List<Reservation>,
+        own: Boolean = false
+    ): List<ReservationDTO> {
         val reservationIds = reservations.map { it.id!! }
 
-        val reviewsExistentesIds = reviewRepository
+        val reviewMap = reviewRepository
             .findAllByReservationIdIn(reservationIds)
-            .map { it.reservation.id }
-            .toSet()
+            .associate { it.reservation.id to it.rating }
 
         return reservations.map { reservation ->
-            val hasReview = reviewsExistentesIds.contains(reservation.id)
+            val ratingEncontrado = reviewMap[reservation.id]
+            val hasReview = ratingEncontrado != null
 
             reservation.toDTO(hasReview).apply {
+
+                if (hasReview) {
+                    this.review = ratingEncontrado!!
+                }
+                if (own) {
+                    canRate = false
+                }
+
                 bibliokarmas = reservation.book.calculateBibliokarmas(
                     reservation.reservationDays(),
                     reservation.user.bibliokarmas
@@ -115,8 +125,6 @@ class ReservationService(
         )
 
         reviewRepository.save(newReview)
-        reservation.rateReview() // canRateReview = false
-        reservation.rate = rating
 
         reservation.book.addReview(newReview)
 

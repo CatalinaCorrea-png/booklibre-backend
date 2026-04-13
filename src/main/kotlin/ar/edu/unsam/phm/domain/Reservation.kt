@@ -12,9 +12,6 @@ data class Reservation(
     var user: User = User(),
     @ManyToOne
     var book: Book = Common(),
-    //@OneToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
-    var rate: Int = 0, // algo asi ponele
-    var canRateReview: Boolean = true,
     var pickUpDate: LocalDate = LocalDate.now(),
     var dropOffDate: LocalDate = LocalDate.now(),
 ) : RepositoryElement {
@@ -22,7 +19,12 @@ data class Reservation(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     override var id: Long? = null
 
-    val state: State get() = calculateState() // se recalcula cada vez que se accede, lo saco de el constructor
+    val state: State
+        get() = State.get(
+            LocalDate.now(),
+            pickUpDate,
+            dropOffDate
+        )// se recalcula cada vez que se accede, lo saco de el constructor
 
     fun reservationDays(): Int = ChronoUnit.DAYS.between(pickUpDate, dropOffDate).toInt() + 1
 
@@ -34,20 +36,6 @@ data class Reservation(
     // Versión con .isBefore() (Si termina justo donde empieza otra, NO cuenta como traslape)
 
     fun isSoonToEnd() = this.dropOffDate.minusDays(2) == LocalDate.now()
-
-    fun calculateState(): State {
-        val today = LocalDate.now()
-        return when {
-            today.isAfter(dropOffDate) -> State.RETURNED
-            today.isBefore(pickUpDate) -> State.RESERVED
-            dropOffDate.minusDays(2) <= today -> State.SOON_TO_END
-            else -> State.ACTIVE
-        }
-    }
-
-    fun rateReview() {
-        canRateReview = false
-    }
 
     fun bookOwnerId(): Long = this.book.owner.id!!
 

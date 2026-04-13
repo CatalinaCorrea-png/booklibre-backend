@@ -1,15 +1,14 @@
 package ar.edu.unsam.phm.repository
 
 import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.Review
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.Query
-import ar.edu.unsam.phm.domain.Review
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import java.time.LocalDate
-import java.util.Optional
 
 interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     // Reservas donde el usuario es el LECTOR
@@ -75,13 +74,15 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
 //    """)
 //    fun findRatingsByBookId(bookId: Long): List<Int>
 
-    @Query("""
+    @Query(
+        """
     SELECT COUNT(r) > 0
     FROM Reservation r
     WHERE r.book.id = :bookId
     AND r.pickUpDate < :dropOffDate
     AND r.dropOffDate > :pickUpDate
-    """)
+    """
+    )
     fun hasOverlappingReservation(
         @Param("bookId") bookId: Long,
         @Param("pickUpDate") pickUpDate: LocalDate,
@@ -90,12 +91,15 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
 
     fun findAllByBookId(bookId: Long): List<Reservation>
 
-    @Query("""
+    @Query(
+        """
     SELECT b.reviews
     FROM Book b
     WHERE b.id = :bookId
-    """)
+    """
+    )
     fun findAllReviewsByBookId(@Param("bookId") bookId: Long): List<Review>
+
     // lo hago asi, para no traer to.do a memoria para hacer un .size en el service y para delegar responsabilidades
     // JPQL retorna long por defecto supuestamente
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.book.id = :bookId")
