@@ -4,6 +4,7 @@ import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.State
 import java.time.LocalDate
 
+
 data class ReservationDTO(
     val book: BookDTO,
     var id: Long,
@@ -18,8 +19,9 @@ data class ReservationDTO(
     var loanedTo: String,
 )
 
-fun Reservation.toDTO(): ReservationDTO {
-    val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()
+fun Reservation.toDTO(
+    hasReview: Boolean
+): ReservationDTO {
 
     return ReservationDTO(
         book = this.book.toDTO(),
@@ -29,7 +31,7 @@ fun Reservation.toDTO(): ReservationDTO {
         pickUpDate = this.pickUpDate,
         dropOffDate = this.dropOffDate,
         state = this.state,
-        canRate = this.canRateReview, // cambiar a que se pueda calificar cuando sea null
+        canRate = this.state == State.RETURNED && !hasReview,
         bibliokarmas = 0, // this.book.calculateBibliokarmas(days, user.bibliokarmas, ), //todo: arreglar esto...
         // se pisa en el service con el valor correcto
         loanedBy = this.book.owner.name,

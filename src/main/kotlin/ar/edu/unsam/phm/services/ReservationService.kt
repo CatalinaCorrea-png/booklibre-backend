@@ -7,7 +7,9 @@ import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
+import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
+import ar.edu.unsam.phm.repository.ReservationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -21,7 +23,9 @@ class ReservationService(
     @Autowired
     val bookRepository: CrudBookRepository,
     @Autowired
-    val userRepository: CrudUserRepository
+    val userRepository: CrudUserRepository,
+    @Autowired
+    val reviewRepository: CrudReviewRepository
 ) {
     @Transactional
     fun createReservation(reservation: CreateReservationDTO) {
@@ -73,13 +77,17 @@ class ReservationService(
     }
 
     private fun getReservationsWithBibliokarmasDTO(reservations: List<Reservation>): List<ReservationDTO> {
-        val bookIds = reservations.map { it.book.id!! }
-//        val countMap = reservationRepository.countByBookIds(bookIds)
-//            .associate { row -> (row[0] as Long) to (row[1] as Long) }
-        // todo: segun dodine el mapeo lo hace el controller
+        val reservationIds = reservations.map { it.id!! }
+
+        val reviewsExistentesIds = reviewRepository
+            .findAllByReservationIdIn(reservationIds)
+            .map { it.reservation.id }
+            .toSet()
+
         return reservations.map { reservation ->
-//            val numReservations = countMap[reservation.book.id!!] ?: 0L
-            reservation.toDTO().apply {
+            val hasReview = reviewsExistentesIds.contains(reservation.id)
+
+            reservation.toDTO(hasReview).apply {
                 bibliokarmas = reservation.book.calculateBibliokarmas(
                     reservation.reservationDays(),
                     reservation.user.bibliokarmas
@@ -91,18 +99,27 @@ class ReservationService(
     @Transactional
     fun rateLoan(reservationId: Long, rating: Int, comment: String, userId: Long) {
         val reservation = reservationRepository.findById(reservationId).get()
+        val existingReview = reviewRepository.findByReservationId(reservationId)
+        if (existingReview != null) {
+            throw BusinessException("La reserva ya tiene una reseña asignada.")
+        }
         //.orElseThrow { NotFoundException("Reserva $reservationId no encontrada") }
         val reviewer = userRepository.findById(userId).get()
         //.orElseThrow { NotFoundException("Usuario $userId no encontrado") }
 
-        reservation.book.addReview(Review(
+        val newReview = Review(
             rating = rating,
             review = comment,
-            reviewerName = reviewer.name
-        ))
+            reviewerName = reviewer.name,
+            reservation = reservation
+        )
 
-//        reservation.rateReview()
-//        reservation.rate = rating
+        reviewRepository.save(newReview)
+        reservation.rateReview() // canRateReview = false
+        reservation.rate = rating
+
+        reservation.book.addReview(newReview)
+
     }
 
     @Transactional(readOnly = true)

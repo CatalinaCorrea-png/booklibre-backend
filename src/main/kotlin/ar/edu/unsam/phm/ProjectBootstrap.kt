@@ -62,7 +62,7 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var valentinaSosa: User
     private lateinit var mateoLopez: User
 
-    // ─── Reseñas ─────────────────────────────────────────────────
+    // ─── Reseñas ─────────────────────────────────────────────────────────────
 
     private lateinit var reviewElProcesoEmilia: Review
     private lateinit var reviewAdiosArmasEmilia: Review
@@ -101,8 +101,8 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var reviewMonteCristoEmilia: Review
     private lateinit var reviewMonteCristoLuciano: Review
 
-//    // ─── Libros Comunes ───────────────────────────────────────────────────────
-//
+    // ─── Libros Comunes ───────────────────────────────────────────────────────
+
     private lateinit var n1984: Book
     private lateinit var elProceso: Book
     private lateinit var crimen: Book
@@ -111,9 +111,9 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var losMiserables: Book
     private lateinit var alquimista: Book
     private lateinit var extranjero: Book
-//
-//    // ─── Libros Con Dedicatoria ───────────────────────────────────────────────
-//
+
+    // ─── Libros Con Dedicatoria ───────────────────────────────────────────────
+
     private lateinit var granGatsby: Book
     private lateinit var adiosArmas: Book
     private lateinit var monteCristo: Book
@@ -122,9 +122,9 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var cuentosMisterio: Book
     private lateinit var fundacion: Book
     private lateinit var cienAnios: Book
-//
-//    // ─── Libros Coleccionables ────────────────────────────────────────────────
-//
+
+    // ─── Libros Coleccionables ────────────────────────────────────────────────
+
     private lateinit var huckFinn: Book
     private lateinit var ficciones: Book
     private lateinit var rayuela: Book
@@ -133,9 +133,9 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var caminoSwann: Book
     private lateinit var jardinCerezos: Book
     private lateinit var harryPotter: Book
-//
-//    // ─── Reservas ─────────────────────────────────────────────────────────────
-//
+
+    // ─── Reservas ─────────────────────────────────────────────────────────────
+
     private lateinit var reservaEmiliaPasada1: Reservation
     private lateinit var reservaEmiliaPasada2: Reservation
     private lateinit var reservaEmiliaPasada3: Reservation
@@ -225,6 +225,7 @@ class ProjectBootstrap : InitializingBean {
     // ═════════════════════════════════════════════════════════════════════════
     // Inicializacion
     // ═════════════════════════════════════════════════════════════════════════
+
     fun initAuthors() {
         orwell     = Author("George Orwell", "/assets/1_george_orwell.png")
         kafka      = Author("Franz Kafka", "/assets/2_franz_kafka.png")
@@ -251,7 +252,8 @@ class ProjectBootstrap : InitializingBean {
         mann       = Author("Thomas Mann", "/assets/23_thomas_mann.png")
         proust     = Author("Marcel Proust", "/assets/24_marcel_proust.png")
 
-        listOf(orwell, kafka, garcia, dostoevsky, rowling, asimov, austen, tolstoy,
+        listOf(
+            orwell, kafka, garcia, dostoevsky, rowling, asimov, austen, tolstoy,
             fitzgerald, hemingway, hugo, twain, dumas, verne, coelho, camus,
             woolf, poe, chekhov, borges, cortazar, saramago, mann, proust
         ).forEach { createAuthor(it) }
@@ -314,155 +316,14 @@ class ProjectBootstrap : InitializingBean {
             .forEach { createUser(it) }
     }
 
-// ─── Reseñas ─────────────────────────────────────────────────
-
-    fun initReviews() {
-        reviewElProcesoEmilia = Review(reviewerName = emiliaRomero.name, rating = 4,
-            review = "Kafkiano en el mejor sentido. La burocracia como pesadilla existencial, muy bien logrado.",
-            timestamp = LocalDate.of(2025, 8, 10))
-
-        reviewAdiosArmasEmilia = Review(reviewerName = emiliaRomero.name, rating = 5,
-            review = "Hemingway en su máxima expresión. El final me dejó sin palabras.",
-            timestamp = LocalDate.of(2025, 10, 15))
-
-        reviewRayuelaEmilia = Review(reviewerName = emiliaRomero.name, rating = 5,
-            review = "Una experiencia única. Lo leí en orden lineal y luego saltando capítulos, totalmente diferente.",
-            timestamp = LocalDate.of(2026, 1, 20))
-
-        reviewGranGatsbyLuciano = Review(reviewerName = lucianoVega.name, rating = 3,
-            review = "Bella prosa, pero el protagonista me resultó difícil de empatizar. Vale la pena igual.",
-            timestamp = LocalDate.of(2025, 6, 5))
-
-        reviewCrimenLuciano = Review(reviewerName = lucianoVega.name, rating = 5,
-            review = "Dostoyevski entiende la psicología humana como nadie. Raskolnikov es aterrador y fascinante.",
-            timestamp = LocalDate.of(2025, 9, 3))
-
-        reviewHuckFinnValentina = Review(reviewerName = valentinaSosa.name, rating = 4,
-            review = "Una aventura atemporal. Twain critica la sociedad con humor fino.",
-            timestamp = LocalDate.of(2025, 5, 20))
-
-        reviewN1984Valentina = Review(reviewerName = valentinaSosa.name, rating = 5,
-            review = "Imprescindible. Cada vez más vigente. Orwell era un visionario.",
-            timestamp = LocalDate.of(2025, 11, 8))
-
-        reviewCaminoSwannValentina = Review(reviewerName = valentinaSosa.name, rating = 4,
-            review = "Proust exige paciencia pero recompensa con una belleza literaria incomparable.",
-            timestamp = LocalDate.of(2026, 1, 5))
-
-        reviewLosMiserablesMateo = Review(reviewerName = mateoLopez.name, rating = 5,
-            review = "Monumental. Victor Hugo logra que te importen profundamente personajes de hace dos siglos.",
-            timestamp = LocalDate.of(2025, 7, 14))
-
-        reviewMontagnaMagicaMateo = Review(reviewerName = mateoLopez.name, rating = 3,
-            review = "Filosóficamente rico pero denso. Hay que entrar con paciencia y tiempo.",
-            timestamp = LocalDate.of(2025, 10, 29))
-
-        reviewMonteCristoMateo = Review(reviewerName = mateoLopez.name, rating = 5,
-            review = "La mejor historia de venganza jamás escrita. No pude soltarlo.",
-            timestamp = LocalDate.of(2026, 2, 15))
-
-        reviewElProcesoValentina = Review(reviewerName = valentinaSosa.name, rating = 5,
-            review = "Una obra que te deja paralizado. La burocracia como metáfora de la existencia.",
-            timestamp = LocalDate.of(2025, 9, 12))
-
-        reviewElProcesoMateo = Review(reviewerName = mateoLopez.name, rating = 4,
-            review = "Kafka logra que te sientas atrapado junto al protagonista. Incómodo pero brillante.",
-            timestamp = LocalDate.of(2025, 11, 30))
-
-        reviewElProcesoEmilia2 = Review(reviewerName = emiliaRomero.name, rating = 3,
-            review = "Me costó entrar pero una vez adentro no pude parar. La angustia de K. se siente real.",
-            timestamp = LocalDate.of(2025, 6, 5))
-
-        reviewElProcesoLuciano = Review(reviewerName = lucianoVega.name, rating = 5,
-            review = "El absurdo kafkiano en estado puro. Una pesadilla que no podés dejar de leer.",
-            timestamp = LocalDate.of(2025, 7, 20))
-
-        reviewElProcesoMateo2 = Review(reviewerName = mateoLopez.name, rating = 4,
-            review = "La culpa sin causa explicada, qué incómodo y qué genial.",
-            timestamp = LocalDate.of(2025, 10, 1))
-
-        reviewAdiosArmasValentina = Review(reviewerName = valentinaSosa.name, rating = 4,
-            review = "La guerra contada sin heroísmo, con una honestidad brutal. Hemingway no decepciona.",
-            timestamp = LocalDate.of(2025, 7, 8))
-
-        reviewAdiosArmasMateo = Review(reviewerName = mateoLopez.name, rating = 3,
-            review = "Buena prosa, aunque el ritmo se me hizo lento en el medio. El final salva todo.",
-            timestamp = LocalDate.of(2026, 1, 14))
-
-        reviewRayuelaLuciano = Review(reviewerName = lucianoVega.name, rating = 4,
-            review = "Cortázar rompe todo y lo reconstruye mejor. Exige concentración pero vale cada página.",
-            timestamp = LocalDate.of(2025, 8, 28))
-
-        reviewRayuelaMateo = Review(reviewerName = mateoLopez.name, rating = 5,
-            review = "La mejor novela latinoamericana que leí. La estructura no lineal es un viaje mental.",
-            timestamp = LocalDate.of(2026, 2, 20))
-
-        reviewGranGatsbyValentina = Review(reviewerName = valentinaSosa.name, rating = 5,
-            review = "El sueño americano desnudo. Fitzgerald escribe con una elegancia que duele.",
-            timestamp = LocalDate.of(2025, 7, 2))
-
-        reviewGranGatsbyMateo = Review(reviewerName = mateoLopez.name, rating = 4,
-            review = "Corto e intenso. La fiesta como fachada del vacío, muy bien retratado.",
-            timestamp = LocalDate.of(2025, 10, 5))
-
-        reviewCrimenEmilia = Review(reviewerName = emiliaRomero.name, rating = 5,
-            review = "La culpa narrada desde adentro. Dostoyevski te mete en la cabeza de Raskolnikov sin escapatoria.",
-            timestamp = LocalDate.of(2025, 6, 20))
-
-        reviewCrimenMateo = Review(reviewerName = mateoLopez.name, rating = 4,
-            review = "Denso pero absorbente. El juicio final es magistral.",
-            timestamp = LocalDate.of(2025, 12, 10))
-
-        reviewHarryPotterEmilia = Review(reviewerName = emiliaRomero.name, rating = 5,
-            review = "Un clásico moderno. La magia de Hogwarts no envejece nunca.",
-            timestamp = LocalDate.of(2025, 5, 10))
-
-        reviewHarryPotterValentina = Review(reviewerName = valentinaSosa.name, rating = 4,
-            review = "Lo leí por primera vez de adulta y entendí por qué marcó a toda una generación.",
-            timestamp = LocalDate.of(2025, 8, 5))
-
-        reviewHuckFinnLuciano = Review(reviewerName = lucianoVega.name, rating = 4,
-            review = "Twain disfraza la crítica social de aventura infantil con una habilidad increíble.",
-            timestamp = LocalDate.of(2025, 9, 22))
-
-        reviewHuckFinnMateo = Review(reviewerName = mateoLopez.name, rating = 3,
-            review = "Entretenido, aunque algunos pasajes se sienten datados. El vínculo Huck-Jim es lo mejor.",
-            timestamp = LocalDate.of(2026, 1, 28))
-
-        reviewN1984Luciano = Review(reviewerName = lucianoVega.name, rating = 5,
-            review = "Perturbador y necesario. Lo releí y cada vez me parece más actual.",
-            timestamp = LocalDate.of(2025, 6, 30))
-
-        reviewN1984Mateo = Review(reviewerName = mateoLopez.name, rating = 5,
-            review = "El Gran Hermano ya existe. Orwell lo supo antes que todos.",
-            timestamp = LocalDate.of(2025, 12, 22))
-
-        reviewLosMiserablesEmilia = Review(reviewerName = emiliaRomero.name, rating = 5,
-            review = "Jean Valjean es uno de los personajes más conmovedores de la literatura universal.",
-            timestamp = LocalDate.of(2025, 8, 18))
-
-        reviewLosMiserablesValentina = Review(reviewerName = valentinaSosa.name, rating = 4,
-            review = "Largo pero cada página tiene peso. Hugo no desperdicia ni un capítulo.",
-            timestamp = LocalDate.of(2026, 2, 10))
-
-        reviewMontagnaMagicaLuciano = Review(reviewerName = lucianoVega.name, rating = 4,
-            review = "Mann logra que el tiempo del sanatorio se sienta tan eterno como para el protagonista.",
-            timestamp = LocalDate.of(2025, 11, 15))
-
-        reviewMontagnaMagicaValentina = Review(reviewerName = valentinaSosa.name, rating = 3,
-            review = "Muy filosófica, quizás demasiado. Los diálogos entre Naphta y Settembrini son brillantes.",
-            timestamp = LocalDate.of(2026, 1, 10))
-
-        reviewMonteCristoEmilia = Review(reviewerName = emiliaRomero.name, rating = 5,
-            review = "Imposible soltar. La venganza de Dantès es satisfactoria en cada nivel.",
-            timestamp = LocalDate.of(2025, 7, 25))
-
-        reviewMonteCristoLuciano = Review(reviewerName = lucianoVega.name, rating = 5,
-            review = "Dumas teje una trama perfecta. Cada detalle de los primeros capítulos vuelve al final.",
-            timestamp = LocalDate.of(2025, 10, 18))
-    }
+    // ─── Libros ───────────────────────────────────────────────────────────────
+    // IMPORTANTE: initBooks() NO agrega reviews. Las reviews se asignan en
+    // initReviews(), que corre después de initReservations() para que cada
+    // Review pueda referenciar su Reservation ya persistida.
+    // ─────────────────────────────────────────────────────────────────────────
 
     fun initBooks() {
+
         // ─── Libros Comunes (8) ───────────────────────────────────────────────
 
         n1984 = Common().apply {
@@ -479,9 +340,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = emiliaRomero
             imageSrc    = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz9gIAgf5hTagXaQZl8ayY6FF26n2qirXQMg&s"
             timestamp   = LocalDate.of(2026, 1, 21)
-            addReview(reviewN1984Valentina)
-            addReview(reviewN1984Luciano)
-            addReview(reviewN1984Mateo)
         }
 
         elProceso = Common().apply {
@@ -498,12 +356,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = lucianoVega
             imageSrc    = "https://acdn-us.mitiendanube.com/stores/001/168/109/products/el-proceso1-d60e6b26de70d743d015882612962062-1024-1024.webp?w=1920"
             timestamp   = LocalDate.of(2024, 3, 1)
-            addReview(reviewElProcesoEmilia)
-            addReview(reviewElProcesoValentina)
-            addReview(reviewElProcesoMateo)
-            addReview(reviewElProcesoEmilia2)
-            addReview(reviewElProcesoLuciano)
-            addReview(reviewElProcesoMateo2)
         }
 
         crimen = Common().apply {
@@ -520,9 +372,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = valentinaSosa
             imageSrc    = "https://acdn-us.mitiendanube.com/stores/004/008/965/products/img_8468-dfbcfc91acd4498ad217537263442873-480-0.webp"
             timestamp   = LocalDate.of(2021, 2, 9)
-            addReview(reviewCrimenLuciano)
-            addReview(reviewCrimenEmilia)
-            addReview(reviewCrimenMateo)
         }
 
         orgullo = Common().apply {
@@ -571,9 +420,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = lucianoVega
             imageSrc    = "https://http2.mlstatic.com/D_NQ_NP_762363-MLM49917565139_052022-O.webp"
             timestamp   = LocalDate.of(2025, 10, 21)
-            addReview(reviewLosMiserablesMateo)
-            addReview(reviewLosMiserablesEmilia)
-            addReview(reviewLosMiserablesValentina)
         }
 
         alquimista = Common().apply {
@@ -624,9 +470,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = emiliaRomero
             imageSrc    = "https://http2.mlstatic.com/D_NQ_NP_980687-MLU78007366453_072024-O.webp"
             timestamp   = LocalDate.of(2026, 3, 17)
-            addReview(reviewGranGatsbyLuciano)
-            addReview(reviewGranGatsbyValentina)
-            addReview(reviewGranGatsbyMateo)
         }
 
         adiosArmas = WithADedication().apply {
@@ -643,9 +486,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = lucianoVega
             imageSrc    = "https://www.penguinlibros.com/ar/1595223/adios-a-las-armas.jpg"
             timestamp   = LocalDate.of(2024, 10, 9)
-            addReview(reviewAdiosArmasEmilia)
-            addReview(reviewAdiosArmasValentina)
-            addReview(reviewAdiosArmasMateo)
         }
 
         monteCristo = WithADedication().apply {
@@ -662,9 +502,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = valentinaSosa
             imageSrc    = "https://www.penguinlibros.com/ar/6234239-large_default/el-conde-de-montecristo.webp"
             timestamp   = LocalDate.of(2022, 1, 6)
-            addReview(reviewMonteCristoMateo)
-            addReview(reviewMonteCristoEmilia)
-            addReview(reviewMonteCristoLuciano)
         }
 
         vueltaMundo = WithADedication().apply {
@@ -763,9 +600,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = emiliaRomero
             imageSrc    = "https://www.edicontinente.com.ar/image/titulos/9788426141057.jpg"
             timestamp   = LocalDate.of(2025, 3, 30)
-            addReview(reviewHuckFinnValentina)
-            addReview(reviewHuckFinnLuciano)
-            addReview(reviewHuckFinnMateo)
         }
 
         ficciones = Collectable().apply {
@@ -798,9 +632,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = valentinaSosa
             imageSrc    = "https://images.cdn3.buscalibre.com/fit-in/360x360/90/53/905322d10841b36aa311dbd5c90d92ed.jpg"
             timestamp   = LocalDate.of(2025, 5, 29)
-            addReview(reviewRayuelaEmilia)
-            addReview(reviewRayuelaLuciano)
-            addReview(reviewRayuelaMateo)
         }
 
         ensayoCeguera = Collectable().apply {
@@ -833,9 +664,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = emiliaRomero
             imageSrc    = "https://images.cdn3.buscalibre.com/fit-in/360x360/75/56/7556ee308c4a24d1a4ea1be13b9ee928.jpg"
             timestamp   = LocalDate.of(2023, 2, 1)
-            addReview(reviewMontagnaMagicaMateo)
-            addReview(reviewMontagnaMagicaLuciano)
-            addReview(reviewMontagnaMagicaValentina)
         }
 
         caminoSwann = Collectable().apply {
@@ -852,7 +680,6 @@ class ProjectBootstrap : InitializingBean {
             owner       = lucianoVega
             imageSrc    = "https://upload.wikimedia.org/wikipedia/commons/e/ee/Por_el_camino_de_Swann-Espasa-Calpe1920-01.jpg"
             timestamp   = LocalDate.of(2023, 5, 21)
-            addReview(reviewCaminoSwannValentina)
         }
 
         jardinCerezos = Collectable().apply {
@@ -885,18 +712,17 @@ class ProjectBootstrap : InitializingBean {
             owner       = mateoLopez
             imageSrc    = "https://images.cdn2.buscalibre.com/fit-in/360x360/e6/5f/e65f54742ad7bbc41903d17f75b77d78.jpg"
             timestamp   = LocalDate.of(2026, 1, 10)
-            addReview(reviewHarryPotterEmilia)
-            addReview(reviewHarryPotterValentina)
         }
 
-        listOf(n1984, elProceso, crimen, orgullo, guerraPaz, losMiserables, alquimista, extranjero,
+        listOf(
+            n1984, elProceso, crimen, orgullo, guerraPaz, losMiserables, alquimista, extranjero,
             granGatsby, adiosArmas, monteCristo, vueltaMundo, senoraDalloway, cuentosMisterio, fundacion, cienAnios,
             huckFinn, ficciones, rayuela, ensayoCeguera, montagnaMagica, caminoSwann, jardinCerezos, harryPotter
         ).forEach { createBook(it) }
     }
 
-
     fun initReservations() {
+
         // ─── Reservas pasadas (finalizadas — libros leídos) ───────────────────
 
         reservaEmiliaPasada1 = Reservation(
@@ -1050,9 +876,6 @@ class ProjectBootstrap : InitializingBean {
             dropOffDate = LocalDate.of(2026, 2, 1),
         )
 
-//
-//        // ─── Reservas pasadas ─────────────────────────────────────────────────
-//
         listOf(
             reservaEmiliaPasada1, reservaEmiliaPasada2, reservaEmiliaPasada3,
             reservaLucianoPasada1, reservaLucianoPasada2,
@@ -1071,9 +894,9 @@ class ProjectBootstrap : InitializingBean {
             reservaMonteCristo2, reservaMonteCristo3, reservaSinCalificar,
             reservaElProceso4, reservaElProceso5, reservaElProceso6,
         ).forEach { createReservation(it) }
-//
-//        // ─── Reservas activas/futuras ─────────────────────────────────────────
-//
+
+        // ─── Reservas activas/futuras ─────────────────────────────────────────
+
         reservaEmilia1 = Reservation(
             user = emiliaRomero, book = jardinCerezos,
             pickUpDate = LocalDate.of(2026, 3, 15), dropOffDate = LocalDate.of(2026, 3, 29),
@@ -1121,6 +944,290 @@ class ProjectBootstrap : InitializingBean {
         ).forEach { createReservation(it) }
     }
 
+    // ─── Reseñas ──────────────────────────────────────────────────────────────
+    // Se crean DESPUÉS de initReservations() para poder referenciar cada
+    // Reservation ya persistida. Al final se agregan a sus libros y se
+    // vuelven a guardar (cascade → persiste las reviews).
+    // ─────────────────────────────────────────────────────────────────────────
+
+    fun initReviews() {
+
+        // ── Crear todas las reviews ───────────────────────────────────────────
+
+        reviewElProcesoEmilia = Review(
+            reviewerName = emiliaRomero.name, rating = 4,
+            review = "Kafkiano en el mejor sentido. La burocracia como pesadilla existencial, muy bien logrado.",
+            reservation = reservaEmiliaPasada1,
+            timestamp = LocalDate.of(2025, 8, 10)
+        )
+        reviewAdiosArmasEmilia = Review(
+            reviewerName = emiliaRomero.name, rating = 5,
+            review = "Hemingway en su máxima expresión. El final me dejó sin palabras.",
+            reservation = reservaEmiliaPasada2,
+            timestamp = LocalDate.of(2025, 10, 15)
+        )
+        reviewRayuelaEmilia = Review(
+            reviewerName = emiliaRomero.name, rating = 5,
+            review = "Una experiencia única. Lo leí en orden lineal y luego saltando capítulos, totalmente diferente.",
+            reservation = reservaEmiliaPasada3,
+            timestamp = LocalDate.of(2026, 1, 20)
+        )
+        reviewGranGatsbyLuciano = Review(
+            reviewerName = lucianoVega.name, rating = 3,
+            review = "Bella prosa, pero el protagonista me resultó difícil de empatizar. Vale la pena igual.",
+            reservation = reservaLucianoPasada1,
+            timestamp = LocalDate.of(2025, 6, 5)
+        )
+        reviewCrimenLuciano = Review(
+            reviewerName = lucianoVega.name, rating = 5,
+            review = "Dostoyevski entiende la psicología humana como nadie. Raskolnikov es aterrador y fascinante.",
+            reservation = reservaLucianoPasada2,
+            timestamp = LocalDate.of(2025, 9, 3)
+        )
+        reviewHuckFinnValentina = Review(
+            reviewerName = valentinaSosa.name, rating = 4,
+            review = "Una aventura atemporal. Twain critica la sociedad con humor fino.",
+            reservation = reservaValentinaPasada1,
+            timestamp = LocalDate.of(2025, 5, 20)
+        )
+        reviewN1984Valentina = Review(
+            reviewerName = valentinaSosa.name, rating = 5,
+            review = "Imprescindible. Cada vez más vigente. Orwell era un visionario.",
+            reservation = reservaValentinaPasada2,
+            timestamp = LocalDate.of(2025, 11, 8)
+        )
+        reviewCaminoSwannValentina = Review(
+            reviewerName = valentinaSosa.name, rating = 4,
+            review = "Proust exige paciencia pero recompensa con una belleza literaria incomparable.",
+            reservation = reservaValentinaPasada3,
+            timestamp = LocalDate.of(2026, 1, 5)
+        )
+        reviewLosMiserablesMateo = Review(
+            reviewerName = mateoLopez.name, rating = 5,
+            review = "Monumental. Victor Hugo logra que te importen profundamente personajes de hace dos siglos.",
+            reservation = reservaMateoPasada1,
+            timestamp = LocalDate.of(2025, 7, 14)
+        )
+        reviewMontagnaMagicaMateo = Review(
+            reviewerName = mateoLopez.name, rating = 3,
+            review = "Filosóficamente rico pero denso. Hay que entrar con paciencia y tiempo.",
+            reservation = reservaMateoPasada2,
+            timestamp = LocalDate.of(2025, 10, 29)
+        )
+        reviewMonteCristoMateo = Review(
+            reviewerName = mateoLopez.name, rating = 5,
+            review = "La mejor historia de venganza jamás escrita. No pude soltarlo.",
+            reservation = reservaMateoPasada3,
+            timestamp = LocalDate.of(2026, 2, 15)
+        )
+        reviewElProcesoValentina = Review(
+            reviewerName = valentinaSosa.name, rating = 5,
+            review = "Una obra que te deja paralizado. La burocracia como metáfora de la existencia.",
+            reservation = reservaElProceso2,
+            timestamp = LocalDate.of(2025, 9, 12)
+        )
+        reviewElProcesoMateo = Review(
+            reviewerName = mateoLopez.name, rating = 4,
+            review = "Kafka logra que te sientas atrapado junto al protagonista. Incómodo pero brillante.",
+            reservation = reservaElProceso3,
+            timestamp = LocalDate.of(2025, 11, 30)
+        )
+        reviewElProcesoEmilia2 = Review(
+            reviewerName = emiliaRomero.name, rating = 3,
+            review = "Me costó entrar pero una vez adentro no pude parar. La angustia de K. se siente real.",
+            reservation = reservaElProceso4,
+            timestamp = LocalDate.of(2025, 6, 5)
+        )
+        reviewElProcesoLuciano = Review(
+            reviewerName = lucianoVega.name, rating = 5,
+            review = "El absurdo kafkiano en estado puro. Una pesadilla que no podés dejar de leer.",
+            reservation = reservaElProceso5,
+            timestamp = LocalDate.of(2025, 7, 20)
+        )
+        reviewElProcesoMateo2 = Review(
+            reviewerName = mateoLopez.name, rating = 4,
+            review = "La culpa sin causa explicada, qué incómodo y qué genial.",
+            reservation = reservaElProceso6,
+            timestamp = LocalDate.of(2025, 10, 1)
+        )
+        reviewAdiosArmasValentina = Review(
+            reviewerName = valentinaSosa.name, rating = 4,
+            review = "La guerra contada sin heroísmo, con una honestidad brutal. Hemingway no decepciona.",
+            reservation = reservaAdiosArmas2,
+            timestamp = LocalDate.of(2025, 7, 8)
+        )
+        reviewAdiosArmasMateo = Review(
+            reviewerName = mateoLopez.name, rating = 3,
+            review = "Buena prosa, aunque el ritmo se me hizo lento en el medio. El final salva todo.",
+            reservation = reservaAdiosArmas3,
+            timestamp = LocalDate.of(2026, 1, 14)
+        )
+        reviewRayuelaLuciano = Review(
+            reviewerName = lucianoVega.name, rating = 4,
+            review = "Cortázar rompe todo y lo reconstruye mejor. Exige concentración pero vale cada página.",
+            reservation = reservaRayuela2,
+            timestamp = LocalDate.of(2025, 8, 28)
+        )
+        reviewRayuelaMateo = Review(
+            reviewerName = mateoLopez.name, rating = 5,
+            review = "La mejor novela latinoamericana que leí. La estructura no lineal es un viaje mental.",
+            reservation = reservaRayuela3,
+            timestamp = LocalDate.of(2026, 2, 20)
+        )
+        reviewGranGatsbyValentina = Review(
+            reviewerName = valentinaSosa.name, rating = 5,
+            review = "El sueño americano desnudo. Fitzgerald escribe con una elegancia que duele.",
+            reservation = reservaGranGatsby2,
+            timestamp = LocalDate.of(2025, 7, 2)
+        )
+        reviewGranGatsbyMateo = Review(
+            reviewerName = mateoLopez.name, rating = 4,
+            review = "Corto e intenso. La fiesta como fachada del vacío, muy bien retratado.",
+            reservation = reservaGranGatsby3,
+            timestamp = LocalDate.of(2025, 10, 5)
+        )
+        reviewCrimenEmilia = Review(
+            reviewerName = emiliaRomero.name, rating = 5,
+            review = "La culpa narrada desde adentro. Dostoyevski te mete en la cabeza de Raskolnikov sin escapatoria.",
+            reservation = reservaCrimen2,
+            timestamp = LocalDate.of(2025, 6, 20)
+        )
+        reviewCrimenMateo = Review(
+            reviewerName = mateoLopez.name, rating = 4,
+            review = "Denso pero absorbente. El juicio final es magistral.",
+            reservation = reservaCrimen3,
+            timestamp = LocalDate.of(2025, 12, 10)
+        )
+        reviewHarryPotterEmilia = Review(
+            reviewerName = emiliaRomero.name, rating = 5,
+            review = "Un clásico moderno. La magia de Hogwarts no envejece nunca.",
+            reservation = reservaHarryPotter2,
+            timestamp = LocalDate.of(2025, 5, 10)
+        )
+        reviewHarryPotterValentina = Review(
+            reviewerName = valentinaSosa.name, rating = 4,
+            review = "Lo leí por primera vez de adulta y entendí por qué marcó a toda una generación.",
+            reservation = reservaHarryPotter3,
+            timestamp = LocalDate.of(2025, 8, 5)
+        )
+        reviewHuckFinnLuciano = Review(
+            reviewerName = lucianoVega.name, rating = 4,
+            review = "Twain disfraza la crítica social de aventura infantil con una habilidad increíble.",
+            reservation = reservaHuckFinn2,
+            timestamp = LocalDate.of(2025, 9, 22)
+        )
+        reviewHuckFinnMateo = Review(
+            reviewerName = mateoLopez.name, rating = 3,
+            review = "Entretenido, aunque algunos pasajes se sienten datados. El vínculo Huck-Jim es lo mejor.",
+            reservation = reservaHuckFinn3,
+            timestamp = LocalDate.of(2026, 1, 28)
+        )
+        reviewN1984Luciano = Review(
+            reviewerName = lucianoVega.name, rating = 5,
+            review = "Perturbador y necesario. Lo releí y cada vez me parece más actual.",
+            reservation = reservaN19842,
+            timestamp = LocalDate.of(2025, 6, 30)
+        )
+        reviewN1984Mateo = Review(
+            reviewerName = mateoLopez.name, rating = 5,
+            review = "El Gran Hermano ya existe. Orwell lo supo antes que todos.",
+            reservation = reservaN19843,
+            timestamp = LocalDate.of(2025, 12, 22)
+        )
+        reviewLosMiserablesEmilia = Review(
+            reviewerName = emiliaRomero.name, rating = 5,
+            review = "Jean Valjean es uno de los personajes más conmovedores de la literatura universal.",
+            reservation = reservaLosMiserables2,
+            timestamp = LocalDate.of(2025, 8, 18)
+        )
+        reviewLosMiserablesValentina = Review(
+            reviewerName = valentinaSosa.name, rating = 4,
+            review = "Largo pero cada página tiene peso. Hugo no desperdicia ni un capítulo.",
+            reservation = reservaLosMiserables3,
+            timestamp = LocalDate.of(2026, 2, 10)
+        )
+        reviewMontagnaMagicaLuciano = Review(
+            reviewerName = lucianoVega.name, rating = 4,
+            review = "Mann logra que el tiempo del sanatorio se sienta tan eterno como para el protagonista.",
+            reservation = reservaMontagnaMagica2,
+            timestamp = LocalDate.of(2025, 11, 15)
+        )
+        reviewMontagnaMagicaValentina = Review(
+            reviewerName = valentinaSosa.name, rating = 3,
+            review = "Muy filosófica, quizás demasiado. Los diálogos entre Naphta y Settembrini son brillantes.",
+            reservation = reservaMontagnaMagica3,
+            timestamp = LocalDate.of(2026, 1, 10)
+        )
+        reviewMonteCristoEmilia = Review(
+            reviewerName = emiliaRomero.name, rating = 5,
+            review = "Imposible soltar. La venganza de Dantès es satisfactoria en cada nivel.",
+            reservation = reservaMonteCristo2,
+            timestamp = LocalDate.of(2025, 7, 25)
+        )
+        reviewMonteCristoLuciano = Review(
+            reviewerName = lucianoVega.name, rating = 5,
+            review = "Dumas teje una trama perfecta. Cada detalle de los primeros capítulos vuelve al final.",
+            reservation = reservaMonteCristo3,
+            timestamp = LocalDate.of(2025, 10, 18)
+        )
+
+        // ── Agregar reviews a sus libros y persistir ──────────────────────────
+
+        elProceso.addReview(reviewElProcesoEmilia)
+        elProceso.addReview(reviewElProcesoValentina)
+        elProceso.addReview(reviewElProcesoMateo)
+        elProceso.addReview(reviewElProcesoEmilia2)
+        elProceso.addReview(reviewElProcesoLuciano)
+        elProceso.addReview(reviewElProcesoMateo2)
+
+        adiosArmas.addReview(reviewAdiosArmasEmilia)
+        adiosArmas.addReview(reviewAdiosArmasValentina)
+        adiosArmas.addReview(reviewAdiosArmasMateo)
+
+        rayuela.addReview(reviewRayuelaEmilia)
+        rayuela.addReview(reviewRayuelaLuciano)
+        rayuela.addReview(reviewRayuelaMateo)
+
+        granGatsby.addReview(reviewGranGatsbyLuciano)
+        granGatsby.addReview(reviewGranGatsbyValentina)
+        granGatsby.addReview(reviewGranGatsbyMateo)
+
+        crimen.addReview(reviewCrimenLuciano)
+        crimen.addReview(reviewCrimenEmilia)
+        crimen.addReview(reviewCrimenMateo)
+
+        harryPotter.addReview(reviewHarryPotterEmilia)
+        harryPotter.addReview(reviewHarryPotterValentina)
+
+        huckFinn.addReview(reviewHuckFinnValentina)
+        huckFinn.addReview(reviewHuckFinnLuciano)
+        huckFinn.addReview(reviewHuckFinnMateo)
+
+        n1984.addReview(reviewN1984Valentina)
+        n1984.addReview(reviewN1984Luciano)
+        n1984.addReview(reviewN1984Mateo)
+
+        losMiserables.addReview(reviewLosMiserablesMateo)
+        losMiserables.addReview(reviewLosMiserablesEmilia)
+        losMiserables.addReview(reviewLosMiserablesValentina)
+
+        montagnaMagica.addReview(reviewMontagnaMagicaMateo)
+        montagnaMagica.addReview(reviewMontagnaMagicaLuciano)
+        montagnaMagica.addReview(reviewMontagnaMagicaValentina)
+
+        monteCristo.addReview(reviewMonteCristoMateo)
+        monteCristo.addReview(reviewMonteCristoEmilia)
+        monteCristo.addReview(reviewMonteCristoLuciano)
+
+        caminoSwann.addReview(reviewCaminoSwannValentina)
+
+        listOf(
+            elProceso, adiosArmas, rayuela, granGatsby, crimen,
+            harryPotter, huckFinn, n1984, losMiserables,
+            montagnaMagica, monteCristo, caminoSwann
+        ).forEach { repoBooks.save(it) }
+    }
+
     // ═════════════════════════════════════════════════════════════════════════
     // InitializingBean
     // ═════════════════════════════════════════════════════════════════════════
@@ -1131,10 +1238,10 @@ class ProjectBootstrap : InitializingBean {
         println("************************************************************************")
         this.initUsers()
         this.initAuthors()
-        this.initReviews()
-        this.initBooks()
-        this.initReservations()
-        this.bookReservationInitializer.initBookReservationsIds() // init reservationsIds del libro
+        this.initBooks()          // libros sin reviews
+        this.initReservations()   // reservaciones ya con users y books
+        this.initReviews()        // reviews con reservaciones → se agregan a libros → save
+        this.bookReservationInitializer.initBookReservationsIds()
         println("------------------------------------------------------------------------")
     }
 }

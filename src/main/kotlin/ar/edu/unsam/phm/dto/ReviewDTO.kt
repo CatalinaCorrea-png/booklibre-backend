@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.dto
 
+import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
 import java.time.LocalDate
 
@@ -8,7 +9,8 @@ data class ReviewDTO(
     var reviewerName: String = "",
     var rating: Int = 0,
     var review: String = "",
-    var timestamp: String = ""
+    var timestamp: String = "",
+    var reservation: ReservationDTO? = null,
 ) {
 
     fun fromDTO(): Review {
@@ -17,6 +19,7 @@ data class ReviewDTO(
             rating = this.rating,
             review = this.review,
             timestamp = LocalDate.parse(this.timestamp),
+            reservation = Reservation()
         ).apply {
             id = this@ReviewDTO.id
         }
