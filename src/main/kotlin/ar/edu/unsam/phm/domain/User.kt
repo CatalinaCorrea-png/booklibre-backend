@@ -4,12 +4,7 @@ import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RepositoryElement
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "app_user")
@@ -24,16 +19,17 @@ class User(
     val location: String = "",
     var userType: UserTypes = UserTypes.COMBINED,
     val timestamp: String = "",
+    @Column(nullable = false)
     var bibliokarmas: Int = 0,
     var password: String = "",
     var img: String = ""
 
-): RepositoryElement {
+) : RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     override var id: Long? = null
 
-    fun addBibliokarmas(bibliokarmas: Int){
+    fun addBibliokarmas(bibliokarmas: Int) {
         this.bibliokarmas += bibliokarmas
     }
 
@@ -48,11 +44,11 @@ class User(
     }
 
     fun validateProfileUpdate() {
-        if(!isNotEmpty(name)) throw BusinessException("Debe ingresar un nombre valido")
-        if(name.length <= 1) throw BusinessException("El nombre debe contener 2 o mas caracteres")
-        if(name.length >= 25) throw BusinessException("El nombre no puede tener mas de 25 caracteres")
-        if(!isNotEmpty(location)) throw BusinessException("Debe añadir una ubicacion valida")
-        if(!isNotEmpty(email)) throw BusinessException("Debe ingrese un email valido")
+        if (!isNotEmpty(name)) throw BusinessException("Debe ingresar un nombre valido")
+        if (name.length <= 1) throw BusinessException("El nombre debe contener 2 o mas caracteres")
+        if (name.length >= 25) throw BusinessException("El nombre no puede tener mas de 25 caracteres")
+        if (!isNotEmpty(location)) throw BusinessException("Debe añadir una ubicacion valida")
+        if (!isNotEmpty(email)) throw BusinessException("Debe ingrese un email valido")
     }
 
     companion object {

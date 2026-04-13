@@ -14,6 +14,11 @@ data class Review(
     var review: String = "",
     @Column
     var timestamp: LocalDate = LocalDate.now(),
+
+    @OneToOne // Esta es la MEJOR solucion de las que pense que tiene solucion a la mierda que hicimos
+    @JoinColumn(name = "reservation_id")
+    val reservation: Reservation
+
 ) : RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,5 @@
 package ar.edu.unsam.phm.controller
 
-
 import ar.edu.unsam.phm.domain.BookSearchCriteria
 import ar.edu.unsam.phm.domain.Gender
 import ar.edu.unsam.phm.dto.*
@@ -19,7 +18,7 @@ class BookController(
     fun getFilteredBooks(
         @ModelAttribute criteria: BookSearchCriteria,
 
-    ): PageResponse<BookDTO> {
+        ): PageResponse<BookDTO> {
         val direction = if (criteria.ascending) Sort.Direction.ASC else Sort.Direction.DESC
         val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
         return bookService.searchBooks(criteria, pageable)
@@ -58,7 +57,12 @@ class BookController(
     }
 
     @GetMapping("/book-detail/{id}/bibliokarmas")
-    fun calculateBibliokarmas(@PathVariable id: Long, @RequestParam userId: Long, @RequestParam pickUpDate: LocalDate, @RequestParam dropOffDate: LocalDate): Int =
+    fun calculateBibliokarmas(
+        @PathVariable id: Long,
+        @RequestParam userId: Long,
+        @RequestParam pickUpDate: LocalDate,
+        @RequestParam dropOffDate: LocalDate
+    ): Int =
         bookService.recalculateBibliokarmas(id, userId, pickUpDate, dropOffDate)
 
     @GetMapping("/book-genders")

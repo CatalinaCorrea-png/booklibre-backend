@@ -2,28 +2,41 @@
 
 > "Que la fuerza te acompañe… y que te devuelvan el libro en fecha."
 
-Backend de la aplicación BookLibre, una plataforma para gestionar préstamos de libros entre usuarios. Desarrollado con **Kotlin + Spring Boot**.
+Backend de **BookLibre**, una plataforma para gestionar préstamos de libros entre usuarios. Desarrollado con **Kotlin + Spring Boot**.
 
 ---
 
-## Tecnologías
+## 🛠️ Tecnologías
 
-- **Kotlin**
-- **Spring Boot**
-- **Spring Data JPA**
-- **PostgreSQL** (base de datos)
-- **Maven / Gradle**
+| Tecnología | Uso |
+|---|---|
+| Kotlin | Lenguaje principal |
+| Spring Boot | Framework web |
+| Spring Data JPA | Persistencia y ORM |
+| PostgreSQL | Base de datos relacional |
+| Gradle | Gestión de dependencias |
+| Docker | Contenedor de base de datos |
+| JWT | Autenticación y seguridad |
 
 ---
 
-## Cómo correr el proyecto
+## 🚀 Cómo correr el proyecto
+
+### Prerequisitos
+- JDK 17+
+- Docker y Docker Compose
+
+### Pasos
 
 ```bash
-# Clonar el repositorio
+# 1. Clonar el repositorio
 git clone https://github.com/tu-usuario/booklibre-backend.git
 cd booklibre-backend
 
-# Correr la aplicación
+# 2. Levantar la base de datos con Docker
+docker-compose up -d
+
+# 3. Correr la aplicación
 ./gradlew bootRun
 ```
 
@@ -176,7 +189,21 @@ BEGIN
 END; 
 $$ LANGUAGE plpgsql;
 ```
+
+### 4. Evitar que los bibliokarmas de un usuario tomen un valor nulo en la base (por fuera de la interfaz de usuario).
+
+``` sql
+ALTER TABLE app_user
+    ALTER COLUMN bibliokarmas SET NOT NULL,
+    ALTER COLUMN bibliokarmas SET DEFAULT 0;
+
+-- Si ya existen filas con NULL se lo saco
+UPDATE app_user SET bibliokarmas = 0 WHERE bibliokarmas IS NULL;
+```
+
+
 ---
+
 
 ##  Tutor
 - **Foglia, Pablo**
