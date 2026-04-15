@@ -5,6 +5,7 @@ import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.*
+import ar.edu.unsam.phm.specification.BookSpecifications
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -96,18 +97,8 @@ class BookService(
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
 //        println("Criteria: $searchCriteria")
 //        println("Pageable: $pageable")
-        val page : Page<Book> = bookRepository.findAllByCriteria(
-            userId = searchCriteria.userId,
-            title = searchCriteria.title,
-            genders = searchCriteria.genders,
-            pagesRangeMin = searchCriteria.pagesRangeMin,
-            pagesRangeMax = searchCriteria.pagesRangeMax,
-            pickUpDate = searchCriteria.pickUpDate,
-            dropOffDate = searchCriteria.dropOffDate,
-            isbn = searchCriteria.isbn,
-            ownersName = searchCriteria.ownersName,
-            pageable = pageable
-        )
+        val spec = BookSpecifications.byCriteria(searchCriteria)
+        val page : Page<Book> = bookRepository.findAll(spec, pageable)
 //        println("Results: ${page.totalElements}")
         val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
         return PageResponse(
