@@ -44,7 +44,7 @@ class JwtAuthenticationFilter(
                 }
             }
         } catch(ex: Exception) {}
-ka
+
         filterChain.doFilter(request, response)
     }
 

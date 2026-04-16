@@ -8,7 +8,8 @@ data class AuthRequest(
 
 // RESPONSE - Lo que devuelve el endpoint, lo que necesita el front
 data class AuthenticationResponse(
-    val accessToken: String
+    val accessToken: String,
+    val refreshToken: String,
 ) {}
 
 data class AuthResponse(
