@@ -94,4 +94,14 @@ class UserService(
 
         return updatedUser
     }
+
+    @Transactional(readOnly = true)
+    fun getUserByEmail(email: String): User {
+        val persistedUser = userRepository
+            .findByEmail(email)
+            .orElseThrow {
+                NotFoundException("No se encuentra un usuario registrado con este email: $email")
+            }
+        return persistedUser
+    }
 }
