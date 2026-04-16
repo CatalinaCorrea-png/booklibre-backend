@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.config
 
+import ar.edu.unsam.phm.services.CustomUserDetailsService
 import ar.edu.unsam.phm.services.TokenService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -14,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class JwtAuthenticationFilter(
-    private val userDetailsService: UserDetailsService,
+    private val userDetailsService: CustomUserDetailsService,
     private val tokenService: TokenService
 ): OncePerRequestFilter() {
 
@@ -31,17 +32,20 @@ class JwtAuthenticationFilter(
         }
 
         val jwtToken = authHeader!!.extractTokenValue()
-        val email = tokenService.extractEmail(jwtToken)
 
-        if(email != null && SecurityContextHolder.getContext().authentication == null){
-            val foundUser = userDetailsService.loadUserByUsername(email)
+        try {
+            val email = tokenService.extractEmail(jwtToken)
 
-            if(tokenService.isValid(jwtToken, foundUser)){
-                updateContext(foundUser, request)
+            if(email != null && SecurityContextHolder.getContext().authentication == null){
+                val foundUser = userDetailsService.loadUserByUsername(email)
+
+                if(tokenService.isValid(jwtToken, foundUser)){
+                    updateContext(foundUser, request)
+                }
             }
-
-            filterChain.doFilter(request, response)
-        }
+        } catch(ex: Exception) {}
+ka
+        filterChain.doFilter(request, response)
     }
 
     private fun updateContext(foundUser: UserDetails, request: HttpServletRequest){
@@ -52,8 +56,8 @@ class JwtAuthenticationFilter(
     }
 
     private fun String?.doesNotContainBearerToken(): Boolean =
-        this == null || this.startsWith("Bearer")
+        this == null || !this.startsWith("Bearer ")
 
     private fun String.extractTokenValue(): String =
-        this.substringAfter("Bearer")
+        this.substringAfter("Bearer ")
 }

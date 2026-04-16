@@ -1,6 +1,7 @@
 package ar.edu.unsam.phm.config
 
 import ar.edu.unsam.phm.repository.CrudUserRepository
+import ar.edu.unsam.phm.services.CustomUserDetailsService
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,17 +18,13 @@ import org.springframework.security.crypto.password.PasswordEncoder
 class Configuration {
 
     @Bean
-    fun userDetailService(crudUserRepository: CrudUserRepository): UserDetailsService =
-        userDetailService(crudUserRepository)
-
-    @Bean
     fun encoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
-    fun authenticationProvider(crudUserRepository: CrudUserRepository): AuthenticationProvider =
+    fun authenticationProvider(userDetailService: CustomUserDetailsService): AuthenticationProvider =
         DaoAuthenticationProvider()
             .also {
-                it.setUserDetailsService ( userDetailService(crudUserRepository) )
+                it.setUserDetailsService (userDetailService)
                 it.setPasswordEncoder(encoder())
             }
 
