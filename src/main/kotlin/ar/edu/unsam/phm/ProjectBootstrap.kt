@@ -7,11 +7,12 @@ import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class ProjectBootstrap : InitializingBean {
+class ProjectBootstrap : InitializingBean{
 
     @Autowired
     private lateinit var repoAuthors: CrudAuthorRepository
@@ -27,6 +28,9 @@ class ProjectBootstrap : InitializingBean {
 
     @Autowired
     private lateinit var bookReservationInitializer: BookReservationInitializer
+
+    @Autowired
+    private lateinit var encoder: PasswordEncoder
 
     // ─── Autores ──────────────────────────────────────────────────────────────
 
@@ -268,7 +272,7 @@ class ProjectBootstrap : InitializingBean {
             location = "Buenos Aires, AR",
             timestamp = "27/10/2021",
             userType = UserTypes.COMBINED,
-            password = "123456",
+            password = encoder.encode("123456"),
             bibliokarmas = 110,
             img = "/assets/emilia_romero_avatar.png"
         )
@@ -281,7 +285,7 @@ class ProjectBootstrap : InitializingBean {
             location = "Rosario, AR",
             userType = UserTypes.READER,
             bibliokarmas = 980,
-            password = "123456",
+            password = encoder.encode("123456"),
             timestamp = "14/02/2016",
             img = "/assets/luciano_vega_avatar.png"
         )
@@ -296,7 +300,7 @@ class ProjectBootstrap : InitializingBean {
             bibliokarmas = 1500,
             timestamp = "10/01/2023",
             img = "/assets/valentina_sosa_avatar.png",
-            password = "123456",
+            password = encoder.encode("123456"),
         )
 
         mateoLopez = User(
@@ -307,7 +311,7 @@ class ProjectBootstrap : InitializingBean {
             location = "Mendoza, AR",
             userType = UserTypes.COMBINED,
             bibliokarmas = 420,
-            password = "123456",
+            password = encoder.encode("123456"),
             timestamp = "01/02/2024",
             img = "/assets/mateo_lopez_avatar.png"
         )

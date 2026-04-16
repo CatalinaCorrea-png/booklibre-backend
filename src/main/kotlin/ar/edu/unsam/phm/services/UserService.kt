@@ -10,13 +10,15 @@ import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.*
 
 
 @Service
 class UserService(
     @Autowired
-    val userRepository: CrudUserRepository
+    val userRepository: CrudUserRepository,
+    private val encoder: PasswordEncoder
 ) {
 
     @Transactional(readOnly = true)
@@ -55,8 +57,13 @@ class UserService(
     fun create(user: User): User {
         val existingUser: Optional<User> = userRepository.findByEmail(user.email)
         if (existingUser.isEmpty) {
-            user.validate()
-            return userRepository.save(user)
+            val userCopy = User(
+                name = user.name,
+                email = user.email,
+                password = encoder.encode(user.password)
+            )
+            userCopy.validate()
+            return userRepository.save(userCopy)
         }  else {
             throw ConflictException("Email '${user.email}' ya se encuentra registrado")
     }}
@@ -77,7 +84,7 @@ class UserService(
             userType = UserTypes.fromValue(userData.userType),
             timestamp = userData.timestamp,
             bibliokarmas = userData.bibliokarmas,
-            password = existingUser.password,
+            password = encoder.encode(existingUser.password),
             img = userData.img
         ).apply {
             id = existingUser.id
@@ -87,5 +94,4 @@ class UserService(
 
         return updatedUser
     }
-
 }
