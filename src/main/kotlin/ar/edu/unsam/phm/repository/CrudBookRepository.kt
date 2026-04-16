@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import ar.edu.unsam.phm.domain.Gender
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
@@ -14,6 +15,13 @@ import java.util.Optional
 
 interface CrudBookRepository: CrudRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     fun findByIsbn(isbn: String): Optional<Book>
+
+    @EntityGraph(attributePaths = ["owner", "author"])
+    override fun findAll(spec: Specification<Book>, pageable: Pageable): Page<Book>
+
+    // Para traer libros con colecciones de reservationIds por ID de libro
+    @EntityGraph(attributePaths = ["owner", "author", "reservationsIds"])
+    fun findAllByIdIn(ids: List<Long>): List<Book>
 
     @Query("""
         SELECT new ar.edu.unsam.phm.dto.ProfileBookDTO(

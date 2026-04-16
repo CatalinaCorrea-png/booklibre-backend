@@ -95,12 +95,24 @@ class BookService(
 
     @Transactional(readOnly = true)
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable ): PageResponse<BookDTO> {
-//        println("Criteria: $searchCriteria")
-//        println("Pageable: $pageable")
+        // println("Criteria: $searchCriteria")
+        // println("Pageable: $pageable")
+
+        // (1) Query paginada sin coleccion de reservationIDS
         val spec = BookSpecifications.byCriteria(searchCriteria)
         val page : Page<Book> = bookRepository.findAll(spec, pageable)
-//        println("Results: ${page.totalElements}")
-        val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
+        // println("Results: ${page.totalElements}")
+
+        // (2) Traigo libros con coleccion. Pero SOLO los de esta pagina (6)
+        val ids = page.content.map { it.id!! }
+        val booksWithCollections = if (ids.isNotEmpty()) {
+            bookRepository.findAllByIdIn(ids).associateBy { it.id!! } // Para mantener orden luego
+        } else emptyMap()
+
+        // (3) Ordeno como vino originalmente (por el sort)
+        val orderedBooks = page.content.map { booksWithCollections[it.id]!! }
+
+        val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(orderedBooks, searchCriteria)
         return PageResponse(
             content = booksWithBibliokarmasDTO,
             page = page.number,
