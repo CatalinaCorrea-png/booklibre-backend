@@ -18,6 +18,7 @@ class AuthenticationService(
     private val tokenService: TokenService,
     private val jwtProperties: JwtProperties,
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val userService: UserService
 ) {
     fun authentication(request: AuthRequest): AuthenticationResponse {
         authManager.authenticate(
@@ -31,8 +32,9 @@ class AuthenticationService(
         val accessToken = generateAccessToken(user)
         val refreshToken = generateRefreshToken(user)
         refreshTokenRepository.save(refreshToken, user)
+        val userOK = userService.getUserByEmail(user.username)
 
-        return AuthenticationResponse(accessToken, refreshToken )
+        return AuthenticationResponse(accessToken, refreshToken, userOK.name, userOK.email, userOK.id!!)
     }
 
     fun refreshAccessToken(token: String): String?{

@@ -10,6 +10,9 @@ data class AuthRequest(
 data class AuthenticationResponse(
     val accessToken: String,
     val refreshToken: String,
+    val name: String,
+    val email: String,
+    val id: Long
 ) {}
 
 data class AuthResponse(
