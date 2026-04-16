@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.dto
 
+import ar.edu.unsam.phm.domain.Common
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
 import java.time.LocalDate
@@ -13,17 +14,18 @@ data class ReviewDTO(
     var reservation: ReservationDTO? = null,
 ) {
 
-    fun fromDTO(): Review {
-        return Review(
-            reviewerName = this.reviewerName,
-            rating = this.rating,
-            review = this.review,
-            timestamp = LocalDate.parse(this.timestamp),
-            reservation = Reservation()
-        ).apply {
-            id = this@ReviewDTO.id
-        }
-    }
+//    fun fromDTO(): Review {
+//        return Review(
+//            reviewerName = this.reviewerName,
+//            rating = this.rating,
+//            review = this.review,
+//            timestamp = LocalDate.parse(this.timestamp),
+//            reservation = Reservation(),
+//            book = Common()
+//        ).apply {
+//            id = this@ReviewDTO.id
+//        }
+//    }
 }
 
 fun Review.toDTO(): ReviewDTO {

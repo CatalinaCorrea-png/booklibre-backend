@@ -17,7 +17,11 @@ data class Review(
 
     @OneToOne // Esta es la MEJOR solucion de las que pense que tiene solucion a la mierda que hicimos
     @JoinColumn(name = "reservation_id")
-    val reservation: Reservation
+    val reservation: Reservation,
+
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    val book: Book,
 
 ) : RepositoryElement {
     @Id

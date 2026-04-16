@@ -73,9 +73,10 @@ abstract class Book(
     var deleted: Boolean = false,
 
     @OneToMany(
+        mappedBy = "book",
         fetch = FetchType.LAZY,
-        cascade = [CascadeType.ALL]
-    ) // Lo cascadeo porque es esta implementación funciona asi...
+        cascade = [CascadeType.ALL],
+    ) // Lo cascadeo porque en esta implementación funciona asi...
     val reviews: MutableList<Review> = mutableListOf(),
 
     @Column
@@ -109,7 +110,6 @@ abstract class Book(
         if (review.rating !in 1..5) throw ConflictException("Ingrese una calificaión entre 1 y 5")
         reviews.add(review)
         updateRating()
-
     }
 
     private fun updateRating() {

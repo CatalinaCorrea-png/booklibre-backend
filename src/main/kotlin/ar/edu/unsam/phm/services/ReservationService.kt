@@ -121,7 +121,8 @@ class ReservationService(
             rating = rating,
             review = comment,
             reviewerName = reviewer.name,
-            reservation = reservation
+            reservation = reservation,
+            book = reservation.book,
         )
 
         reviewRepository.save(newReview)
