@@ -4,7 +4,8 @@ import jakarta.persistence.Entity
 
 @Entity
 class Common : Book(bookType = "COMUN") {
-    override fun typeBibliokarmas(userBibliokarmas: Int) : Int = if (userBibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
+    override fun typeBibliokarmas(userBibliokarmas: Int): Int =
+        if (userBibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
 }
 
 @Entity

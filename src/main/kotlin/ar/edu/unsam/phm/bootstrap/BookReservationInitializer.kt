@@ -1,4 +1,4 @@
-package ar.edu.unsam.phm
+package ar.edu.unsam.phm.bootstrap
 
 import ar.edu.unsam.phm.repository.CrudReservationRepository
 import jakarta.transaction.Transactional

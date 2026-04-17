@@ -35,12 +35,6 @@ data class Reservation(
         !this.pickUpDate.isAfter(reservation.dropOffDate) && !reservation.pickUpDate.isAfter(this.dropOffDate)
     // Versión con .isBefore() (Si termina justo donde empieza otra, NO cuenta como traslape)
 
-    fun isSoonToEnd() = this.dropOffDate.minusDays(2) == LocalDate.now()
-
-    fun bookOwnerId(): Long = this.book.owner.id!!
-
-    fun holderId(): Long = this.user.id!!
-
     private fun isPickUpNotBeforeToday(): Boolean {
         return if (this.pickUpDate.isBefore(LocalDate.now()))
             throw BusinessException("La fecha de recogida no puede ser anterior a hoy")
@@ -61,5 +55,4 @@ data class Reservation(
         isPickUpBeforeDropOff() && isPickUpNotBeforeToday()
     }
 
-    fun isActive(): Boolean = state == State.BORROWED || state == State.SOON_TO_END
 }

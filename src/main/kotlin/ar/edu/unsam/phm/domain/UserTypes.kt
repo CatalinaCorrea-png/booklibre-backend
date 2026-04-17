@@ -1,9 +1,8 @@
 package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.errors.ConflictException
-import jakarta.persistence.DiscriminatorValue
 
-enum class UserTypes(val value: String){
+enum class UserTypes(val value: String) {
     PUBLISHER("Publicador"),
     READER("Lector"),
     COMBINED("Lector / Publicador");

@@ -3,16 +3,15 @@ package ar.edu.unsam.phm.services
 import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
-import ar.edu.unsam.phm.errors.NotFoundException
-import org.springframework.stereotype.Service
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.ConflictException
+import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudUserRepository
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
-
 
 @Service
 class UserService(
@@ -44,15 +43,6 @@ class UserService(
         return persistedUser
     }
 
-//
-//    fun search( user: User) : User {
-//        val userMatch = userRepository.findByEmail(user.email)
-//        if (userMatch.isEmpty){
-//            throw BusinessException("Credenciales incorrectas")
-//        }else{
-//            return userMatch
-//        }
-//    }
     @Transactional
     fun create(user: User): User {
         val existingUser: Optional<User> = userRepository.findByEmail(user.email)
@@ -64,9 +54,10 @@ class UserService(
             )
             userCopy.validate()
             return userRepository.save(userCopy)
-        }  else {
+        } else {
             throw ConflictException("Email '${user.email}' ya se encuentra registrado")
-    }}
+        }
+    }
 
     fun updateUserProfile(userData: UpdateUserProfileDTO): User {
         val existingUser = userRepository

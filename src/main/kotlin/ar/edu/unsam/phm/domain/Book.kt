@@ -130,13 +130,4 @@ abstract class Book(
     override fun meetsSearchCriteria(criteria: String): Boolean =
         criteria.isBlank() ||
                 this.title.contains(criteria.trim(), ignoreCase = true)
-//              || this.author.name.contains(criteria.trim(), ignoreCase = true)
-
-    fun meetsPagesCriteria(pagesRangeMin: Int?, pagesRangeMax: Int?): Boolean {
-//        println("pagesRangeMin: $pagesRangeMin - pagesRangeMax: $pagesRangeMax")
-        val min = pagesRangeMin ?: 0
-        val max = pagesRangeMax ?: 1500 // Regla de negocio (Por ahora)
-        return this.numPages in min..max
-    }
-
 }

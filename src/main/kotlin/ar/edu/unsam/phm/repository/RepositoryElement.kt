@@ -11,7 +11,7 @@ interface RepositoryElement {
 
     fun isNotEmpty(criteria: String) = criteria.isNotBlank()
 
-    fun meetsSearchCriteria(criteria: String) : Boolean
+    fun meetsSearchCriteria(criteria: String): Boolean
 
     fun validate()
 

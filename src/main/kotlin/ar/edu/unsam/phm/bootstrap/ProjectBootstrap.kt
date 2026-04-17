@@ -1,6 +1,18 @@
-package ar.edu.unsam.phm
+package ar.edu.unsam.phm.bootstrap
 
-import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.bootstrap.BookReservationInitializer
+import ar.edu.unsam.phm.domain.Author
+import ar.edu.unsam.phm.domain.Book
+import ar.edu.unsam.phm.domain.BookCondition
+import ar.edu.unsam.phm.domain.Collectable
+import ar.edu.unsam.phm.domain.Common
+import ar.edu.unsam.phm.domain.Gender
+import ar.edu.unsam.phm.domain.Language
+import ar.edu.unsam.phm.domain.Reservation
+import ar.edu.unsam.phm.domain.Review
+import ar.edu.unsam.phm.domain.User
+import ar.edu.unsam.phm.domain.UserTypes
+import ar.edu.unsam.phm.domain.WithADedication
 import ar.edu.unsam.phm.repository.CrudAuthorRepository
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
@@ -12,7 +24,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class ProjectBootstrap : InitializingBean{
+class ProjectBootstrap : InitializingBean {
 
     @Autowired
     private lateinit var repoAuthors: CrudAuthorRepository

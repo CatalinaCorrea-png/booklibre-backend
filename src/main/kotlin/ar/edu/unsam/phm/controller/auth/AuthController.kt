@@ -29,5 +29,5 @@ class AuthController(
                 "Invalid refresh token!"
             )
 
-    private fun String.mapToTokenResponse(): TokenResponse = TokenResponse( token = this )
+    private fun String.mapToTokenResponse(): TokenResponse = TokenResponse(token = this)
 }

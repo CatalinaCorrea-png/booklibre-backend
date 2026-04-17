@@ -1,9 +1,6 @@
 package ar.edu.unsam.phm.dto
 
-import ar.edu.unsam.phm.domain.Common
-import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
-import java.time.LocalDate
 
 data class ReviewDTO(
     var id: Long = 0,

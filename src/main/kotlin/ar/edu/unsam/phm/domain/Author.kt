@@ -10,7 +10,7 @@ import jakarta.persistence.Id
 data class Author(
     val name: String,
     val avatar: String
-): RepositoryElement {
+) : RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     override var id: Long? = null
@@ -19,7 +19,7 @@ data class Author(
         TODO("Not yet implemented")
     }
 
-    override fun meetsSearchCriteria(criteria: String) : Boolean {
+    override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO("Not yet implemented")
     }
 }

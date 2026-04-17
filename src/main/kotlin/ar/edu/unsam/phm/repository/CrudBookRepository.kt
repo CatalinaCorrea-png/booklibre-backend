@@ -4,18 +4,16 @@ import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.dto.ProfileBookDTO
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import ar.edu.unsam.phm.domain.Gender
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
-import java.time.LocalDate
-import java.util.Optional
+import java.util.*
 
-interface CrudBookRepository: CrudRepository<Book, Long>, JpaSpecificationExecutor<Book> {
+interface CrudBookRepository : CrudRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     fun findByIsbn(isbn: String): Optional<Book>
 
-    @Query("""
+    @Query(
+        """
         SELECT new ar.edu.unsam.phm.dto.ProfileBookDTO(
             b.id,
             b.title,
@@ -41,7 +39,8 @@ interface CrudBookRepository: CrudRepository<Book, Long>, JpaSpecificationExecut
                 OR (:filterBy = 'BORROWED' AND r IS NOT NULL)
             )
 
-    """)
+    """
+    )
     fun getAllUserBooks(userId: Long?, pageable: Pageable, filterBy: String): Page<ProfileBookDTO>
 
     //trae todos los libros que no tienen el borrado logico, es decir todos los libros que no fueron borrados

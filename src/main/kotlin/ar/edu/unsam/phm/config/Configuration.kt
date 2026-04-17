@@ -1,6 +1,5 @@
 package ar.edu.unsam.phm.config
 
-import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.services.CustomUserDetailsService
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -9,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 
@@ -24,7 +22,7 @@ class Configuration {
     fun authenticationProvider(userDetailService: CustomUserDetailsService): AuthenticationProvider =
         DaoAuthenticationProvider()
             .also {
-                it.setUserDetailsService (userDetailService)
+                it.setUserDetailsService(userDetailService)
                 it.setPasswordEncoder(encoder())
             }
 

@@ -1,6 +1,5 @@
 package ar.edu.unsam.phm.config
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -26,7 +25,7 @@ class SecurityConfiguration(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/api/auth","/api/auth/refresh","/error")
+                    .requestMatchers("/api/auth", "/api/auth/refresh", "/error")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/register")
                     .permitAll()

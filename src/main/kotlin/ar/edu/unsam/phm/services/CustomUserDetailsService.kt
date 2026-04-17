@@ -1,6 +1,5 @@
 package ar.edu.unsam.phm.services
 
-
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
@@ -13,7 +12,7 @@ typealias ApplicationUser = ar.edu.unsam.phm.domain.User
 @Service
 class CustomUserDetailsService(
     private val userRepository: CrudUserRepository
-): UserDetailsService {
+) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails =
         userRepository.findByEmail(username)

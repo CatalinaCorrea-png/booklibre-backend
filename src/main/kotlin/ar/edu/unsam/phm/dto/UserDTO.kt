@@ -17,14 +17,14 @@ data class UserDTO(
 ) {
     fun fromDTO(): User {
         return User(
-            name= this.name,
-            description= this.description,
-            email= this.email,
-            cel= this.cel,
-            location= this.location,
-            userType= UserTypes.fromValue(this.userType),
-            timestamp= this.timestamp,
-            bibliokarmas= this.bibliokarmas,
+            name = this.name,
+            description = this.description,
+            email = this.email,
+            cel = this.cel,
+            location = this.location,
+            userType = UserTypes.fromValue(this.userType),
+            timestamp = this.timestamp,
+            bibliokarmas = this.bibliokarmas,
             img = this.img
         )
     }

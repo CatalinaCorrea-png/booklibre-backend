@@ -2,12 +2,11 @@ package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.config.JwtProperties
 import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwt
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
-import java.util.Date
+import java.util.*
 
 @Service
 class TokenService(

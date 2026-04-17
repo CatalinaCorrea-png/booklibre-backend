@@ -23,7 +23,7 @@ data class Review(
     @JoinColumn(name = "book_id")
     val book: Book,
 
-) : RepositoryElement {
+    ) : RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     override var id: Long? = null

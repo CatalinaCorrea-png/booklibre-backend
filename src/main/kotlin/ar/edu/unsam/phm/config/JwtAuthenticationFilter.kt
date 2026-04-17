@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -17,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 class JwtAuthenticationFilter(
     private val userDetailsService: CustomUserDetailsService,
     private val tokenService: TokenService
-): OncePerRequestFilter() {
+) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -26,7 +25,7 @@ class JwtAuthenticationFilter(
     ) {
         val authHeader: String? = request.getHeader("Authorization")
 
-        if(authHeader.doesNotContainBearerToken()){
+        if (authHeader.doesNotContainBearerToken()) {
             filterChain.doFilter(request, response)
             return
         }
@@ -36,19 +35,20 @@ class JwtAuthenticationFilter(
         try {
             val email = tokenService.extractEmail(jwtToken)
 
-            if(email != null && SecurityContextHolder.getContext().authentication == null){
+            if (email != null && SecurityContextHolder.getContext().authentication == null) {
                 val foundUser = userDetailsService.loadUserByUsername(email)
 
-                if(tokenService.isValid(jwtToken, foundUser)){
+                if (tokenService.isValid(jwtToken, foundUser)) {
                     updateContext(foundUser, request)
                 }
             }
-        } catch(ex: Exception) {}
+        } catch (ex: Exception) {
+        }
 
         filterChain.doFilter(request, response)
     }
 
-    private fun updateContext(foundUser: UserDetails, request: HttpServletRequest){
+    private fun updateContext(foundUser: UserDetails, request: HttpServletRequest) {
         val authToken = UsernamePasswordAuthenticationToken(foundUser, null, foundUser.authorities)
         authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
 

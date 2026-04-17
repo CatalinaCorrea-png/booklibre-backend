@@ -8,8 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
-import org.springframework.web.servlet.HandlerMapping
-import java.util.Date
+import java.util.*
 
 @Service
 class AuthenticationService(
@@ -37,14 +36,14 @@ class AuthenticationService(
         return AuthenticationResponse(accessToken, refreshToken, userOK.name, userOK.email, userOK.id!!)
     }
 
-    fun refreshAccessToken(token: String): String?{
+    fun refreshAccessToken(token: String): String? {
         val extractedEmail = tokenService.extractEmail(token)
 
         return extractedEmail?.let { email ->
             val currentUserDetails = userDetailsService.loadUserByUsername(email)
             val refreshTokenUserDetails = refreshTokenRepository.findUserDetailsByToken(token)
 
-            if(!tokenService.isExpired(token) && currentUserDetails.username == refreshTokenUserDetails?.username)
+            if (!tokenService.isExpired(token) && currentUserDetails.username == refreshTokenUserDetails?.username)
                 generateAccessToken(currentUserDetails)
             else
                 null
