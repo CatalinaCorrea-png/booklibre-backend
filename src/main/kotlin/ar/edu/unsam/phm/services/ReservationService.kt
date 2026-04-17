@@ -79,29 +79,26 @@ class ReservationService(
         reservations: List<Reservation>,
         own: Boolean = false
     ): List<ReservationDTO> {
-        val reservationIds = reservations.map { it.id!! }
+        if (reservations.isEmpty()) return emptyList()
 
-        val reviewMap = reviewRepository
-            .findAllByReservationIdIn(reservationIds)
-            .associate { it.reservation.id to it.rating }
+        val reviewMap: Map<Long?, Int> = reviewRepository
+            .findRatingsByReservationIdIn(reservations.map { it.id!! })
+            .associate { it.reservationId to it.rating }
 
         return reservations.map { reservation ->
-            val ratingEncontrado = reviewMap[reservation.id]
-            val hasReview = ratingEncontrado != null
+            val rating = reviewMap[reservation.id]
 
-            reservation.toDTO(hasReview).apply {
+            val bibliokarmas = reservation.book.calculateBibliokarmas(
+                reservation.reservationDays(),
+                reservation.user.bibliokarmas
+            )
 
-                if (hasReview) {
-                    this.review = ratingEncontrado!!
+            reservation.toDTO(rating != null).apply {
+                if (rating != null) {  // el .toDTO se lo pone en 0
+                    this.review = rating
                 }
-                if (own) {
-                    canRate = false
-                }
-
-                bibliokarmas = reservation.book.calculateBibliokarmas(
-                    reservation.reservationDays(),
-                    reservation.user.bibliokarmas
-                )
+                this.canRate = !own && rating == null
+                this.bibliokarmas = bibliokarmas
             }
         }
     }
@@ -126,9 +123,7 @@ class ReservationService(
         )
 
         reviewRepository.save(newReview)
-
         reservation.book.addReview(newReview)
-
     }
 
     @Transactional(readOnly = true)
