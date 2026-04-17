@@ -373,7 +373,7 @@ class ProjectBootstrap : InitializingBean {
             condition = BookCondition.VERY_GOOD
             owner = lucianoVega
             imageSrc =
-                "https://acdn-us.mitiendanube.com/stores/001/168/109/products/el-proceso1-d60e6b26de70d743d015882612962062-1024-1024.webp?w=1920"
+                "https://quelibroleo.com/images/libros/9788493621360.jpg"
             timestamp = LocalDate.of(2024, 3, 1)
         }
 
@@ -529,8 +529,7 @@ class ProjectBootstrap : InitializingBean {
             publishDate = LocalDate.of(1844, 1, 1)
             condition = BookCondition.REGULAR
             owner = valentinaSosa
-            imageSrc = "https://www.penguinlibros.com/ar/6234239-large_default/el-conde-de-montecristo.webp"
-            timestamp = LocalDate.of(2022, 1, 6)
+            imageSrc = "https://imagessl0.casadellibro.com/a/l/s5/00/9788497945400.webp"
         }
 
         vueltaMundo = WithADedication().apply {
