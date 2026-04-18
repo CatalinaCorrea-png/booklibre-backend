@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.persistence.*
+fiximport org.hibernate.annotations.Formula
 import java.time.LocalDate
 
 @Entity
@@ -82,8 +83,12 @@ abstract class Book(
     @Column
     var ratingAvg: Double = 0.0,
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    private val _reservationsIds: MutableList<Long> = mutableListOf(),
+//    @ElementCollection(fetch = FetchType.LAZY)
+//    private val _reservationsIds: MutableList<Long> = mutableListOf(),
+
+//    @Formula("(SELECT COUNT(*) FROM reservation r WHERE r.book_id = {alias}.id)") // {alias} lo hace más compatible con otros motores
+    @Formula("(SELECT COUNT(*) FROM reservation r WHERE r.book_id = id)")
+    private var reservationCount: Long = 0,
 
     ) : RepositoryElement {
 
@@ -96,11 +101,11 @@ abstract class Book(
     }
 
     // Template Method Primitiva
-    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int): Int =
+    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int): Long =
         5 * reservationDays + typeBibliokarmas(userBibliokarmas)
 
     // different for every type of book
-    abstract fun typeBibliokarmas(userBibliokarmas: Int): Int
+    abstract fun typeBibliokarmas(userBibliokarmas: Int): Long
 
     fun addReview(review: Review) {
         if (review.rating !in 1..5) throw ConflictException("Ingrese una calificaión entre 1 y 5")
@@ -135,12 +140,8 @@ abstract class Book(
         return this.numPages in min..max
     }
 
-    fun reservationsIds(): List<Long> = _reservationsIds
+    fun reservationCount(): Long = this.reservationCount
 
-    fun addReservation(id: Long) {
-        _reservationsIds.add(id)
-    }
-
-    fun numOfReservations(): Int = this._reservationsIds.size
+    fun numPagesLong() : Long = this.numPages.toLong()
 
 }

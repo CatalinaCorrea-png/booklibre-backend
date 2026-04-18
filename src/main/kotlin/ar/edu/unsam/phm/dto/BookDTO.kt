@@ -1,7 +1,6 @@
 package ar.edu.unsam.phm.dto
 import ar.edu.unsam.phm.domain.*
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 data class BookDTO(
     var id: Long,
@@ -19,7 +18,7 @@ data class BookDTO(
     var condition: String,
     var owner: UserDTO,
     var imageSrc: String,
-    var bookBibliokarmas: Int = 0,
+    var bookBibliokarmas: Long = 0,
     var rating: Double = 0.0
 )
 
@@ -32,7 +31,7 @@ fun Book.toDTO(): BookDTO{
         authorName = this.author.name,
         authorAvatarUrl = this.author.avatar,
         numPages = this.numPages,
-        isbn=  this.isbn,
+        isbn =  this.isbn,
         language = this.language.value,
         editorial = this.editorial,
         publishDate = this.publishDate,

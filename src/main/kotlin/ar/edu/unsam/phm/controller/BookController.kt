@@ -62,7 +62,7 @@ class BookController(
         @RequestParam userId: Long,
         @RequestParam pickUpDate: LocalDate,
         @RequestParam dropOffDate: LocalDate
-    ): Int =
+    ): Long =
         bookService.recalculateBibliokarmas(id, userId, pickUpDate, dropOffDate)
 
     @GetMapping("/book-genders")

@@ -16,12 +16,8 @@ import java.util.Optional
 interface CrudBookRepository: CrudRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     fun findByIsbn(isbn: String): Optional<Book>
 
-    @EntityGraph(attributePaths = ["owner", "author", "reservationsIds"])
+    @EntityGraph(attributePaths = ["owner", "author"])
     override fun findAll(spec: Specification<Book>, pageable: Pageable): Page<Book>
-
-    // Para traer libros con colecciones de reservationIds por ID de libro
-    @EntityGraph(attributePaths = ["owner", "author", "reservationsIds"])
-    fun findAllByIdIn(ids: List<Long>): List<Book>
 
     @Query("""
         SELECT new ar.edu.unsam.phm.dto.ProfileBookDTO(
