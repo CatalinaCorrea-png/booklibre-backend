@@ -45,7 +45,7 @@ class BookController(
 
     //este endpoint lo cree solo para poder ver si traia los creados/eliminados
     @GetMapping("/books")
-    fun getAllBooks() = bookService.getAllBooks().map { it.toDTO() }
+    fun getAllBooks() = "HOLA!!!"
 
     @GetMapping("/userOwnBooks/{userId}")
     fun getAllUserBooks(
