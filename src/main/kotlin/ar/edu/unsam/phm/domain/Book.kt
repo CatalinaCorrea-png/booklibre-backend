@@ -83,7 +83,7 @@ abstract class Book(
     var ratingAvg: Double = 0.0,
 
     @ElementCollection(fetch = FetchType.LAZY)
-    val reservationsIds: MutableList<Long> = mutableListOf(),
+    private val _reservationsIds: MutableList<Long> = mutableListOf(),
 
     ) : RepositoryElement {
 
@@ -101,10 +101,6 @@ abstract class Book(
 
     // different for every type of book
     abstract fun typeBibliokarmas(userBibliokarmas: Int): Int
-
-    fun addReservation(id: Long) {
-        reservationsIds.add(id)
-    }
 
     fun addReview(review: Review) {
         if (review.rating !in 1..5) throw ConflictException("Ingrese una calificaión entre 1 y 5")
@@ -138,5 +134,13 @@ abstract class Book(
         val max = pagesRangeMax ?: 1500 // Regla de negocio (Por ahora)
         return this.numPages in min..max
     }
+
+    fun reservationsIds(): List<Long> = _reservationsIds
+
+    fun addReservation(id: Long) {
+        _reservationsIds.add(id)
+    }
+
+    fun numOfReservations(): Int = this._reservationsIds.size
 
 }

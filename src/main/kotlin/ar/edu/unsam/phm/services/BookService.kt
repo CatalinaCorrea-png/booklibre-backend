@@ -104,15 +104,15 @@ class BookService(
         // println("Results: ${page.totalElements}")
 
         // (2) Traigo libros con coleccion. Pero SOLO los de esta pagina (6)
-        val ids = page.content.map { it.id!! }
-        val booksWithCollections = if (ids.isNotEmpty()) {
-            bookRepository.findAllByIdIn(ids).associateBy { it.id!! } // Para mantener orden luego
-        } else emptyMap()
+//        val ids = page.content.map { it.id!! }
+//        val booksWithCollections = if (ids.isNotEmpty()) {
+//            bookRepository.findAllByIdIn(ids).associateBy { it.id!! } // Para mantener orden luego
+//        } else emptyMap()
 
         // (3) Ordeno como vino originalmente (por el sort)
-        val orderedBooks = page.content.map { booksWithCollections[it.id]!! }
+//        val orderedBooks = page.content.map { booksWithCollections[it.id]!! }
 
-        val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(orderedBooks, searchCriteria)
+        val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
         return PageResponse(
             content = booksWithBibliokarmasDTO,
             page = page.number,

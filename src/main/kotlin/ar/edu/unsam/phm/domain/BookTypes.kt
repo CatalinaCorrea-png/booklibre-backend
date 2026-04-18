@@ -9,7 +9,7 @@ class Common : Book(bookType = "COMUN") {
 
 @Entity
 class WithADedication : Book(bookType = "CON DEDICATORIA") {
-    override fun typeBibliokarmas(userBibliokarmas: Int): Int = 200 + 10 * this.reservationsIds.size
+    override fun typeBibliokarmas(userBibliokarmas: Int): Int = 200 + 10 * this.numOfReservations()
 }
 
 @Entity
