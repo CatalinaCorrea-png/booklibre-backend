@@ -4,6 +4,9 @@ import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.dto.ProfileBookDTO
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import ar.edu.unsam.phm.domain.Gender
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
@@ -11,6 +14,9 @@ import java.util.*
 
 interface CrudBookRepository : CrudRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     fun findByIsbn(isbn: String): Optional<Book>
+
+    @EntityGraph(attributePaths = ["owner", "author"])
+    override fun findAll(spec: Specification<Book>, pageable: Pageable): Page<Book>
 
     @Query(
         """
@@ -38,7 +44,6 @@ interface CrudBookRepository : CrudRepository<Book, Long>, JpaSpecificationExecu
                 OR (:filterBy = 'AVAILABLE' AND r IS NULL)
                 OR (:filterBy = 'BORROWED' AND r IS NOT NULL)
             )
-
     """
     )
     fun getAllUserBooks(userId: Long?, pageable: Pageable, filterBy: String): Page<ProfileBookDTO>

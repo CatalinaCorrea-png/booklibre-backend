@@ -20,7 +20,7 @@ data class BookDTO(
     var condition: String,
     var owner: UserDTO,
     var imageSrc: String,
-    var bookBibliokarmas: Int = 0,
+    var bookBibliokarmas: Long = 0,
     var rating: Double = 0.0
 )
 

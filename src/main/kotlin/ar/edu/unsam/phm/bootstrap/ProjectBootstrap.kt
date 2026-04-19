@@ -1,6 +1,5 @@
 package ar.edu.unsam.phm.bootstrap
 
-import ar.edu.unsam.phm.bootstrap.BookReservationInitializer
 import ar.edu.unsam.phm.domain.Author
 import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.BookCondition
@@ -37,9 +36,6 @@ class ProjectBootstrap : InitializingBean {
 
     @Autowired
     private lateinit var repoReservations: CrudReservationRepository
-
-    @Autowired
-    private lateinit var bookReservationInitializer: BookReservationInitializer
 
     @Autowired
     private lateinit var encoder: PasswordEncoder
@@ -1321,7 +1317,6 @@ class ProjectBootstrap : InitializingBean {
         this.initBooks()          // libros sin reviews
         this.initReservations()   // reservaciones ya con users y books
         this.initReviews()        // reviews con reservaciones → se agregan a libros → save
-        this.bookReservationInitializer.initBookReservationsIds()
         println("------------------------------------------------------------------------")
     }
 }

@@ -52,7 +52,7 @@ class ReservationService(
             throw BusinessException("Reserva no disponible en esa fecha")
         }
 
-        user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas))
+        user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas).toInt())
 
         userRepository.save(user)
         reservationRepository.save(reservation)
@@ -98,7 +98,7 @@ class ReservationService(
                     this.review = rating
                 }
                 this.canRate = !own && rating == null
-                this.bibliokarmas = bibliokarmas
+                this.bibliokarmas = bibliokarmas.toInt()
             }
         }
     }

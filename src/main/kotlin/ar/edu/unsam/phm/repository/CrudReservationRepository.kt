@@ -18,7 +18,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
             "book",
             "book.owner", // esto por que el dto necesita el nombre
             "book.author", // esto por el nombre de el autor para el filtro
-            "book.reservationsIds", // esto es para evitar una query
             //"review", // la review para el can rate
             "user"]
     )
@@ -46,7 +45,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
             "book",
             "book.owner",
             "book.author",
-            "book.reservationsIds",
             //"review",
             "user"]
     )

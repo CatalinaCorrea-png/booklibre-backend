@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.persistence.*
+import org.hibernate.annotations.Formula
 import java.time.LocalDate
 
 @Entity
@@ -82,8 +83,12 @@ abstract class Book(
     @Column
     var ratingAvg: Double = 0.0,
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    val reservationsIds: MutableList<Long> = mutableListOf(),
+//    @ElementCollection(fetch = FetchType.LAZY)
+//    private val _reservationsIds: MutableList<Long> = mutableListOf(),
+
+//    @Formula("(SELECT COUNT(*) FROM reservation r WHERE r.book_id = {alias}.id)") // {alias} lo hace más compatible con otros motores
+    @Formula("(SELECT COUNT(*) FROM reservation r WHERE r.book_id = id)")
+    private var reservationCount: Long = 0,
 
     ) : RepositoryElement {
 
@@ -96,15 +101,11 @@ abstract class Book(
     }
 
     // Template Method Primitiva
-    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int): Int =
+    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int): Long =
         5 * reservationDays + typeBibliokarmas(userBibliokarmas)
 
     // different for every type of book
-    abstract fun typeBibliokarmas(userBibliokarmas: Int): Int
-
-    fun addReservation(id: Long) {
-        reservationsIds.add(id)
-    }
+    abstract fun typeBibliokarmas(userBibliokarmas: Int): Long
 
     fun addReview(review: Review) {
         if (review.rating !in 1..5) throw ConflictException("Ingrese una calificaión entre 1 y 5")
@@ -130,4 +131,10 @@ abstract class Book(
     override fun meetsSearchCriteria(criteria: String): Boolean =
         criteria.isBlank() ||
                 this.title.contains(criteria.trim(), ignoreCase = true)
+//              || this.author.name.contains(criteria.trim(), ignoreCase = true)
+
+    fun reservationCount(): Long = this.reservationCount
+
+    fun numPagesLong() : Long = this.numPages.toLong()
+
 }

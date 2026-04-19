@@ -111,14 +111,17 @@ class BookService(
         return PagedResult(booksPageContent, booksPage.size, booksPage.totalPages)
     }
 
-    @Transactional(readOnly = true)
+//    @Transactional(readOnly = true)
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable): PageResponse<BookDTO> {
-//        println("Criteria: $searchCriteria")
-//        println("Pageable: $pageable")
+        // println("Criteria: $searchCriteria")
+        // println("Pageable: $pageable")
+
+        // (1) Query paginada sin coleccion de reservationIDS
         val spec = BookSpecifications.byCriteria(searchCriteria)
-        val page: Page<Book> = bookRepository.findAll(spec, pageable)
-//        println("Results: ${page.totalElements}")
-        val booksWithBibliokarmasDTO: List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
+        val page : Page<Book> = bookRepository.findAll(spec, pageable)
+        // println("Results: ${page.totalElements}")
+
+        val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
         return PageResponse(
             content = booksWithBibliokarmasDTO,
             page = page.number,
@@ -154,7 +157,7 @@ class BookService(
     fun getAllBooks(): List<Book> = bookRepository.findAllByDeletedIsFalse()
 
     @Transactional(readOnly = true)
-    fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Int {
+    fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Long {
         val book = bookRepository.findById(bookId)
             .orElseThrow {
                 NotFoundException("No se encuentra un libro registrado con el id: $bookId")
