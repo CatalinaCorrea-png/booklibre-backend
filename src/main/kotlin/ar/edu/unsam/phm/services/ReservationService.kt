@@ -121,6 +121,7 @@ class ReservationService(
             reservation = reservation,
             book = reservation.book,
         )
+        newReview.validate()
 
         reviewRepository.save(newReview)
         reservation.book.addReview(newReview)

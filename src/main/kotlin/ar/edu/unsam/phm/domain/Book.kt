@@ -120,6 +120,7 @@ abstract class Book(
     override fun validate() {
         if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
         if (!isNotEmpty(desc)) throw ConflictException("El libro tiene que tener descripcion")
+        if (desc.length > 500) throw ConflictException("La descripcion no debe superar los 500 caracteres")
         if (!isNotEmpty(author.toString())) throw ConflictException("El libro tiene que tener autor")
         if (numPages <= 0) throw ConflictException("El libro tiene que tener cantidad de paginas")
         if (!isNotEmpty(isbn)) throw ConflictException("El libro tiene que tener ISBN")
