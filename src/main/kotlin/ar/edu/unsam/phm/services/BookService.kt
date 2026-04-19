@@ -94,7 +94,7 @@ class BookService(
             .forEach { reservationRepository.delete(it) }
 
         book.logicDelete()
-        bookRepository.save(book)  // guarda el libro con el delete logico, no lo borra de la coleccion
+        //no hace falta el .save, esta attached y lo detecta el hibernate con el dirty cheking
     }
 
     @Transactional(readOnly = true)

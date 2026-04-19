@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 
 @Entity
-data class Author(
+class Author(
     val name: String,
     val avatar: String
 ) : RepositoryElement {
