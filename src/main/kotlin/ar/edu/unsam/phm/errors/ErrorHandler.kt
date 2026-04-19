@@ -1,7 +1,10 @@
 package ar.edu.unsam.phm.errors
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import java.time.ZonedDateTime
@@ -58,5 +61,37 @@ class GlobalExceptionHandler {
             "timestamp" to ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         )
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse)
+    }
+    //handler para errores en serializacion/deserializacion
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleHttpMessageNotReadable(ex: HttpMessageNotReadableException): ResponseEntity<Map<String, Any>> {
+
+        val detail = when (val cause = ex.cause) {
+            is InvalidFormatException -> {
+                val field = cause.path.joinToString(".") { it.fieldName ?: "" }
+                "El campo '$field' tiene un valor inválido."
+            }
+            else -> ex.message ?: "El cuerpo de la solicitud no es válido."
+        }
+
+        val errorResponse = mapOf(
+            "status" to HttpStatus.BAD_REQUEST.value(),
+            "error" to "Error en el formato del JSON",
+            "detail" to detail,
+            "timestamp" to ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        )
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
+    }
+
+    //handler para autenticacion de login con token
+    @ExceptionHandler(BadCredentialsException::class)
+    fun handleBadCredentials(ex: BadCredentialsException): ResponseEntity<Map<String, Any>> {
+        val errorResponse = mapOf(
+            "status" to HttpStatus.UNAUTHORIZED.value(),
+            "error" to "Credenciales inválidas",
+            "detail" to "El email o la contraseña son incorrectos.",
+            "timestamp" to ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        )
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse)
     }
 }

@@ -45,6 +45,7 @@ class BookService(
 
         val newBook = bookCreateDTO.createFromDTO(owner)
         newBook.author = author
+        println("author name del DTO: ${bookCreateDTO.book.author.name}")
         newBook.validate()
         bookRepository.save(newBook)
     }
@@ -94,7 +95,7 @@ class BookService(
             .forEach { reservationRepository.delete(it) }
 
         book.logicDelete()
-        bookRepository.save(book)  // guarda el libro con el delete logico, no lo borra de la coleccion
+        //no hace falta el .save, esta attached y lo detecta el hibernate con el dirty cheking
     }
 
     @Transactional(readOnly = true)

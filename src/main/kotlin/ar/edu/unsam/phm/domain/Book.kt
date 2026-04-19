@@ -22,7 +22,7 @@ import java.time.LocalDate
 )
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 abstract class Book(
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     var title: String = "",
 
     @Column(name = "description", length = 1000, nullable = false)
@@ -46,7 +46,7 @@ abstract class Book(
     @Column(nullable = false)
     var language: Language = Language.SPANISH,
 
-    @Column(nullable = false)
+    @Column(nullable = false, length =50)
     var editorial: String = "",
 
     @Column(nullable = false)
@@ -119,14 +119,19 @@ abstract class Book(
 
     override fun validate() {
         if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
+        if (title.length > 50) throw ConflictException("El titulo no debe superar los 50 caracteres")
         if (!isNotEmpty(desc)) throw ConflictException("El libro tiene que tener descripcion")
-        if (desc.length > 500) throw ConflictException("La descripcion no debe superar los 500 caracteres")
+        if (desc.length > 1000) throw ConflictException("La descripcion no debe superar los 1000 caracteres")
         if (!isNotEmpty(author.toString())) throw ConflictException("El libro tiene que tener autor")
         if (numPages <= 0) throw ConflictException("El libro tiene que tener cantidad de paginas")
+        if (numPages > 2000) throw ConflictException("El libro no puede superar las 2000 paginas")
         if (!isNotEmpty(isbn)) throw ConflictException("El libro tiene que tener ISBN")
         if (!isNotEmpty(editorial)) throw ConflictException("El libro tiene que tener editorial")
+        if (editorial.length > 50) throw ConflictException("La editorial no debe superar los 50 caracteres")
         if (!isNotEmpty(imageSrc)) throw ConflictException("El libro tiene que tener imagen de referencia")
         if (imageSrc.length >= 255) throw ConflictException("La imagen del libro tiene demasiados caracteres. Max. 255")
+        if (!isNotEmpty(author.name)) throw ConflictException("El libro tiene que tener un autor")
+        if ((author.name).length > 50) throw ConflictException("El nombre del autor no debe superar los 50 caracteres")
     }
 
     override fun meetsSearchCriteria(criteria: String): Boolean =

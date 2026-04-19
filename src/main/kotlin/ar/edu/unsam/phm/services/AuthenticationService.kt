@@ -3,8 +3,11 @@ package ar.edu.unsam.phm.services
 import ar.edu.unsam.phm.config.JwtProperties
 import ar.edu.unsam.phm.dto.AuthRequest
 import ar.edu.unsam.phm.dto.AuthenticationResponse
+import ar.edu.unsam.phm.errors.BusinessException
+import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.RefreshTokenRepository
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
@@ -20,14 +23,19 @@ class AuthenticationService(
     private val userService: UserService
 ) {
     fun authentication(request: AuthRequest): AuthenticationResponse {
-        authManager.authenticate(
-            UsernamePasswordAuthenticationToken(
-                request.email,
-                request.password
+        try {
+            authManager.authenticate(
+                UsernamePasswordAuthenticationToken(
+                    request.email,
+                    request.password
+                )
             )
-        )
+        } catch (ex: BadCredentialsException) {
+            throw BusinessException("Las credenciales no coinciden")
+        }
 
         val user = userDetailsService.loadUserByUsername(request.email)
+
         val accessToken = generateAccessToken(user)
         val refreshToken = generateRefreshToken(user)
         refreshTokenRepository.save(refreshToken, user)
