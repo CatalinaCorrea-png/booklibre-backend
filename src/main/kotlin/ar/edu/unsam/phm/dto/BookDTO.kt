@@ -46,20 +46,7 @@ fun Book.toDTO(): BookDTO {
     return bookDTO
 }
 
-//hago un DTO aparte para la creacion, ya que en el create no necesito ID, ni reservations ID ni owner
 data class BookCreateDTO(
-    val title: String = "",
-    val desc: String = "",
-    val gender: String = "",
-    val authorName: String = "",
-    val authorAvatarUrl: String = "",
-    val numPages: Int = 0,
-    val isbn: String = "",
-    val language: String = "",
-    val editorial: String = "",
-    val publishDate: LocalDate? = null,
-    val condition: String = "",
-    val imageSrc: String = "",
     val ownerId: Long? = null,
     val book: Book
 )
@@ -68,18 +55,6 @@ fun BookCreateDTO.createFromDTO(owner: User): Book = this.book.apply { this.owne
 
 
 fun Book.toBookCreateDTO() = BookCreateDTO(
-    title = this.title,
-    desc = this.desc,
-    gender = this.gender.value,
-    authorName = this.author.name,
-    authorAvatarUrl = this.author.avatar,
-    numPages = this.numPages,
-    isbn = this.isbn,
-    language = this.language.value,
-    editorial = this.editorial,
-    publishDate = this.publishDate,
-    condition = this.condition.value,
-    imageSrc = this.imageSrc,
     ownerId = this.owner.id,
-    book = this                  // toma el bookType que Jackson serializa
+    book = this
 )

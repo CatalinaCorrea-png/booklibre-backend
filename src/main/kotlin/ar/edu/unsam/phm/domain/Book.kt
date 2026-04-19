@@ -119,7 +119,7 @@ abstract class Book(
 
     override fun validate() {
         if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
-        if (title.length > 50)
+        if (title.length > 50) throw ConflictException("El titulo no debe superar los 50 caracteres")
         if (!isNotEmpty(desc)) throw ConflictException("El libro tiene que tener descripcion")
         if (desc.length > 1000) throw ConflictException("La descripcion no debe superar los 1000 caracteres")
         if (!isNotEmpty(author.toString())) throw ConflictException("El libro tiene que tener autor")
@@ -130,6 +130,8 @@ abstract class Book(
         if (editorial.length > 50) throw ConflictException("La editorial no debe superar los 50 caracteres")
         if (!isNotEmpty(imageSrc)) throw ConflictException("El libro tiene que tener imagen de referencia")
         if (imageSrc.length >= 255) throw ConflictException("La imagen del libro tiene demasiados caracteres. Max. 255")
+        if (!isNotEmpty(author.name)) throw ConflictException("El libro tiene que tener un autor")
+        if ((author.name).length > 50) throw ConflictException("El nombre del autor no debe superar los 50 caracteres")
     }
 
     override fun meetsSearchCriteria(criteria: String): Boolean =
