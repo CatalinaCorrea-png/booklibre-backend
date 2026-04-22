@@ -23,5 +23,6 @@ class CustomUserDetailsService(
         User.builder()
             .username(this.email)
             .password(this.password)
+            .authorities(this.userType.name)
             .build()
 }

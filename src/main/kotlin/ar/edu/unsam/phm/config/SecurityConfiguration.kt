@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.config
 
+import ar.edu.unsam.phm.domain.UserTypes
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -29,6 +30,11 @@ class SecurityConfiguration(
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/register")
                     .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/create-book").hasAnyAuthority(UserTypes.PUBLISHER.name,
+                        UserTypes.COMBINED.name)
+                    .requestMatchers(HttpMethod.PUT, "/edit-book/**").hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
+                    .requestMatchers(HttpMethod.POST, "/create-reservation").hasAnyAuthority(UserTypes.READER.name,
+                        UserTypes.COMBINED.name)
                     .anyRequest()
                     .fullyAuthenticated()
             }
