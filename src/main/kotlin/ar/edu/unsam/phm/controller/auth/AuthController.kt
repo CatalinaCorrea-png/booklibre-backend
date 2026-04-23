@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-@CrossOrigin("*")
+//@CrossOrigin("*")
 @RequestMapping("/api/auth")
 class AuthController(
     private val authenticationService: AuthenticationService,

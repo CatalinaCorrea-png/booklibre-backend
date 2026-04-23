@@ -5,7 +5,7 @@ import ar.edu.unsam.phm.services.ReservationService
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@CrossOrigin("*")
+//@CrossOrigin("*")
 class ReservationController(
     val reservationService: ReservationService,
 ) {

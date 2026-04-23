@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.config
 
+import ar.edu.unsam.phm.errors.TokenExpiredException
 import ar.edu.unsam.phm.services.CustomUserDetailsService
 import ar.edu.unsam.phm.services.TokenService
 import jakarta.servlet.FilterChain
@@ -23,16 +24,17 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val authHeader: String? = request.getHeader("Authorization")
-
-        if (authHeader.doesNotContainBearerToken()) {
-            filterChain.doFilter(request, response)
-            return
-        }
-
-        val jwtToken = authHeader!!.extractTokenValue()
-
         try {
+            val authHeader: String? = request.getHeader("Authorization")
+
+            if (authHeader.doesNotContainBearerToken()) {
+                filterChain.doFilter(request, response)
+                return
+            }
+
+            val jwtToken = authHeader!!.extractTokenValue()
+
+
             val email = tokenService.extractEmail(jwtToken)
 
             if (email != null && SecurityContextHolder.getContext().authentication == null) {
@@ -42,7 +44,16 @@ class JwtAuthenticationFilter(
                     updateContext(foundUser, request)
                 }
             }
-        } catch (ex: Exception) {
+        } catch (ex: TokenExpiredException) {
+            // Captura la excepción de token expirado y devuelve el status code adecuado (401-Unauthorized)
+            logger.warn(ex.message)
+            response.status = HttpServletResponse.SC_UNAUTHORIZED
+            response.setHeader("WWW-Authenticate", "Bearer error=\"invalid_token\", error_description=\"The access token expired\"")
+            response.contentType = "application/json"
+            response.writer.write("{\"error\":\"Token expired\",\"message\":\"${ex.message}\"}")
+
+            // Importante: NO llamar a filterChain.doFilter() después de manejar el error
+            return
         }
 
         filterChain.doFilter(request, response)

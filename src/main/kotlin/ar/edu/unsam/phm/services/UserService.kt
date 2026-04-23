@@ -71,7 +71,7 @@ class UserService(
             .orElseThrow {
                 NotFoundException("No se encuentra un usuario registrado con ese ID ${userData.id}")
             }
-        println(existingUser.password)
+
         val updatedUser = User(
             name = userData.name,
             description = userData.description,

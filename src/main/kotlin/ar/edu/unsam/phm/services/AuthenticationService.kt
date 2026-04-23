@@ -31,7 +31,7 @@ class AuthenticationService(
                 )
             )
         } catch (ex: BadCredentialsException) {
-            throw BusinessException("Las credenciales no coinciden")
+            throw BusinessException("Credenciales inválidas")
         }
 
         val user = userDetailsService.loadUserByUsername(request.email)
