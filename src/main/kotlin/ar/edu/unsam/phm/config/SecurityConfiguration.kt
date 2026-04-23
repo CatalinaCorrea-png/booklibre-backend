@@ -32,8 +32,14 @@ class SecurityConfiguration(
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/create-book").hasAnyAuthority(UserTypes.PUBLISHER.name,
                         UserTypes.COMBINED.name)
-                    .requestMatchers(HttpMethod.PUT, "/edit-book/**").hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
                     .requestMatchers(HttpMethod.POST, "/create-reservation").hasAnyAuthority(UserTypes.READER.name,
+                        UserTypes.COMBINED.name)
+                    .requestMatchers(HttpMethod.PUT, "/edit-book/**").hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
+                    .requestMatchers(HttpMethod.PATCH, "/**/calificar").hasAnyAuthority(UserTypes.READER.name,
+                        UserTypes.COMBINED.name)
+                    .requestMatchers(HttpMethod.DELETE, "/delete-book/**").hasAnyAuthority(UserTypes.PUBLISHER.name,
+                        UserTypes.COMBINED.name)
+                    .requestMatchers(HttpMethod.GET, "/userOwnBooks/**").hasAnyAuthority(UserTypes.PUBLISHER.name,
                         UserTypes.COMBINED.name)
                     .anyRequest()
                     .fullyAuthenticated()

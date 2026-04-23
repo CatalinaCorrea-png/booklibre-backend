@@ -121,4 +121,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     """
     )
     fun countUserReadBooksNumber(userId: Long): Long
+    fun findAllByUser_Id(userId: Long): MutableList<Reservation>
+    fun findAllByBook_Owner_Id(bookOwnerId: Long): MutableList<Reservation>
 }
