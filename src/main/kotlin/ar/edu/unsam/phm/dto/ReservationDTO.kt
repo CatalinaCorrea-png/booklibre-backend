@@ -30,7 +30,7 @@ fun Reservation.toDTO(
         pickUpDate = this.pickUpDate,
         dropOffDate = this.dropOffDate,
         state = this.state,
-        canRate = this.state == State.RETURNED && !hasReview,
+        canRate = this.state == State.RETURNED && !hasReview, // esto se calcula en el service, no se por que esta aca
         bibliokarmas = 0, // this.book.calculateBibliokarmas(days, user.bibliokarmas, ), //todo: arreglar esto...
         // se pisa en el service con el valor correcto
         loanedBy = this.book.owner.name,
