@@ -31,7 +31,7 @@ class AuthenticationService(
                 )
             )
         } catch (ex: BadCredentialsException) {
-            throw BusinessException("Las credenciales no coinciden")
+            throw BusinessException("Credenciales inválidas")
         }
 
         val user = userDetailsService.loadUserByUsername(request.email)
@@ -61,11 +61,13 @@ class AuthenticationService(
     private fun generateRefreshToken(user: UserDetails): String = tokenService.generate(
         userDetails = user,
         expirationDate = Date(System.currentTimeMillis() + jwtProperties.refreshTokenExpiration)
+
     )
 
     private fun generateAccessToken(user: UserDetails): String = tokenService.generate(
         userDetails = user,
-        expirationDate = Date(System.currentTimeMillis() + jwtProperties.accessTokenExpiration)
+        expirationDate = Date(System.currentTimeMillis() + jwtProperties.accessTokenExpiration),
+        additionalClaims = mapOf("role" to user.authorities.map { it.authority }, "name" to user.username )
     )
 
 }

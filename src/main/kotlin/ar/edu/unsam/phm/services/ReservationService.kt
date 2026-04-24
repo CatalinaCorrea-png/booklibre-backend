@@ -2,6 +2,7 @@ package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
+import ar.edu.unsam.phm.domain.State
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
@@ -97,7 +98,7 @@ class ReservationService(
                 if (rating != null) {  // el .toDTO se lo pone en 0
                     this.review = rating
                 }
-                this.canRate = !own && rating == null
+                this.canRate = !own && rating == null && this.state == State.RETURNED
                 this.bibliokarmas = bibliokarmas.toInt()
             }
         }

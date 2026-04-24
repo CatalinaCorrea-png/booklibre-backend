@@ -5,11 +5,14 @@ import ar.edu.unsam.phm.dto.AuthenticationResponse
 import ar.edu.unsam.phm.services.AuthenticationService
 import ar.edu.unsam.phm.services.TokenService
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-@CrossOrigin("*")
+//@CrossOrigin("*")
 @RequestMapping("/api/auth")
 class AuthController(
     private val authenticationService: AuthenticationService,
@@ -25,7 +28,7 @@ class AuthController(
         authenticationService.refreshAccessToken(request.token)
             ?.mapToTokenResponse()
             ?: throw ResponseStatusException(
-                HttpStatus.FORBIDDEN,
+                HttpStatus.UNAUTHORIZED,
                 "Invalid refresh token!"
             )
 

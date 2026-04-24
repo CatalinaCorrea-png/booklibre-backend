@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 @RestController
-@CrossOrigin("*")
+//@CrossOrigin("*")
 class BookController(
     val bookService: BookService,
 ) {

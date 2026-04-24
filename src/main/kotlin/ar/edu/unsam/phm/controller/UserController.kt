@@ -6,7 +6,7 @@ import ar.edu.unsam.phm.services.UserService
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@CrossOrigin("*")
+//@CrossOrigin("*")
 class UserController(private val userService: UserService) {
 
     @PostMapping("/login")
