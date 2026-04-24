@@ -15,14 +15,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.DefaultSecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository
-import org.springframework.security.web.csrf.CsrfToken
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
-import org.springframework.security.web.csrf.CsrfTokenRequestHandler
-import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler
+import org.springframework.security.web.csrf.*
 import org.springframework.util.StringUtils
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import java.util.function.Supplier
 
 @Configuration
@@ -37,7 +34,7 @@ class SecurityConfiguration(
         jwtAuthenticationFilter: JwtAuthenticationFilter
     ): DefaultSecurityFilterChain =
         http
-            .cors ( Customizer.withDefaults() )
+            .cors(Customizer.withDefaults())
             .csrf {
                 it.ignoringRequestMatchers("/api/auth", "/refresh")
                 it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -50,43 +47,68 @@ class SecurityConfiguration(
                     .requestMatchers(HttpMethod.OPTIONS).permitAll()
                     .requestMatchers(HttpMethod.POST, "/register")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/create-book").hasAnyAuthority(UserTypes.PUBLISHER.name,
-                        UserTypes.COMBINED.name)
-                    .requestMatchers(HttpMethod.POST, "/create-reservation").hasAnyAuthority(UserTypes.READER.name,
-                        UserTypes.COMBINED.name)
-                    .requestMatchers(HttpMethod.PUT, "/edit-book/**").hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
-                    .requestMatchers(HttpMethod.PATCH, "/**/calificar").hasAnyAuthority(UserTypes.READER.name,
-                        UserTypes.COMBINED.name)
-                    .requestMatchers(HttpMethod.DELETE, "/delete-book/**").hasAnyAuthority(UserTypes.PUBLISHER.name,
-                        UserTypes.COMBINED.name)
-                    .requestMatchers(HttpMethod.GET, "/userOwnBooks/**").hasAnyAuthority(UserTypes.PUBLISHER.name,
-                        UserTypes.COMBINED.name)
+                    .requestMatchers(HttpMethod.POST, "/create-book").hasAnyAuthority(
+                        UserTypes.PUBLISHER.name,
+                        UserTypes.COMBINED.name
+                    )
+                    .requestMatchers(HttpMethod.POST, "/create-reservation").hasAnyAuthority(
+                        UserTypes.READER.name,
+                        UserTypes.COMBINED.name
+                    )
+                    .requestMatchers(HttpMethod.PUT, "/edit-book/**")
+                    .hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
+                    .requestMatchers(HttpMethod.PATCH, "/**/calificar").hasAnyAuthority(
+                        UserTypes.READER.name,
+                        UserTypes.COMBINED.name
+                    )
+                    .requestMatchers(HttpMethod.DELETE, "/delete-book/**").hasAnyAuthority(
+                        UserTypes.PUBLISHER.name,
+                        UserTypes.COMBINED.name
+                    )
+                    .requestMatchers(HttpMethod.GET, "/userOwnBooks/**").hasAnyAuthority(
+                        UserTypes.PUBLISHER.name,
+                        UserTypes.COMBINED.name
+                    )
                     .anyRequest()
                     .fullyAuthenticated()
             }
-            .httpBasic(Customizer.withDefaults())
+//            .httpBasic(Customizer.withDefaults()) // esot pone el basic?
             .sessionManagement { configurer ->
                 configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-            .exceptionHandling(Customizer.withDefaults())
+            .exceptionHandling(Customizer.withDefaults()) // todo: ver para que es esto
             .build()
 
+//    @Bean
+//    fun corsConfigurer(): WebMvcConfigurer {
+//        return object : WebMvcConfigurer {
+//            override fun addCorsMappings(registry: CorsRegistry) {
+//                registry.addMapping("/**")
+//                    .allowedOrigins("http://localhost:5173")
+//                    .allowedHeaders("*")
+//                    .allowedMethods("POST", "GET", "PUT", "DELETE")
+//                    .allowCredentials(true)
+//                    .exposedHeaders("WWW-Authenticate")
+//            }
+//        }
+//    }
 
     @Bean
-    fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:5173")
-                    .allowedHeaders("*")
-                    .allowedMethods("POST", "GET", "PUT", "DELETE")
-                    .allowCredentials(true)
-                    .exposedHeaders("WWW-Authenticate")
-            }
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val config = CorsConfiguration().apply {
+            allowedOrigins = listOf("http://localhost:5173")
+            allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+            allowedHeaders = listOf("*")
+            exposedHeaders = listOf("WWW-Authenticate")
+            allowCredentials = true
+        }
+        return UrlBasedCorsConfigurationSource().apply {
+            registerCorsConfiguration("/**", config)
         }
     }
+
 }
 
 class SpaCsrfTokenRequestHandler : CsrfTokenRequestHandler {
