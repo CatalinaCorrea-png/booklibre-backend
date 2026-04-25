@@ -230,8 +230,13 @@ class ProjectBootstrap : InitializingBean {
     }
 
     fun createReservation(reservation: Reservation) {
-        repoReservations.save(reservation)
-        println("Reservation creada para ${reservation.user.name} - ${reservation.book.title}")
+        val reservationInRepo = repoReservations.findById(reservation.id!!)
+        if (reservationInRepo.isPresent) {
+            reservation.id = reservationInRepo.get().id
+        } else {
+            repoReservations.save(reservation)
+            println("Reservation creada para ${reservation.user.name} - ${reservation.book.title}")
+        }
     }
 
     // ═════════════════════════════════════════════════════════════════════════

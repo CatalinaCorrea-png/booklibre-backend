@@ -70,4 +70,9 @@ class AuthenticationService(
         additionalClaims = mapOf("role" to user.authorities.map { it.authority }, "name" to user.username )
     )
 
+    fun generateTokenForUser(email: String): String {
+        val user = userDetailsService.loadUserByUsername(email)
+        return generateAccessToken(user)
+    }
+
 }

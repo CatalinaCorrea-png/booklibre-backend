@@ -57,3 +57,8 @@ fun User.toUserDTO(): UserDTO {
         img = this.img
     )
 }
+
+data class UpdateProfileResponse(
+    val user: UserDTO,
+    val accessToken: String
+)

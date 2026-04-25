@@ -18,6 +18,13 @@ object BookSpecifications {
             }
         }
 
+    fun ownerIsNotReader(userId: Long?): Specification<Book> =
+        Specification { root, _, cb ->
+            userId?.let {
+                cb.notEqual(root.get<User>("owner").get<UserTypes>("userType"), UserTypes.READER)
+            }
+        }
+
     fun titleLike(title: String?): Specification<Book> =
         Specification { root, _, cb ->
             title?.let {
@@ -85,9 +92,11 @@ object BookSpecifications {
             .and(notDeleted())
             .and(titleLike(criteria.title))
             .and(ownersNameLike(criteria.ownersName))
+            .and(ownerIsNotReader(criteria.userId))
             .and(isbnLike(criteria.isbn))
             .and(pagesMin(criteria.pagesRangeMin))
             .and(pagesMax(criteria.pagesRangeMax))
             .and(gendersIn(criteria.genders))
             .and(noOverlappingReservations(criteria.pickUpDate, criteria.dropOffDate))
+
 }

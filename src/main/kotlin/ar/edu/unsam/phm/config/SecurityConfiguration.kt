@@ -37,6 +37,7 @@ class SecurityConfiguration(
             .cors(Customizer.withDefaults())
             .csrf {
                 it.ignoringRequestMatchers("/api/auth", "/refresh")
+
                 it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 it.csrfTokenRequestHandler(SpaCsrfTokenRequestHandler())
             }
@@ -44,6 +45,8 @@ class SecurityConfiguration(
                 it
                     .requestMatchers("/api/auth", "/api/auth/refresh", "/error")
                     .permitAll()
+                    //para que no rompan las imagenes de perfil
+                    .requestMatchers("/assets/**").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS).permitAll()
                     .requestMatchers(HttpMethod.POST, "/register")
                     .permitAll()

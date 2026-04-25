@@ -2,12 +2,13 @@ package ar.edu.unsam.phm.controller
 
 import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.dto.*
+import ar.edu.unsam.phm.services.AuthenticationService
 import ar.edu.unsam.phm.services.UserService
 import org.springframework.web.bind.annotation.*
 
 @RestController
 //@CrossOrigin("*")
-class UserController(private val userService: UserService) {
+class UserController(private val userService: UserService, private val authenticationService: AuthenticationService) {
 
     @PostMapping("/login")
     fun getUser(@RequestBody request: AuthRequest): AuthResponse {
@@ -39,6 +40,9 @@ class UserController(private val userService: UserService) {
     @PutMapping("/updateProfile")
     fun updateUserProfile(
         @RequestPart("userData") userData: UpdateUserProfileDTO,
-    ): UserDTO =
-        userService.updateUserProfile(userData).toUserDTO()
+    ): UpdateProfileResponse {
+        val updatedUser = userService.updateUserProfile(userData)
+        val newToken = authenticationService.generateTokenForUser(updatedUser.email)
+        return UpdateProfileResponse(updatedUser.toUserDTO(), newToken)
+    }
 }
