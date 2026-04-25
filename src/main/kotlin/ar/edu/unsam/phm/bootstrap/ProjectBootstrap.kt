@@ -230,7 +230,7 @@ class ProjectBootstrap : InitializingBean {
     }
 
     fun createReservation(reservation: Reservation) {
-        val reservationInRepo = repoReservations.findById(reservation.id!!)
+        val reservationInRepo = repoReservations.findById(reservation.id?: 0)
         if (reservationInRepo.isPresent) {
             reservation.id = reservationInRepo.get().id
         } else {

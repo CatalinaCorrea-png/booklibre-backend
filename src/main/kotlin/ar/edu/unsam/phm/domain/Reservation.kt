@@ -3,6 +3,7 @@ package ar.edu.unsam.phm.domain
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import jakarta.persistence.*
+import org.hibernate.usertype.UserType
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -47,12 +48,24 @@ data class Reservation(
         else true
     }
 
+    private fun userIsPublisher(): Boolean {
+        return if (this.user.userType == UserTypes.PUBLISHER) {
+            throw BusinessException("Un publicador no puede reservar libros. Cambia tu rol a lector o combinado.")
+        } else true
+    }
+
+    private fun ownerIsReader(): Boolean {
+        return if (this.book.ownerIsReader()) {
+            throw BusinessException("Este libro ya no está disponible.")
+        } else true
+    }
+
     override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO("Not yet implemented")
     }
 
     override fun validate() {
-        isPickUpBeforeDropOff() && isPickUpNotBeforeToday()
+        isPickUpBeforeDropOff() && isPickUpNotBeforeToday() && ownerIsReader() && userIsPublisher()
     }
 
 }

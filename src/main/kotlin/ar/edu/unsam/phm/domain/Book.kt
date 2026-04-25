@@ -117,6 +117,8 @@ abstract class Book(
         this.ratingAvg = reviews.map { it.rating }.average()
     }
 
+    fun ownerIsReader(): Boolean = owner.userType == UserTypes.READER
+
     override fun validate() {
         if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
         if (title.length > 50) throw ConflictException("El titulo no debe superar los 50 caracteres")
@@ -132,6 +134,7 @@ abstract class Book(
         if (imageSrc.length >= 255) throw ConflictException("La imagen del libro tiene demasiados caracteres. Max. 255")
         if (!isNotEmpty(author.name)) throw ConflictException("El libro tiene que tener un autor")
         if ((author.name).length > 50) throw ConflictException("El nombre del autor no debe superar los 50 caracteres")
+        if (ownerIsReader()) throw ConflictException("Si sos lector no podes crear un libro. Cambia tu rol.")
     }
 
     override fun meetsSearchCriteria(criteria: String): Boolean =

@@ -114,14 +114,14 @@ class UserService(
     fun validateActiveReservationsAsPublisher(userId: Long) {
         var reservations = reservationRepository.findAllByBook_Owner_Id(userId)
         if(reservations.any { it.dropOffDate >= LocalDate.now() }) {
-            throw BusinessException("Tenes reservas activas. No podes cambiar tu tipo a lector. Respetá")
+            throw BusinessException("Tenes reservas activas. No podes cambiar tu tipo a sólo lector.")
         }
     }
 
     fun validateActiveReservationsAsReader(userId: Long) {
             var reservations = reservationRepository.findAllByUser_Id(userId)
             if(reservations.any { it.dropOffDate >= LocalDate.now() }) {
-                throw BusinessException("Tenes reservas activas!!! WTF ESTAS LOCO?! No podes cambiar tu tipo. Respetá")
+                throw BusinessException("Tenes reservas activas. No podes cambiar tu tipo a sólo publicador.")
             }
     }
 }
