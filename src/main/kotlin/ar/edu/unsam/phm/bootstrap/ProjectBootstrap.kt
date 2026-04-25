@@ -90,7 +90,7 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var reviewElProcesoValentina: Review
     private lateinit var reviewElProcesoMateo: Review
     private lateinit var reviewElProcesoEmilia2: Review
-    private lateinit var reviewElProcesoLuciano: Review
+    private lateinit var reviewOrgulloLuciano: Review
     private lateinit var reviewElProcesoMateo2: Review
     private lateinit var reviewAdiosArmasValentina: Review
     private lateinit var reviewAdiosArmasMateo: Review
@@ -162,7 +162,7 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var reservaElProceso2: Reservation
     private lateinit var reservaElProceso3: Reservation
     private lateinit var reservaElProceso4: Reservation
-    private lateinit var reservaElProceso5: Reservation
+    private lateinit var reservaOrgulloLuciano: Reservation
     private lateinit var reservaElProceso6: Reservation
     private lateinit var reservaAdiosArmas2: Reservation
     private lateinit var reservaAdiosArmas3: Reservation
@@ -767,158 +767,159 @@ class ProjectBootstrap : InitializingBean {
     }
 
     fun initReservations() {
+        val today = LocalDate.now()
 
         // ─── Reservas pasadas (finalizadas — libros leídos) ───────────────────
 
         reservaEmiliaPasada1 = Reservation(
             user = emiliaRomero, book = elProceso,
-            pickUpDate = LocalDate.of(2025, 7, 20), dropOffDate = LocalDate.of(2025, 8, 9),
+            pickUpDate = today.minusMonths(9), dropOffDate = today.minusMonths(9).plusDays(20),
         )
         reservaEmiliaPasada2 = Reservation(
             user = emiliaRomero, book = adiosArmas,
-            pickUpDate = LocalDate.of(2025, 9, 25), dropOffDate = LocalDate.of(2025, 10, 14),
+            pickUpDate = today.minusMonths(7), dropOffDate = today.minusMonths(7).plusDays(19),
         )
         reservaEmiliaPasada3 = Reservation(
             user = emiliaRomero, book = rayuela,
-            pickUpDate = LocalDate.of(2025, 12, 28), dropOffDate = LocalDate.of(2026, 1, 19),
+            pickUpDate = today.minusMonths(4), dropOffDate = today.minusMonths(4).plusDays(22),
         )
         reservaLucianoPasada1 = Reservation(
             user = lucianoVega, book = granGatsby,
-            pickUpDate = LocalDate.of(2025, 5, 15), dropOffDate = LocalDate.of(2025, 6, 4),
+            pickUpDate = today.minusMonths(11), dropOffDate = today.minusMonths(11).plusDays(20),
         )
         reservaLucianoPasada2 = Reservation(
             user = lucianoVega, book = crimen,
-            pickUpDate = LocalDate.of(2025, 8, 12), dropOffDate = LocalDate.of(2025, 9, 2),
+            pickUpDate = today.minusMonths(8), dropOffDate = today.minusMonths(8).plusDays(21),
         )
         reservaValentinaPasada1 = Reservation(
             user = valentinaSosa, book = huckFinn,
-            pickUpDate = LocalDate.of(2025, 4, 28), dropOffDate = LocalDate.of(2025, 5, 19),
+            pickUpDate = today.minusMonths(12), dropOffDate = today.minusMonths(12).plusDays(21),
         )
         reservaValentinaPasada2 = Reservation(
             user = valentinaSosa, book = n1984,
-            pickUpDate = LocalDate.of(2025, 10, 18), dropOffDate = LocalDate.of(2025, 11, 7),
+            pickUpDate = today.minusMonths(6), dropOffDate = today.minusMonths(6).plusDays(20),
         )
         reservaValentinaPasada3 = Reservation(
             user = valentinaSosa, book = caminoSwann,
-            pickUpDate = LocalDate.of(2025, 12, 10), dropOffDate = LocalDate.of(2026, 1, 4),
+            pickUpDate = today.minusMonths(4).minusDays(10), dropOffDate = today.minusMonths(3).minusDays(15),
         )
         reservaMateoPasada1 = Reservation(
             user = mateoLopez, book = losMiserables,
-            pickUpDate = LocalDate.of(2025, 6, 10), dropOffDate = LocalDate.of(2025, 7, 13),
+            pickUpDate = today.minusMonths(10), dropOffDate = today.minusMonths(10).plusDays(33),
         )
         reservaMateoPasada2 = Reservation(
             user = mateoLopez, book = montagnaMagica,
-            pickUpDate = LocalDate.of(2025, 9, 20), dropOffDate = LocalDate.of(2025, 10, 28),
+            pickUpDate = today.minusMonths(7), dropOffDate = today.minusMonths(7).plusDays(38),
         )
         reservaMateoPasada3 = Reservation(
             user = mateoLopez, book = monteCristo,
-            pickUpDate = LocalDate.of(2026, 1, 22), dropOffDate = LocalDate.of(2026, 2, 14),
+            pickUpDate = today.minusMonths(3), dropOffDate = today.minusMonths(3).plusDays(23),
         )
         reservaElProceso2 = Reservation(
             user = valentinaSosa, book = elProceso,
-            pickUpDate = LocalDate.of(2025, 8, 22), dropOffDate = LocalDate.of(2025, 9, 11),
+            pickUpDate = today.minusMonths(8).minusDays(5), dropOffDate = today.minusMonths(8).plusDays(15),
         )
         reservaElProceso3 = Reservation(
             user = mateoLopez, book = elProceso,
-            pickUpDate = LocalDate.of(2025, 11, 10), dropOffDate = LocalDate.of(2025, 11, 29),
+            pickUpDate = today.minusMonths(5), dropOffDate = today.minusMonths(5).plusDays(19),
         )
         reservaElProceso4 = Reservation(
             user = emiliaRomero, book = elProceso,
-            pickUpDate = LocalDate.of(2025, 5, 15), dropOffDate = LocalDate.of(2025, 6, 4),
+            pickUpDate = today.minusMonths(11).plusDays(5), dropOffDate = today.minusMonths(11).plusDays(25),
         )
-        reservaElProceso5 = Reservation(
-            user = lucianoVega, book = elProceso,
-            pickUpDate = LocalDate.of(2025, 6, 30), dropOffDate = LocalDate.of(2025, 7, 19),
+        reservaOrgulloLuciano = Reservation(
+            user = lucianoVega, book = orgullo,
+            pickUpDate = today.minusMonths(10).minusDays(5), dropOffDate = today.minusMonths(10).plusDays(15),
         )
         reservaElProceso6 = Reservation(
             user = mateoLopez, book = elProceso,
-            pickUpDate = LocalDate.of(2025, 9, 11), dropOffDate = LocalDate.of(2025, 9, 30),
+            pickUpDate = today.minusMonths(7).minusDays(5), dropOffDate = today.minusMonths(7).plusDays(14),
         )
         reservaAdiosArmas2 = Reservation(
             user = valentinaSosa, book = adiosArmas,
-            pickUpDate = LocalDate.of(2025, 6, 18), dropOffDate = LocalDate.of(2025, 7, 7),
+            pickUpDate = today.minusMonths(10).plusDays(5), dropOffDate = today.minusMonths(10).plusDays(24),
         )
         reservaAdiosArmas3 = Reservation(
             user = mateoLopez, book = adiosArmas,
-            pickUpDate = LocalDate.of(2025, 12, 25), dropOffDate = LocalDate.of(2026, 1, 13),
+            pickUpDate = today.minusMonths(3).minusDays(10), dropOffDate = today.minusMonths(3).plusDays(9),
         )
         reservaRayuela2 = Reservation(
             user = lucianoVega, book = rayuela,
-            pickUpDate = LocalDate.of(2025, 8, 8), dropOffDate = LocalDate.of(2025, 8, 27),
+            pickUpDate = today.minusMonths(8).plusDays(5), dropOffDate = today.minusMonths(8).plusDays(24),
         )
         reservaRayuela3 = Reservation(
             user = mateoLopez, book = rayuela,
-            pickUpDate = LocalDate.of(2026, 1, 30), dropOffDate = LocalDate.of(2026, 2, 19),
+            pickUpDate = today.minusMonths(2), dropOffDate = today.minusMonths(2).plusDays(20),
         )
         reservaGranGatsby2 = Reservation(
             user = valentinaSosa, book = granGatsby,
-            pickUpDate = LocalDate.of(2025, 6, 12), dropOffDate = LocalDate.of(2025, 7, 1),
+            pickUpDate = today.minusMonths(10).minusDays(10), dropOffDate = today.minusMonths(10).plusDays(9),
         )
         reservaGranGatsby3 = Reservation(
             user = mateoLopez, book = granGatsby,
-            pickUpDate = LocalDate.of(2025, 9, 15), dropOffDate = LocalDate.of(2025, 10, 4),
+            pickUpDate = today.minusMonths(7).plusDays(5), dropOffDate = today.minusMonths(7).plusDays(24),
         )
         reservaCrimen2 = Reservation(
             user = emiliaRomero, book = crimen,
-            pickUpDate = LocalDate.of(2025, 5, 30), dropOffDate = LocalDate.of(2025, 6, 19),
+            pickUpDate = today.minusMonths(11).plusDays(10), dropOffDate = today.minusMonths(11).plusDays(30),
         )
         reservaCrimen3 = Reservation(
             user = mateoLopez, book = crimen,
-            pickUpDate = LocalDate.of(2025, 11, 20), dropOffDate = LocalDate.of(2025, 12, 9),
+            pickUpDate = today.minusMonths(5).plusDays(5), dropOffDate = today.minusMonths(5).plusDays(24),
         )
         reservaHarryPotter2 = Reservation(
             user = emiliaRomero, book = harryPotter,
-            pickUpDate = LocalDate.of(2025, 4, 20), dropOffDate = LocalDate.of(2025, 5, 9),
+            pickUpDate = today.minusMonths(12).plusDays(5), dropOffDate = today.minusMonths(12).plusDays(24),
         )
         reservaHarryPotter3 = Reservation(
             user = valentinaSosa, book = harryPotter,
-            pickUpDate = LocalDate.of(2025, 7, 16), dropOffDate = LocalDate.of(2025, 8, 4),
+            pickUpDate = today.minusMonths(9).plusDays(5), dropOffDate = today.minusMonths(9).plusDays(24),
         )
         reservaHuckFinn2 = Reservation(
             user = lucianoVega, book = huckFinn,
-            pickUpDate = LocalDate.of(2025, 9, 2), dropOffDate = LocalDate.of(2025, 9, 21),
+            pickUpDate = today.minusMonths(7).minusDays(5), dropOffDate = today.minusMonths(7).plusDays(14),
         )
         reservaHuckFinn3 = Reservation(
             user = mateoLopez, book = huckFinn,
-            pickUpDate = LocalDate.of(2026, 1, 8), dropOffDate = LocalDate.of(2026, 1, 27),
+            pickUpDate = today.minusMonths(3).plusDays(5), dropOffDate = today.minusMonths(3).plusDays(24),
         )
         reservaN19842 = Reservation(
             user = lucianoVega, book = n1984,
-            pickUpDate = LocalDate.of(2025, 6, 10), dropOffDate = LocalDate.of(2025, 6, 29),
+            pickUpDate = today.minusMonths(10).minusDays(10), dropOffDate = today.minusMonths(10).plusDays(9),
         )
         reservaN19843 = Reservation(
             user = mateoLopez, book = n1984,
-            pickUpDate = LocalDate.of(2025, 12, 2), dropOffDate = LocalDate.of(2025, 12, 21),
+            pickUpDate = today.minusMonths(4).minusDays(5), dropOffDate = today.minusMonths(4).plusDays(14),
         )
         reservaLosMiserables2 = Reservation(
             user = emiliaRomero, book = losMiserables,
-            pickUpDate = LocalDate.of(2025, 7, 28), dropOffDate = LocalDate.of(2025, 8, 17),
+            pickUpDate = today.minusMonths(9).plusDays(10), dropOffDate = today.minusMonths(9).plusDays(30),
         )
         reservaLosMiserables3 = Reservation(
             user = valentinaSosa, book = losMiserables,
-            pickUpDate = LocalDate.of(2026, 1, 20), dropOffDate = LocalDate.of(2026, 2, 9),
+            pickUpDate = today.minusMonths(2).minusDays(10), dropOffDate = today.minusMonths(2).plusDays(10),
         )
         reservaMontagnaMagica2 = Reservation(
             user = lucianoVega, book = montagnaMagica,
-            pickUpDate = LocalDate.of(2025, 10, 25), dropOffDate = LocalDate.of(2025, 11, 14),
+            pickUpDate = today.minusMonths(6).minusDays(5), dropOffDate = today.minusMonths(6).plusDays(15),
         )
         reservaMontagnaMagica3 = Reservation(
             user = valentinaSosa, book = montagnaMagica,
-            pickUpDate = LocalDate.of(2025, 12, 20), dropOffDate = LocalDate.of(2026, 1, 9),
+            pickUpDate = today.minusMonths(3).minusDays(10), dropOffDate = today.minusMonths(3).plusDays(10),
         )
         reservaMonteCristo2 = Reservation(
             user = emiliaRomero, book = monteCristo,
-            pickUpDate = LocalDate.of(2025, 7, 5), dropOffDate = LocalDate.of(2025, 7, 24),
+            pickUpDate = today.minusMonths(9).minusDays(5), dropOffDate = today.minusMonths(9).plusDays(14),
         )
         reservaMonteCristo3 = Reservation(
             user = lucianoVega, book = monteCristo,
-            pickUpDate = LocalDate.of(2025, 9, 28), dropOffDate = LocalDate.of(2025, 10, 17),
+            pickUpDate = today.minusMonths(6).plusDays(5), dropOffDate = today.minusMonths(6).plusDays(24),
         )
         reservaSinCalificar = Reservation(
             user = emiliaRomero,
             book = elProceso,
-            pickUpDate = LocalDate.of(2026, 1, 1),
-            dropOffDate = LocalDate.of(2026, 2, 1),
+            pickUpDate = today.minusMonths(1),
+            dropOffDate = today.minusDays(7),
         )
 
         listOf(
@@ -937,55 +938,38 @@ class ProjectBootstrap : InitializingBean {
             reservaLosMiserables2, reservaLosMiserables3,
             reservaMontagnaMagica2, reservaMontagnaMagica3,
             reservaMonteCristo2, reservaMonteCristo3, reservaSinCalificar,
-            reservaElProceso4, reservaElProceso5, reservaElProceso6,
+            reservaElProceso4, reservaOrgulloLuciano, reservaElProceso6,
         ).forEach { createReservation(it) }
 
         // ─── Reservas activas/futuras ─────────────────────────────────────────
 
         reservaEmilia1 = Reservation(
             user = emiliaRomero, book = jardinCerezos,
-            pickUpDate = LocalDate.of(2026, 3, 15), dropOffDate = LocalDate.of(2026, 3, 29),
-        )
-        reservaEmilia2 = Reservation(
-            user = emiliaRomero, book = ficciones,
-            pickUpDate = LocalDate.of(2026, 4, 1), dropOffDate = LocalDate.of(2026, 4, 14),
+            pickUpDate = today.plusDays(7), dropOffDate = today.plusDays(21),
         )
         reservaLuciano1 = Reservation(
             user = lucianoVega, book = fundacion,
-            pickUpDate = LocalDate.of(2026, 3, 20), dropOffDate = LocalDate.of(2026, 4, 3),
+            pickUpDate = today.plusDays(10), dropOffDate = today.plusDays(24),
         )
         reservaLuciano2 = Reservation(
             user = lucianoVega, book = vueltaMundo,
-            pickUpDate = LocalDate.of(2026, 4, 5), dropOffDate = LocalDate.of(2026, 4, 19),
-        )
-        reservaValentina1 = Reservation(
-            user = valentinaSosa, book = cienAnios,
-            pickUpDate = LocalDate.of(2026, 3, 10), dropOffDate = LocalDate.of(2026, 3, 24),
-        )
-        reservaValentina2 = Reservation(
-            user = valentinaSosa, book = guerraPaz,
-            pickUpDate = LocalDate.of(2026, 4, 2), dropOffDate = LocalDate.of(2026, 4, 16),
-        )
-        reservaMateo1 = Reservation(
-            user = mateoLopez, book = cuentosMisterio,
-            pickUpDate = LocalDate.of(2026, 3, 18), dropOffDate = LocalDate.of(2026, 4, 1),
+            pickUpDate = today.plusDays(25), dropOffDate = today.plusDays(39),
         )
         reservaMateo2 = Reservation(
             user = mateoLopez, book = senoraDalloway,
-            pickUpDate = LocalDate.of(2026, 4, 7), dropOffDate = LocalDate.of(2026, 4, 21),
+            pickUpDate = today.plusDays(27), dropOffDate = today.plusDays(41),
         )
         reservaActivaMateo = Reservation(
             user = mateoLopez,
             book = huckFinn,
-            pickUpDate = LocalDate.of(2026, 4, 2),
-            dropOffDate = LocalDate.of(2026, 4, 5)
+            pickUpDate = today.minusDays(2),
+            dropOffDate = today.plusDays(4)
         )
 
         listOf(
-            reservaEmilia1, reservaEmilia2,
+            reservaEmilia1,
             reservaLuciano1, reservaLuciano2,
-            reservaValentina1, reservaValentina2,
-            reservaMateo1, reservaMateo2, reservaActivaMateo
+            reservaMateo2, reservaActivaMateo
         ).forEach { createReservation(it) }
     }
 
@@ -996,6 +980,7 @@ class ProjectBootstrap : InitializingBean {
     // ─────────────────────────────────────────────────────────────────────────
 
     fun initReviews() {
+        val today = LocalDate.now()
 
         // ── Crear todas las reviews ───────────────────────────────────────────
 
@@ -1003,252 +988,252 @@ class ProjectBootstrap : InitializingBean {
             reviewerName = emiliaRomero.name, rating = 4,
             review = "Kafkiano en el mejor sentido. La burocracia como pesadilla existencial, muy bien logrado.",
             reservation = reservaEmiliaPasada1,
-            timestamp = LocalDate.of(2025, 8, 10),
+            timestamp = today.minusMonths(9).plusDays(21),
             book = elProceso
         )
         reviewAdiosArmasEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Hemingway en su máxima expresión. El final me dejó sin palabras.",
             reservation = reservaEmiliaPasada2,
-            timestamp = LocalDate.of(2025, 10, 15),
+            timestamp = today.minusMonths(7).plusDays(20),
             book = adiosArmas
         )
         reviewRayuelaEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Una experiencia única. Lo leí en orden lineal y luego saltando capítulos, totalmente diferente.",
             reservation = reservaEmiliaPasada3,
-            timestamp = LocalDate.of(2026, 1, 20),
+            timestamp = today.minusMonths(4).plusDays(23),
             book = rayuela
         )
         reviewGranGatsbyLuciano = Review(
             reviewerName = lucianoVega.name, rating = 3,
             review = "Bella prosa, pero el protagonista me resultó difícil de empatizar. Vale la pena igual.",
             reservation = reservaLucianoPasada1,
-            timestamp = LocalDate.of(2025, 6, 5),
+            timestamp = today.minusMonths(11).plusDays(21),
             book = granGatsby
         )
         reviewCrimenLuciano = Review(
             reviewerName = lucianoVega.name, rating = 5,
             review = "Dostoyevski entiende la psicología humana como nadie. Raskolnikov es aterrador y fascinante.",
             reservation = reservaLucianoPasada2,
-            timestamp = LocalDate.of(2025, 9, 3),
+            timestamp = today.minusMonths(8).plusDays(22),
             book = crimen
         )
         reviewHuckFinnValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "Una aventura atemporal. Twain critica la sociedad con humor fino.",
             reservation = reservaValentinaPasada1,
-            timestamp = LocalDate.of(2025, 5, 20),
+            timestamp = today.minusMonths(12).plusDays(22),
             book = huckFinn
         )
         reviewN1984Valentina = Review(
             reviewerName = valentinaSosa.name, rating = 5,
             review = "Imprescindible. Cada vez más vigente. Orwell era un visionario.",
             reservation = reservaValentinaPasada2,
-            timestamp = LocalDate.of(2025, 11, 8),
+            timestamp = today.minusMonths(6).plusDays(21),
             book = n1984
         )
         reviewCaminoSwannValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "Proust exige paciencia pero recompensa con una belleza literaria incomparable.",
             reservation = reservaValentinaPasada3,
-            timestamp = LocalDate.of(2026, 1, 5),
+            timestamp = today.minusMonths(3).minusDays(14),
             book = caminoSwann
         )
         reviewLosMiserablesMateo = Review(
             reviewerName = mateoLopez.name, rating = 5,
             review = "Monumental. Victor Hugo logra que te importen profundamente personajes de hace dos siglos.",
             reservation = reservaMateoPasada1,
-            timestamp = LocalDate.of(2025, 7, 14),
+            timestamp = today.minusMonths(10).plusDays(34),
             book = losMiserables
         )
         reviewMontagnaMagicaMateo = Review(
             reviewerName = mateoLopez.name, rating = 3,
             review = "Filosóficamente rico pero denso. Hay que entrar con paciencia y tiempo.",
             reservation = reservaMateoPasada2,
-            timestamp = LocalDate.of(2025, 10, 29),
+            timestamp = today.minusMonths(7).plusDays(39),
             book = montagnaMagica
         )
         reviewMonteCristoMateo = Review(
             reviewerName = mateoLopez.name, rating = 5,
             review = "La mejor historia de venganza jamás escrita. No pude soltarlo.",
             reservation = reservaMateoPasada3,
-            timestamp = LocalDate.of(2026, 2, 15),
+            timestamp = today.minusMonths(3).plusDays(24),
             book = monteCristo
         )
         reviewElProcesoValentina = Review(
             reviewerName = valentinaSosa.name, rating = 5,
             review = "Una obra que te deja paralizado. La burocracia como metáfora de la existencia.",
             reservation = reservaElProceso2,
-            timestamp = LocalDate.of(2025, 9, 12),
+            timestamp = today.minusMonths(8).plusDays(16),
             book = elProceso
         )
         reviewElProcesoMateo = Review(
             reviewerName = mateoLopez.name, rating = 4,
             review = "Kafka logra que te sientas atrapado junto al protagonista. Incómodo pero brillante.",
             reservation = reservaElProceso3,
-            timestamp = LocalDate.of(2025, 11, 30),
+            timestamp = today.minusMonths(5).plusDays(20),
             book = elProceso
         )
         reviewElProcesoEmilia2 = Review(
             reviewerName = emiliaRomero.name, rating = 3,
             review = "Me costó entrar pero una vez adentro no pude parar. La angustia de K. se siente real.",
             reservation = reservaElProceso4,
-            timestamp = LocalDate.of(2025, 6, 5),
+            timestamp = today.minusMonths(11).plusDays(26),
             book = elProceso
         )
-        reviewElProcesoLuciano = Review(
+        reviewOrgulloLuciano = Review(
             reviewerName = lucianoVega.name, rating = 5,
-            review = "El absurdo kafkiano en estado puro. Una pesadilla que no podés dejar de leer.",
-            reservation = reservaElProceso5,
-            timestamp = LocalDate.of(2025, 7, 20),
-            book = elProceso
+            review = "Austen domina la ironía con una precisión quirúrgica. Darcy y Elizabeth son un dueto irresistible.",
+            reservation = reservaOrgulloLuciano,
+            timestamp = today.minusMonths(10).plusDays(16),
+            book = orgullo
         )
         reviewElProcesoMateo2 = Review(
             reviewerName = mateoLopez.name, rating = 4,
             review = "La culpa sin causa explicada, qué incómodo y qué genial.",
             reservation = reservaElProceso6,
-            timestamp = LocalDate.of(2025, 10, 1),
+            timestamp = today.minusMonths(7).plusDays(15),
             book = elProceso
         )
         reviewAdiosArmasValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "La guerra contada sin heroísmo, con una honestidad brutal. Hemingway no decepciona.",
             reservation = reservaAdiosArmas2,
-            timestamp = LocalDate.of(2025, 7, 8),
+            timestamp = today.minusMonths(10).plusDays(25),
             book = adiosArmas
         )
         reviewAdiosArmasMateo = Review(
             reviewerName = mateoLopez.name, rating = 3,
             review = "Buena prosa, aunque el ritmo se me hizo lento en el medio. El final salva todo.",
             reservation = reservaAdiosArmas3,
-            timestamp = LocalDate.of(2026, 1, 14),
+            timestamp = today.minusMonths(3).plusDays(10),
             book = adiosArmas
         )
         reviewRayuelaLuciano = Review(
             reviewerName = lucianoVega.name, rating = 4,
             review = "Cortázar rompe todo y lo reconstruye mejor. Exige concentración pero vale cada página.",
             reservation = reservaRayuela2,
-            timestamp = LocalDate.of(2025, 8, 28),
+            timestamp = today.minusMonths(8).plusDays(25),
             book = rayuela
         )
         reviewRayuelaMateo = Review(
             reviewerName = mateoLopez.name, rating = 5,
             review = "La mejor novela latinoamericana que leí. La estructura no lineal es un viaje mental.",
             reservation = reservaRayuela3,
-            timestamp = LocalDate.of(2026, 2, 20),
+            timestamp = today.minusMonths(2).plusDays(21),
             book = rayuela
         )
         reviewGranGatsbyValentina = Review(
             reviewerName = valentinaSosa.name, rating = 5,
             review = "El sueño americano desnudo. Fitzgerald escribe con una elegancia que duele.",
             reservation = reservaGranGatsby2,
-            timestamp = LocalDate.of(2025, 7, 2),
+            timestamp = today.minusMonths(10).plusDays(10),
             book = granGatsby
         )
         reviewGranGatsbyMateo = Review(
             reviewerName = mateoLopez.name, rating = 4,
             review = "Corto e intenso. La fiesta como fachada del vacío, muy bien retratado.",
             reservation = reservaGranGatsby3,
-            timestamp = LocalDate.of(2025, 10, 5),
+            timestamp = today.minusMonths(7).plusDays(25),
             book = granGatsby
         )
         reviewCrimenEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "La culpa narrada desde adentro. Dostoyevski te mete en la cabeza de Raskolnikov sin escapatoria.",
             reservation = reservaCrimen2,
-            timestamp = LocalDate.of(2025, 6, 20),
+            timestamp = today.minusMonths(11).plusDays(31),
             book = crimen
         )
         reviewCrimenMateo = Review(
             reviewerName = mateoLopez.name, rating = 4,
             review = "Denso pero absorbente. El juicio final es magistral.",
             reservation = reservaCrimen3,
-            timestamp = LocalDate.of(2025, 12, 10),
+            timestamp = today.minusMonths(5).plusDays(25),
             book = crimen
         )
         reviewHarryPotterEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Un clásico moderno. La magia de Hogwarts no envejece nunca.",
             reservation = reservaHarryPotter2,
-            timestamp = LocalDate.of(2025, 5, 10),
+            timestamp = today.minusMonths(12).plusDays(25),
             book = harryPotter
         )
         reviewHarryPotterValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "Lo leí por primera vez de adulta y entendí por qué marcó a toda una generación.",
             reservation = reservaHarryPotter3,
-            timestamp = LocalDate.of(2025, 8, 5),
+            timestamp = today.minusMonths(9).plusDays(25),
             book = harryPotter
         )
         reviewHuckFinnLuciano = Review(
             reviewerName = lucianoVega.name, rating = 4,
             review = "Twain disfraza la crítica social de aventura infantil con una habilidad increíble.",
             reservation = reservaHuckFinn2,
-            timestamp = LocalDate.of(2025, 9, 22),
+            timestamp = today.minusMonths(7).plusDays(15),
             book = huckFinn
         )
         reviewHuckFinnMateo = Review(
             reviewerName = mateoLopez.name, rating = 3,
             review = "Entretenido, aunque algunos pasajes se sienten datados. El vínculo Huck-Jim es lo mejor.",
             reservation = reservaHuckFinn3,
-            timestamp = LocalDate.of(2026, 1, 28),
+            timestamp = today.minusMonths(3).plusDays(25),
             book = huckFinn
         )
         reviewN1984Luciano = Review(
             reviewerName = lucianoVega.name, rating = 5,
             review = "Perturbador y necesario. Lo releí y cada vez me parece más actual.",
             reservation = reservaN19842,
-            timestamp = LocalDate.of(2025, 6, 30),
+            timestamp = today.minusMonths(10).plusDays(10),
             book = n1984
         )
         reviewN1984Mateo = Review(
             reviewerName = mateoLopez.name, rating = 5,
             review = "El Gran Hermano ya existe. Orwell lo supo antes que todos.",
             reservation = reservaN19843,
-            timestamp = LocalDate.of(2025, 12, 22),
+            timestamp = today.minusMonths(4).plusDays(15),
             book = n1984
         )
         reviewLosMiserablesEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Jean Valjean es uno de los personajes más conmovedores de la literatura universal.",
             reservation = reservaLosMiserables2,
-            timestamp = LocalDate.of(2025, 8, 18),
+            timestamp = today.minusMonths(9).plusDays(31),
             book = losMiserables
         )
         reviewLosMiserablesValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "Largo pero cada página tiene peso. Hugo no desperdicia ni un capítulo.",
             reservation = reservaLosMiserables3,
-            timestamp = LocalDate.of(2026, 2, 10),
+            timestamp = today.minusMonths(2).plusDays(11),
             book = losMiserables
         )
         reviewMontagnaMagicaLuciano = Review(
             reviewerName = lucianoVega.name, rating = 4,
             review = "Mann logra que el tiempo del sanatorio se sienta tan eterno como para el protagonista.",
             reservation = reservaMontagnaMagica2,
-            timestamp = LocalDate.of(2025, 11, 15),
+            timestamp = today.minusMonths(6).plusDays(16),
             book = montagnaMagica
         )
         reviewMontagnaMagicaValentina = Review(
             reviewerName = valentinaSosa.name, rating = 3,
             review = "Muy filosófica, quizás demasiado. Los diálogos entre Naphta y Settembrini son brillantes.",
             reservation = reservaMontagnaMagica3,
-            timestamp = LocalDate.of(2026, 1, 10),
+            timestamp = today.minusMonths(3).plusDays(11),
             book = montagnaMagica
         )
         reviewMonteCristoEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Imposible soltar. La venganza de Dantès es satisfactoria en cada nivel.",
             reservation = reservaMonteCristo2,
-            timestamp = LocalDate.of(2025, 7, 25),
+            timestamp = today.minusMonths(9).plusDays(15),
             book = monteCristo
         )
         reviewMonteCristoLuciano = Review(
             reviewerName = lucianoVega.name, rating = 5,
             review = "Dumas teje una trama perfecta. Cada detalle de los primeros capítulos vuelve al final.",
             reservation = reservaMonteCristo3,
-            timestamp = LocalDate.of(2025, 10, 18),
+            timestamp = today.minusMonths(6).plusDays(25),
             book = monteCristo
         )
 
@@ -1258,8 +1243,9 @@ class ProjectBootstrap : InitializingBean {
         elProceso.addReview(reviewElProcesoValentina)
         elProceso.addReview(reviewElProcesoMateo)
         elProceso.addReview(reviewElProcesoEmilia2)
-        elProceso.addReview(reviewElProcesoLuciano)
         elProceso.addReview(reviewElProcesoMateo2)
+
+        orgullo.addReview(reviewOrgulloLuciano)
 
         adiosArmas.addReview(reviewAdiosArmasEmilia)
         adiosArmas.addReview(reviewAdiosArmasValentina)
@@ -1305,7 +1291,7 @@ class ProjectBootstrap : InitializingBean {
         listOf(
             elProceso, adiosArmas, rayuela, granGatsby, crimen,
             harryPotter, huckFinn, n1984, losMiserables,
-            montagnaMagica, monteCristo, caminoSwann
+            montagnaMagica, monteCristo, caminoSwann, orgullo
         ).forEach { repoBooks.save(it) }
     }
 
