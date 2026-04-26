@@ -1,6 +1,7 @@
 package ar.edu.unsam.phm.domain
 
 import jakarta.persistence.Entity
+import kotlin.math.ceil
 
 @Entity
 class Common : Book(bookType = "COMUN") {
@@ -16,7 +17,7 @@ class WithADedication : Book(bookType = "CON DEDICATORIA") {
 class Collectable : Book(bookType = "COLECCIONABLE") {
     override fun typeBibliokarmas(userBibliokarmas: Int): Long {
         // redondeo hacia arriba
-        val fifthPart = (userBibliokarmas + 4) / 5
+        val fifthPart = ceil(userBibliokarmas / 5.0).toLong()
         return fifthPart + this.numPagesLong()
     }
 }
