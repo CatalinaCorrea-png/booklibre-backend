@@ -10,9 +10,8 @@ data class AuthRequest(
 data class AuthenticationResponse(
     val accessToken: String,
     val refreshToken: String,
-    val name: String,
-    val email: String,
-    val id: Long
+    val expirationTime:  Long,
+    val id: Long // pasamos esto por que si no tenemos que cambiar toda la logica en el front y los endpoints
 ) {}
 
 data class AuthResponse(
@@ -23,14 +22,6 @@ data class AuthResponse(
 
 data class AuthRegisterRequest(
     val name: String,
-    val email: String,
-    val password: String
-) {}
-
-
-data class AuthUserRegisterRequest(
-    val name: String = "nombre",
-    var lastName: String = "apellido",
     val email: String,
     val password: String
 ) {}

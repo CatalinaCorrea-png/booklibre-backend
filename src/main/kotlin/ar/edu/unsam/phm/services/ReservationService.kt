@@ -3,6 +3,7 @@ package ar.edu.unsam.phm.services
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.State
+import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
@@ -63,7 +64,7 @@ class ReservationService(
     @Transactional(readOnly = true)
     fun getReservesByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
         val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
-        val reservationsPage = reservationRepository.findByLectorIdFiltered(userId, search, pageable)
+        val reservationsPage = reservationRepository.findByLectorIdFiltered(userId, search, UserTypes.PUBLISHER, pageable)
         val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content)
         return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
     }
@@ -71,7 +72,7 @@ class ReservationService(
     @Transactional(readOnly = true)
     fun getLoansMadeByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
         val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
-        val reservationsPage = reservationRepository.findByOwnerIdFiltered(userId, search, pageable)
+        val reservationsPage = reservationRepository.findByOwnerIdFiltered(userId, search, UserTypes.PUBLISHER, pageable)
         val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content, true)
         return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
     }

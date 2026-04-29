@@ -31,12 +31,14 @@ class JwtAuthenticationFilter(
     ) {
         val authHeader: String? = request.getHeader("Authorization")
 
+        // Si no hay Bearer token, dejar pasar porque Spring Security decidira si el endpoint requiere autenticacion o no
         if (authHeader.doesNotContainBearerToken()) {
             filterChain.doFilter(request, response)
             return
         }
 
         val jwtToken = authHeader!!.extractTokenValue()
+
         try {
             val email = tokenService.extractEmail(jwtToken)
 
@@ -62,20 +64,6 @@ class JwtAuthenticationFilter(
             )
             return
         }
-//        } catch (ex: TokenExpiredException) {
-//            // Captura la excepción de token expirado y devuelve el status code adecuado (401-Unauthorized)
-//            logger.warn(ex.message)
-//            response.status = HttpServletResponse.SC_UNAUTHORIZED
-//            response.setHeader(
-//                "WWW-Authenticate",
-//                "Bearer error=\"invalid_token\", error_description=\"The access token expired\""
-//            )
-//            response.contentType = "application/json"
-//            response.writer.write("{\"error\":\"Token expired\",\"message\":\"${ex.message}\"}")
-//
-//            // Importante: NO llamar a filterChain.doFilter() después de manejar el error
-//            return
-//        }
 
         filterChain.doFilter(request, response)
     }
@@ -97,7 +85,6 @@ class JwtAuthenticationFilter(
     private fun updateContext(foundUser: UserDetails, request: HttpServletRequest) {
         val authToken = UsernamePasswordAuthenticationToken(foundUser, null, foundUser.authorities)
         authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-
         SecurityContextHolder.getContext().authentication = authToken
     }
 

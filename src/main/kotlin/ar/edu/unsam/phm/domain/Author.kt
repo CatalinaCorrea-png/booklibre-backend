@@ -10,7 +10,7 @@ import jakarta.persistence.Id
 @Entity
 class Author(
     val name: String,
-    val avatar: String
+    val avatar: String = "assets/author_default.jpg"
 ) : RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

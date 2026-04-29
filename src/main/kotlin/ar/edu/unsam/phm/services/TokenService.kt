@@ -25,6 +25,7 @@ class TokenService(
         Jwts.builder()
             .claims()
             .subject(userDetails.username)
+            .id(UUID.randomUUID().toString())
             .issuedAt(Date(System.currentTimeMillis()))
             .expiration(expirationDate)
             .add(additionalClaims)

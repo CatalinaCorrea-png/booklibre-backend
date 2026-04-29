@@ -2,6 +2,7 @@ package ar.edu.unsam.phm.repository
 
 import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
+import ar.edu.unsam.phm.domain.UserTypes
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph
@@ -26,6 +27,7 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     SELECT r FROM Reservation r
     WHERE r.user.id = :userId
     AND r.book.deleted = false
+    AND r.user.userType <> :userType
     AND (
         LOWER(r.book.title) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(r.book.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -34,6 +36,7 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     fun findByLectorIdFiltered(
         @Param("userId") userId: Long,
         @Param("search") search: String,
+        @Param("userType") userType: UserTypes,
         pageable: Pageable
     ): Page<Reservation> // todo: !important la tercera query es por esto
     // estos son de spring Data, lo tengo que usar si o si por que page me devuleve la cantidad de elementos y la cantidad de paginas segun el tamaño de la pagina
@@ -53,6 +56,7 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
         SELECT r FROM Reservation r
         WHERE r.book.owner.id = :userId
         AND r.book.deleted = false
+        AND r.user.userType <> :userType
         AND (
             LOWER(r.book.title) LIKE LOWER(CONCAT('%', :search, '%'))
             OR LOWER(r.book.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -61,6 +65,7 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
     fun findByOwnerIdFiltered(
         @Param("userId") userId: Long,
         @Param("search") search: String,
+        @Param("userType") userType: UserTypes,
         pageable: Pageable
     ): Page<Reservation>
 

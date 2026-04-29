@@ -37,8 +37,7 @@ class BookService(
             .orElseGet {
                 authorRepository.save(
                     Author(
-                        name = bookCreateDTO.book.author.name,
-                        avatar = bookCreateDTO.book.author.avatar
+                        name = bookCreateDTO.book.author.name
                     )
                 )
             }
@@ -60,6 +59,10 @@ class BookService(
 
         if (existingBook.deleted) {
             throw ConflictException("No se puede modificar un libro eliminado")
+        }
+
+        if (owner.id != existingBook.owner.id) {
+            throw ConflictException("No podes modificar un libro que no es tuyo.")
         }
 
         val author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)

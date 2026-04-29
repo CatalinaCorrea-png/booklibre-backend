@@ -7,15 +7,7 @@ import ar.edu.unsam.phm.services.UserService
 import org.springframework.web.bind.annotation.*
 
 @RestController
-//@CrossOrigin("*")
 class UserController(private val userService: UserService, private val authenticationService: AuthenticationService) {
-
-    @PostMapping("/login")
-    fun getUser(@RequestBody request: AuthRequest): AuthResponse {
-        val user = User(email = request.email, password = request.password)
-        val userOK = userService.getUser(user)
-        return AuthResponse(email = userOK.email, name = userOK.name, id = userOK.id!!)
-    }
 
     @PostMapping("/register")
     fun createUser(@RequestBody request: AuthRegisterRequest): AuthResponse {

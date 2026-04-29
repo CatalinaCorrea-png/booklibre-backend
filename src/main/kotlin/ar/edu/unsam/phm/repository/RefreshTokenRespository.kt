@@ -12,4 +12,8 @@ class RefreshTokenRepository {
     }
 
     fun findUserDetailsByToken(token: String): UserDetails? = tokens[token]
+
+    fun deleteByToken(token: String) {
+        tokens.remove(token)
+    }
 }

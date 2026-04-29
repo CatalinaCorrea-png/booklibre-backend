@@ -35,7 +35,7 @@ class ReservationController(
     ): PagedResult<ReservationDTO> =
         reservationService.getLoansMadeByUserId(userId, search, page, pageSize)
 
-    @PatchMapping("/{reservationId}/calificar")
+    @PostMapping("/{reservationId}/calificar")
     fun rateLoan(@PathVariable reservationId: Long, @RequestBody body: ReviewDTO, @RequestParam userId: Long) {
         reservationService.rateLoan(reservationId, body.rating, body.review, userId)
     }

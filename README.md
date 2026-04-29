@@ -201,9 +201,28 @@ ALTER TABLE app_user
 UPDATE app_user SET bibliokarmas = 0 WHERE bibliokarmas IS NULL;
 ```
 
+### 5. Listar los usuarios que tengan más de 2 reservas devueltas.
+``` sql
+
+CREATE VIEW users_with_more_than_2_returned_reservations AS
+SELECT 
+    u.id,
+    u.name,
+    u.email,
+    u.user_type,
+    COUNT(r.id) AS returned_reservations
+FROM app_user u
+JOIN reservation r ON r.user_id = u.id
+WHERE r.drop_off_date < CURRENT_DATE
+GROUP BY u.id, u.name, u.email, u.user_type
+HAVING COUNT(r.id) > 2
+ORDER BY returned_reservations DESC;
+
+SELECT * FROM users_with_more_than_2_returned_reservations;
+
+```
 
 ---
-
 
 ##  Tutor
 - **Foglia, Pablo**

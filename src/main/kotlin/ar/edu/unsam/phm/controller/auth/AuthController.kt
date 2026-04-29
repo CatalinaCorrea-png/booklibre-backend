@@ -3,12 +3,11 @@ package ar.edu.unsam.phm.controller.auth
 import ar.edu.unsam.phm.dto.AuthRequest
 import ar.edu.unsam.phm.dto.AuthenticationResponse
 import ar.edu.unsam.phm.services.AuthenticationService
-import ar.edu.unsam.phm.services.TokenService
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.ResponseCookie
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
@@ -16,21 +15,48 @@ import org.springframework.web.server.ResponseStatusException
 @RequestMapping("/api/auth")
 class AuthController(
     private val authenticationService: AuthenticationService,
-    private val tokenService: TokenService
 ) {
 
     @PostMapping
-    fun authenticate(@RequestBody authRequest: AuthRequest): AuthenticationResponse =
-        authenticationService.authentication(authRequest)
+    fun authenticate(
+        @RequestBody authRequest: AuthRequest,
+        response: HttpServletResponse // esto no lo manda el front, es para armar vos la respuesta
+    ): AuthenticationResponse {
+        val authResponse = authenticationService.authentication(authRequest)
+
+        val refreshCookie = ResponseCookie.from("refreshToken", authResponse.refreshToken)
+            .httpOnly(true)
+            .secure(false) // todo: esto se tiene que cambiar, ahora local host no es secure
+            .path("/")
+            .maxAge(1800)
+            .sameSite("Strict")
+            .build()
+
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+
+        return authResponse.copy(refreshToken = "") // devolvemos el AccessToken pero vaciamos el RefreshToken del JSON
+    }
 
     @PostMapping("/refresh")
-    fun refreshAccessToken(@RequestBody request: RefreshTokenResponse): TokenResponse =
-        authenticationService.refreshAccessToken(request.token)
-            ?.mapToTokenResponse()
-            ?: throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Invalid refresh token!"
-            )
+    fun refreshAccessToken(
+        @CookieValue(name = "refreshToken") token: String?,
+        response: HttpServletResponse
+    ): TokenResponse {
+        if (token.isNullOrEmpty()) throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
 
-    private fun String.mapToTokenResponse(): TokenResponse = TokenResponse(token = this)
+        val (newAccess, newRefresh) = authenticationService.refreshAccessToken(token)
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+
+        val newCookie = ResponseCookie.from("refreshToken", newRefresh)
+            .httpOnly(true)
+            .secure(false)
+            .path("/")
+            .maxAge(1800)
+            .sameSite("Strict")
+            .build()
+
+        response.addHeader(HttpHeaders.SET_COOKIE, newCookie.toString())
+
+        return TokenResponse(token = newAccess)
+    }
 }

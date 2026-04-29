@@ -83,10 +83,6 @@ abstract class Book(
     @Column
     var ratingAvg: Double = 0.0,
 
-//    @ElementCollection(fetch = FetchType.LAZY)
-//    private val _reservationsIds: MutableList<Long> = mutableListOf(),
-
-//    @Formula("(SELECT COUNT(*) FROM reservation r WHERE r.book_id = {alias}.id)") // {alias} lo hace más compatible con otros motores
     @Formula("(SELECT COUNT(*) FROM reservation r WHERE r.book_id = id)")
     private var reservationCount: Long = 0,
 

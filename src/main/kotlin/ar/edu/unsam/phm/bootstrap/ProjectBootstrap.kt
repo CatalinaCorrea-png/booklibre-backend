@@ -244,30 +244,30 @@ class ProjectBootstrap : InitializingBean {
     // ═════════════════════════════════════════════════════════════════════════
 
     fun initAuthors() {
-        orwell = Author("George Orwell", "/assets/1_george_orwell.png")
-        kafka = Author("Franz Kafka", "/assets/2_franz_kafka.png")
-        garcia = Author("Gabriel García Márquez", "/assets/3_gabriel_garcia_marquez.png")
-        dostoevsky = Author("Fiódor Dostoyevski", "/assets/4_fiodor_dostoyevski.png")
-        rowling = Author("J.K. Rowling", "/assets/5_j_k_rowling.png")
-        asimov = Author("Isaac Asimov", "/assets/6_isaac_asimov.png")
-        austen = Author("Jane Austen", "/assets/7_jane_austen.png")
-        tolstoy = Author("León Tolstói", "/assets/8_leon_tolstoi.png")
-        fitzgerald = Author("F. Scott Fitzgerald", "/assets/9_f_scott_fitzgerald.png")
-        hemingway = Author("Ernest Hemingway", "/assets/10_ernest_hemingway.png")
-        hugo = Author("Victor Hugo", "/assets/11_victor_hugo.png")
-        twain = Author("Mark Twain", "/assets/12_mark_twain.png")
-        dumas = Author("Alexandre Dumas", "/assets/13_alexandre_dumas.png")
-        verne = Author("Julio Verne", "/assets/14_julio_verne.png")
-        coelho = Author("Paulo Coelho", "/assets/15_paulo_coelho.png")
-        camus = Author("Albert Camus", "/assets/16_albert_camus.png")
-        woolf = Author("Virginia Woolf", "/assets/17_virginia_woolf.png")
-        poe = Author("Edgar Allan Poe", "/assets/18_edgar_allan_poe.png")
-        chekhov = Author("Antón Chéjov", "/assets/19_anton_chejov.png")
-        borges = Author("Jorge Luis Borges", "/assets/20_jorge_luis_borges.png")
-        cortazar = Author("Julio Cortázar", "/assets/21_julio_cortazar.png")
-        saramago = Author("José Saramago", "/assets/22_jose_saramago.png")
-        mann = Author("Thomas Mann", "/assets/23_thomas_mann.png")
-        proust = Author("Marcel Proust", "/assets/24_marcel_proust.png")
+        orwell = Author("George Orwell", "assets/1_george_orwell.png")
+        kafka = Author("Franz Kafka", "assets/2_franz_kafka.png")
+        garcia = Author("Gabriel García Márquez", "assets/3_gabriel_garcia_marquez.png")
+        dostoevsky = Author("Fiódor Dostoyevski", "assets/4_fiodor_dostoyevski.png")
+        rowling = Author("J.K. Rowling", "assets/5_j_k_rowling.png")
+        asimov = Author("Isaac Asimov", "assets/6_isaac_asimov.png")
+        austen = Author("Jane Austen", "assets/7_jane_austen.png")
+        tolstoy = Author("León Tolstói", "assets/8_leon_tolstoi.png")
+        fitzgerald = Author("F. Scott Fitzgerald", "assets/9_f_scott_fitzgerald.png")
+        hemingway = Author("Ernest Hemingway", "assets/10_ernest_hemingway.png")
+        hugo = Author("Victor Hugo", "assets/11_victor_hugo.png")
+        twain = Author("Mark Twain", "assets/12_mark_twain.png")
+        dumas = Author("Alexandre Dumas", "assets/13_alexandre_dumas.png")
+        verne = Author("Julio Verne", "assets/14_julio_verne.png")
+        coelho = Author("Paulo Coelho", "assets/15_paulo_coelho.png")
+        camus = Author("Albert Camus", "assets/16_albert_camus.png")
+        woolf = Author("Virginia Woolf", "assets/17_virginia_woolf.png")
+        poe = Author("Edgar Allan Poe", "assets/18_edgar_allan_poe.png")
+        chekhov = Author("Antón Chéjov", "assets/19_anton_chejov.png")
+        borges = Author("Jorge Luis Borges", "assets/20_jorge_luis_borges.png")
+        cortazar = Author("Julio Cortázar", "assets/21_julio_cortazar.png")
+        saramago = Author("José Saramago", "assets/22_jose_saramago.png")
+        mann = Author("Thomas Mann", "assets/23_thomas_mann.png")
+        proust = Author("Marcel Proust", "assets/24_marcel_proust.png")
 
         listOf(
             orwell, kafka, garcia, dostoevsky, rowling, asimov, austen, tolstoy,
@@ -308,7 +308,7 @@ class ProjectBootstrap : InitializingBean {
             description = "Escritora y lectora compulsiva",
             email = "valentina@example.com",
             cel = "1155550000",
-            location = "Córdoba, AR",
+            location = "Cordoba, AR",
             userType = UserTypes.PUBLISHER,
             bibliokarmas = 1500,
             timestamp = "10/01/2023",
