@@ -89,15 +89,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, Long> {
 
     fun findAllByBookId(bookId: Long): List<Reservation>
 
-    @Query(
-        """
-    SELECT b.reviews
-    FROM Book b
-    WHERE b.id = :bookId
-    """
-    )
-    fun findAllReviewsByBookId(@Param("bookId") bookId: Long): List<Review>
-
     // lo hago asi, para no traer to.do a memoria para hacer un .size en el service y para delegar responsabilidades
     // JPQL retorna long por defecto supuestamente
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.book.id = :bookId")

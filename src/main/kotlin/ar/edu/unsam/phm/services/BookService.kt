@@ -7,6 +7,7 @@ import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudAuthorRepository
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
+import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.specification.BookSpecifications
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,7 +27,9 @@ class BookService(
     @Autowired
     val userRepository: CrudUserRepository,
     @Autowired
-    val authorRepository: CrudAuthorRepository
+    val authorRepository: CrudAuthorRepository,
+    @Autowired
+    val reviewRepository: CrudReviewRepository,
 ) {
     @Transactional
     fun createBook(bookCreateDTO: BookCreateDTO) {
@@ -172,5 +175,11 @@ class BookService(
             }
         val days = Reservation(pickUpDate = pickUpDate, dropOffDate = dropOffDate).reservationDays()
         return book.calculateBibliokarmas(days, user.bibliokarmas)
+    }
+
+    @Transactional(readOnly = true)
+    fun getBookReviews(bookId: Long, page: Int = 0, pageSize: Int = 2): List<Review> {
+        val pageable = PageRequest.of(page, pageSize)
+        return reviewRepository.findAllByBookId(bookId, pageable).content
     }
 }

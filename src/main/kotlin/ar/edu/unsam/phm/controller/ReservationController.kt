@@ -48,15 +48,6 @@ class ReservationController(
     fun getUserLentBooks(@PathVariable userId: Long): Long =
         reservationService.getUserLentBooksNumber(userId)
 
-    //
-    @GetMapping("/book-review/{bookId}")
-    fun getBookReviews(
-        @PathVariable bookId: Long,
-        @RequestParam page: Int,
-        @RequestParam pageSize: Int
-    ): List<ReviewDTO> =
-        reservationService.getBookReviews(bookId, page, pageSize).map { it.toDTO() }
-
     @GetMapping("/reservations/book/{bookId}/dates")
     fun getReservedDatesByBook(@PathVariable bookId: Long): List<ReservedPeriodDTO> =
         reservationService.getReservedDates(bookId)

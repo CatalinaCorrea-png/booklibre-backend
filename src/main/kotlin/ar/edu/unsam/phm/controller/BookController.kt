@@ -67,4 +67,12 @@ class BookController(
 
     @GetMapping("/book-genders")
     fun getBookGenders() = Gender.entries
+
+    @GetMapping("/book-review/{bookId}")
+    fun getBookReviews(
+        @PathVariable bookId: Long,
+        @RequestParam page: Int,
+        @RequestParam pageSize: Int
+    ): List<ReviewDTO> =
+        bookService.getBookReviews(bookId, page, pageSize).map { it.toDTO() }
 }
