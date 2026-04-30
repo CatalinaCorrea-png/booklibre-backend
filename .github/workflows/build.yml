@@ -74,11 +74,13 @@ jobs:
       # Â¡Pero en un PR podemos comentar la cobertura! Haremos el chequeo inverso para cubrirlo
       - name: Post coverage summary in PR
         if: ${{ github.event_name == 'pull_request' }}
-        uses: madrapps/jacoco-report@v1.6
+        uses: madrapps/jacoco-report@v1.7.1
         with:
           paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           title: Estado Actual de Cobertura
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
 
       # Finalmente, subimos un artefacto con el reporte de jacoco en formato HTML.
       # Estos archivos quedarÃ¡n disponibles para descargar y revisar en Github durante un tiempo, y luego se borrarÃ¡n.
