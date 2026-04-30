@@ -8,6 +8,7 @@ import io.jsonwebtoken.JwtException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
+@Profile("!test")
 class JwtAuthenticationFilter(
     private val userDetailsService: CustomUserDetailsService,
     private val tokenService: TokenService,

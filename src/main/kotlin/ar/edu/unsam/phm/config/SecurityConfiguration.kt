@@ -3,6 +3,7 @@ package ar.edu.unsam.phm.config
 import ar.edu.unsam.phm.domain.UserTypes
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationProvider
@@ -19,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
+@Profile("!test")
 class SecurityConfiguration(
     private val authenticationProvider: AuthenticationProvider
 ) {

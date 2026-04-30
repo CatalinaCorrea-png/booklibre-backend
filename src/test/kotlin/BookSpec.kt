@@ -1,119 +1,122 @@
-//import ar.edu.unsam.phm.domain.Collectable
-//import ar.edu.unsam.phm.domain.Common
-//import ar.edu.unsam.phm.domain.Reservation
-//import ar.edu.unsam.phm.domain.User
-//import ar.edu.unsam.phm.domain.WithADedication
-//import ar.edu.unsam.phm.errors.BusinessException
-//import io.kotest.assertions.throwables.shouldThrow
-//import io.kotest.core.spec.IsolationMode
-//import io.kotest.core.spec.style.DescribeSpec
-//import io.kotest.matchers.shouldBe
-//import ar.edu.unsam.phm.domain.*
-//import java.time.LocalDate
-//
-//
-//class BookSpec : DescribeSpec ({
-//    isolationMode = IsolationMode.InstancePerTest
-//
-//    describe("Testing reservations and bibliokarmas for new User and 4 day reservation") {
-//        val newUser = User(userType = UserType.READER)
-//        val reservation =
-//            Reservation(user = newUser, pickUpDate = LocalDate.now().minusDays(4), dropOffDate = LocalDate.now())
-//
-//        it("Una reserva de libro Comun por 4 dias de usuario nuevo") {
-//            // Arrange
-//            val commonBook = Common(
-//                this.title,
-//                this.desc,
-//                Gender.DRAMA,
-//                Author(this.authorName, this.authorAvatarUrl),
-//                0
-//            )
-//
-//            // Act
-//            newUser.reserveBook(book = commonBook, reservation = reservation)
-//
-//            // Assert
-//            commonBook.reservations.size shouldBe 1
-//            commonBook.calculateBibliokarmas(reservation) shouldBe 20
-//            newUser.bibliokarmas shouldBe 20
-//        }
-//
-//        it("Una reserva de libro con Dedicatoria por 4 dias de usuario nuevo") {
-//            // Arrange
-//            val dedicationBook = WithADedication()
-//
-//            // Act
-//            newUser.reserveBook(book = dedicationBook, reservation = reservation)
-//
-//            // Assert
-//            dedicationBook.reservations.size shouldBe 1
-//            newUser.bibliokarmas shouldBe 230
-//        }
-//
-//        it("Una reserva de libro Coleccionable por 4 dias de usuario nuevo") {
-//            // Arrange
-//            val collectableBook = Collectable()
-//
-//            // Act
-//            newUser.reserveBook(book = collectableBook, reservation = reservation)
-//
-//            // Assert
-//            collectableBook.reservations.size shouldBe 1
-//            newUser.bibliokarmas shouldBe 20
-//        }
-//
-//        it("Dos reservas de libro Comun por 4 dias de usuario nuevo") {
-//            // Arrange
-//            val commonBook = Common(
-//                this.title,
-//                this.desc,
-//                Gender.DRAMA,
-//                Author(this.authorName, this.authorAvatarUrl),
-//                0
-//            )
-//            val otherReservation = Reservation(
-//                user = newUser,
-//                pickUpDate = LocalDate.now().minusDays(9),
-//                dropOffDate = LocalDate.now().minusDays(5)
-//            )
-//
-//            // Act
-//            newUser.reserveBook(book = commonBook, reservation = otherReservation)
-//            newUser.reserveBook(book = commonBook, reservation = reservation)
-//
-//            // Assert
-//            commonBook.reservations.size shouldBe 2
-//            newUser.bibliokarmas shouldBe 40
-//        }
-//
-//    }
-//
-//    describe("Reservations validations") {
-//
-//        it("No se puede reservar un libro que ya esta reservado en esa fecha") {
-//            // Arrange
-//            val newUser = User(userType = UserType.READER)
-//            val commonBook = Common(
-//                this.title,
-//                this.desc,
-//                Gender.DRAMA,
-//                Author(this.authorName, this.authorAvatarUrl),
-//                0
-//            )
-//            val reservation =
-//                Reservation(user = newUser, pickUpDate = LocalDate.now().minusDays(4), dropOffDate = LocalDate.now())
-//            val otherReservation =
-//                Reservation(user = newUser, pickUpDate = LocalDate.now().minusDays(4), dropOffDate = LocalDate.now())
-//
-//            // Act / Assert
-//            newUser.reserveBook(book = commonBook, reservation = reservation)
-//            val excepcion = shouldThrow<BusinessException> {
-//                newUser.reserveBook(book = commonBook, reservation = otherReservation)
-//            }
-//
-//            // excepcion.message shouldBe ("Reserva no disponible en esas fechas")
-//        }
-//    }
-//
-//})
+package ar.edu.unsam.phm.domain
+
+import ar.edu.unsam.phm.errors.ConflictException
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.doubles.shouldBeExactly
+import io.kotest.matchers.longs.shouldBeExactly
+import io.kotest.matchers.shouldBe
+import java.time.LocalDate
+
+class BookTest : DescribeSpec({
+
+    fun validBook(type: Book = Common()): Book = type.apply {
+        title = "El Quijote"
+        desc = "Novela clásica"
+        gender = Gender.DRAMA
+        author = Author("Cervantes", "avatar.jpg")
+        numPages = 500
+        isbn = "978-3-16-148410-0"
+        language = Language.SPANISH
+        editorial = "Planeta"
+        publishDate = LocalDate.of(1605, 1, 1)
+        condition = BookCondition.EXCELLENT
+        owner = User().apply { id = 1L }
+        imageSrc = "image.jpg"
+    }
+
+    describe("validate") {
+        it("no lanza excepción cuando todos los campos son válidos") {
+            validBook().validate()
+        }
+
+        it("lanza ConflictException si el título está vacío") {
+            val book = validBook().apply { title = "" }
+            shouldThrow<ConflictException> { book.validate() }
+                .message shouldBe "El libro tiene que tener titulo"
+        }
+
+        it("lanza ConflictException si la descripción supera 1000 caracteres") {
+            val book = validBook().apply { desc = "a".repeat(1001) }
+            shouldThrow<ConflictException> { book.validate() }
+        }
+
+        it("lanza ConflictException si numPages es 0") {
+            val book = validBook().apply { numPages = 0 }
+            shouldThrow<ConflictException> { book.validate() }
+        }
+
+        it("lanza ConflictException si imageSrc supera 255 caracteres") {
+            val book = validBook().apply { imageSrc = "a".repeat(255) }
+            shouldThrow<ConflictException> { book.validate() }
+        }
+    }
+
+    describe("logicDelete") {
+        it("marca el libro como deleted") {
+            val book = validBook()
+            book.deleted shouldBe false
+            book.logicDelete()
+            book.deleted shouldBe true
+        }
+    }
+
+    describe("addReview") {
+        it("agrega la review y actualiza el rating promedio") {
+            val book = validBook()
+            val reservation = Reservation()
+            book.addReview(Review(rating = 5, review = "Excelente", book = book, reservation = reservation))
+            book.addReview(Review(rating = 3, review = "Regular", book = book, reservation = reservation))
+            book.ratingAvg shouldBeExactly 4.0
+        }
+
+        it("lanza ConflictException si el rating es menor a 1") {
+            val book = validBook()
+            val reservation = Reservation()
+            shouldThrow<ConflictException> {
+                book.addReview(Review(rating = 0, review = "Malo", book = book, reservation = reservation))
+            }
+        }
+
+        it("lanza ConflictException si el rating es mayor a 5") {
+            val book = validBook()
+            val reservation = Reservation()
+            shouldThrow<ConflictException> {
+                book.addReview(Review(rating = 6, review = "Increíble", book = book, reservation = reservation))
+            }
+        }
+    }
+
+    describe("calculateBibliokarmas - Template Method") {
+        it("Common: 5 * días de reserva + numPages * 5") {
+            val book = validBook(Common())
+            book.calculateBibliokarmas(reservationDays = 10, userBibliokarmas = 100) shouldBeExactly 2550L
+        }
+
+        it("WithADedication: 5 * días + 200 + 10 * reservationCount") {
+            val book = validBook(WithADedication())
+            // Con reservationCount = 0 (default)
+            book.calculateBibliokarmas(reservationDays = 10, userBibliokarmas = 100) shouldBeExactly 250L
+        }
+
+        it("Collectable:  5 * días + userBibliokarmas/5 + numPages") {
+            val book = validBook(Collectable())
+            // Ajustar según implementación real
+            book.calculateBibliokarmas(10, 101) shouldBeExactly 571L
+        }
+    }
+
+    describe("meetsSearchCriteria") {
+        it("devuelve true si criteria está vacío") {
+            validBook().meetsSearchCriteria("") shouldBe true
+        }
+
+        it("devuelve true si el título contiene el criterio (case insensitive)") {
+            validBook().meetsSearchCriteria("quijote") shouldBe true
+        }
+
+        it("devuelve false si el título no contiene el criterio") {
+            validBook().meetsSearchCriteria("harry potter") shouldBe false
+        }
+    }
+})

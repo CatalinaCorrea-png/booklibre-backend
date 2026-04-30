@@ -54,6 +54,7 @@ dependencies {
     //para posgres y springboot
     runtimeOnly("org.postgresql:postgresql")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    testImplementation("com.h2database:h2")
 
     // Spring Security (base necesaria para JWT)
     implementation("org.springframework.boot:spring-boot-starter-security")

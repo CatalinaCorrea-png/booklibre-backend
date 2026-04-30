@@ -18,11 +18,13 @@ import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Profile
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
+@Profile("!test & !sectest")
 class ProjectBootstrap : InitializingBean {
 
     @Autowired
