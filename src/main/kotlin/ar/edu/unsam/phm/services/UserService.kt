@@ -27,19 +27,6 @@ class UserService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getUser(user: User): User {
-        val persistedUser = userRepository
-            .findByEmail(user.email)
-            .orElseThrow {
-                NotFoundException("No se encuentra un usuario registrado con ese mail")
-            }
-
-        if (persistedUser.password != user.password) throw BusinessException("Las credenciales no coinciden")
-
-        return persistedUser
-    }
-
-    @Transactional(readOnly = true)
     fun getUserProfile(userId: Long): User {
         val persistedUser = userRepository
             .findById(userId)
