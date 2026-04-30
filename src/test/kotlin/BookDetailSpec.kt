@@ -1,44 +1,61 @@
-//import ar.edu.unsam.phm.domain.Common
-//import ar.edu.unsam.phm.domain.User
-//import ar.edu.unsam.phm.domain.UserTypes
-//import ar.edu.unsam.phm.errors.NotFoundException
-//import ar.edu.unsam.phm.services.BookService
-//import io.kotest.assertions.throwables.shouldThrow
-//import io.kotest.core.spec.IsolationMode
-//import io.kotest.core.spec.style.DescribeSpec
-//import io.kotest.matchers.shouldBe
-//
-//class BookDetailSpec : DescribeSpec({
-//    isolationMode = IsolationMode.InstancePerTest
-//
-//    val owner = User(userType = UserTypes.PUBLISHER)
-//
-//    val commonBook = Common().apply {
-//        title = "1984"
-//        numPages = 328
-//        this.owner = owner
-//    }
-//
-//    describe("Caso feliz y caso triste cuando pido un libro con id = 1"){
-//        it("Caso feliz: me trae correctamente el libro"){
-//            // Arrange
-//            val bookRepository = BookRepository()
-//            bookRepository.create(commonBook)
-//            val bookService = BookService(bookRepository, ReservationRepository(), UserRepository())
-//
-//            // Act
-//            val result = bookService.getBookById(commonBook.id)
-//
-//            // Assert
-//            result.title shouldBe "1984"
-//        }
-//        it("Caso triste: lanza excepcion si el libro no existe") {
-//            // Arrange
-//            val bookRepository = BookRepository()
-//            val bookService = BookService(bookRepository, ReservationRepository(), UserRepository())
-//
-//            // Act & Assert
-//            shouldThrow<NotFoundException> { bookService.getBookById(999) }
-//        }
-//    }
-//})
+package ar.edu.unsam.phm.services
+
+import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.errors.NotFoundException
+import ar.edu.unsam.phm.repository.*
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import java.time.LocalDate
+import java.util.Optional
+
+class BookDetailSpec : DescribeSpec({
+    isolationMode = IsolationMode.InstancePerTest
+
+    val bookRepository     = mockk<CrudBookRepository>()
+    val reservationRepository = mockk<CrudReservationRepository>(relaxed = true)
+    val userRepository     = mockk<CrudUserRepository>(relaxed = true)
+    val authorRepository   = mockk<CrudAuthorRepository>(relaxed = true)
+    val reviewRepository   = mockk<CrudReviewRepository>(relaxed = true)
+
+    val bookService = BookService(
+        bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository
+    )
+
+    val owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER).apply { id = 1 }
+    val book = Common().apply {
+        id = 1
+        title = "El Señor de los Anillos"
+        desc = "Épica de fantasía"
+        gender = Gender.DRAMA
+        author = Author("J.R.R. Tolkien", "avatar.jpg")
+        numPages = 1178
+        isbn = "978-0-618-00224-4"
+        language = Language.SPANISH
+        editorial = "Minotauro"
+        publishDate = LocalDate.of(1954, 7, 29)
+        condition = BookCondition.EXCELLENT
+        this.owner = owner
+        imageSrc = "lotr.jpg"
+    }
+
+    describe("getBookById") {
+        it("Caso feliz: devuelve el BookDTO cuando el libro existe") {
+            every { bookRepository.findById(1) } returns Optional.of(book)
+
+            val result = bookService.getBookById(1)
+
+            result.title shouldBe "El Señor de los Anillos"
+            result.id shouldBe 1
+        }
+
+        it("Caso triste: lanza NotFoundException cuando el libro no existe") {
+            every { bookRepository.findById(999) } returns Optional.empty()
+
+            shouldThrow<NotFoundException> { bookService.getBookById(999) }
+        }
+    }
+})

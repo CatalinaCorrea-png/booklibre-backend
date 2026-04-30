@@ -3,6 +3,7 @@ import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.repository.CrudAuthorRepository
 import ar.edu.unsam.phm.repository.CrudBookRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
+import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.services.BookService
 import io.kotest.core.spec.IsolationMode
@@ -25,7 +26,8 @@ class ProfileSpec : DescribeSpec({
     val reservationRepository = mockk<CrudReservationRepository>()
     val userRepository = mockk<CrudUserRepository>()
     val authorRepository = mockk<CrudAuthorRepository>()
-    val bookService = BookService(bookRepository, reservationRepository, userRepository, authorRepository)
+    val reviewRepository   = mockk<CrudReviewRepository>(relaxed = true)
+    val bookService = BookService(bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository)
 
     val userId = 1L
 

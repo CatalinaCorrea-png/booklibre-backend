@@ -52,7 +52,7 @@ class SecurityConfiguration(
                     .requestMatchers(HttpMethod.POST, "/register").permitAll()
 
                     // Endpoints por rol
-                    .requestMatchers(HttpMethod.GET, "/filtered-books")
+                    .requestMatchers(HttpMethod.GET, "/filtered-books", "book-detail/**")
                     .hasAnyAuthority(UserTypes.READER.name, UserTypes.COMBINED.name)
                     .requestMatchers(HttpMethod.POST, "/create-book")
                     .hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
