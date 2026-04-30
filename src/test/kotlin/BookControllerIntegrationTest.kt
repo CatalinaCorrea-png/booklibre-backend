@@ -191,7 +191,6 @@ class BookControllerIntegrationTest {
     @Test
     fun `excluye libros eliminados logicamente`() {
         book1.logicDelete()
-        bookRepository.save(book1)
 
         mockMvc.perform(get("/filtered-books").param("userId", otherUser.id.toString()))
             .andExpect(status().isOk)

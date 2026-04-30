@@ -27,20 +27,6 @@ import java.time.LocalDate
 @Transactional
 class BookDetailSecurityTest {
 
-    @TestConfiguration
-    class SecurityTestConfig {
-        @Bean
-        fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
-            http
-                .csrf { it.disable() }
-                .authorizeHttpRequests {
-                    it.requestMatchers(HttpMethod.GET, "/book-detail/**")
-                        .hasAnyAuthority(UserTypes.READER.name, UserTypes.COMBINED.name)
-                        .anyRequest().authenticated()
-                }
-                .build()
-    }
-
     @Autowired lateinit var mockMvc: MockMvc
     @Autowired lateinit var bookRepository: CrudBookRepository
     @Autowired lateinit var userRepository: CrudUserRepository

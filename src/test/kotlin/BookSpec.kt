@@ -50,6 +50,11 @@ class BookTest : DescribeSpec({
             val book = validBook().apply { imageSrc = "a".repeat(255) }
             shouldThrow<ConflictException> { book.validate() }
         }
+
+        it("lanza ConflictException si el dueño es un lector") {
+            val book = validBook().apply { owner = User().apply { userType = UserTypes.READER } }
+            shouldThrow<ConflictException> { book.validate() }
+        }
     }
 
     describe("logicDelete") {
