@@ -9,9 +9,9 @@ import java.time.temporal.ChronoUnit
 
 @Entity
 data class Reservation(
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var user: User = User(),
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var book: Book = Common(),
     var pickUpDate: LocalDate = LocalDate.now(),
     var dropOffDate: LocalDate = LocalDate.now(),

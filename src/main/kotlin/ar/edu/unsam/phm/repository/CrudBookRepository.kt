@@ -18,6 +18,9 @@ interface CrudBookRepository : CrudRepository<Book, Long>, JpaSpecificationExecu
     @EntityGraph(attributePaths = ["owner", "author"])
     override fun findAll(spec: Specification<Book>, pageable: Pageable): Page<Book>
 
+    @EntityGraph(attributePaths = ["owner", "author"])
+    override fun findById(id: Long): Optional<Book>
+
     @Query(
         """
         SELECT new ar.edu.unsam.phm.dto.ProfileBookDTO(

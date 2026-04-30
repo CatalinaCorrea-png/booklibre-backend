@@ -4,6 +4,9 @@ import ar.edu.unsam.phm.domain.Review
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.query.Param
 
 interface ReservationRatingProjection {
     val reservationId: Long
@@ -20,4 +23,6 @@ interface CrudReviewRepository : CrudRepository<Review, Long> {
     @Query("SELECT r.reservation.id AS reservationId, r.rating AS rating FROM Review r WHERE r.reservation.id IN :ids")
     fun findRatingsByReservationIdIn(ids: List<Long>): List<ReservationRatingProjection>
 
+    @Query("SELECT r FROM Review r WHERE r.book.id = :bookId")
+    fun findAllByBookId(@Param("bookId") bookId: Long, pageable: Pageable): Page<Review>
 }

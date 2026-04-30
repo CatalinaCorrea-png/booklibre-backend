@@ -105,7 +105,7 @@ class ReservationService(
         }
     }
 
-    //@Transactional
+    @Transactional
     fun rateLoan(reservationId: Long, rating: Int, comment: String, userId: Long) {
         val reservation = reservationRepository.findById(reservationId)
             .orElseThrow { BusinessException("Reserva $reservationId no encontrada") }
@@ -131,12 +131,6 @@ class ReservationService(
 
     @Transactional(readOnly = true)
     fun getUserReadBooksNumber(userId: Long): Long = reservationRepository.countUserReadBooksNumber(userId)
-
-    fun getBookReviews(bookId: Long, page: Int = 0, pageSize: Int = 2): List<Review> {
-        return reservationRepository.findAllReviewsByBookId(bookId)
-            .drop(page * pageSize)
-            .take(pageSize)
-    }
 
     fun getReservedDates(bookId: Long): List<ReservedPeriodDTO> =
         reservationRepository.findAllByBookId(bookId)
