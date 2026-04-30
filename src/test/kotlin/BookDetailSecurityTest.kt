@@ -23,7 +23,7 @@ import java.time.LocalDate
 
 @SpringBootTest
 @AutoConfigureMockMvc   // sin addFilters = false → los filtros de seguridad están activos
-@ActiveProfiles("test")
+@ActiveProfiles("sectest")
 @Transactional
 class BookDetailSecurityTest {
 
