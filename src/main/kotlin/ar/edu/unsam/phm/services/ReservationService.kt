@@ -61,18 +61,18 @@ class ReservationService(
     }
 
     // esto quiza esta de mas, supongo que regla de negocio?
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     fun getReservesByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
         val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
-        val reservationsPage = reservationRepository.findByLectorIdFiltered(userId, search, UserTypes.PUBLISHER, pageable)
+        val reservationsPage = reservationRepository.findByLectorIdFiltered(userId, search, UserTypes.PUBLISHER,pageable)
         val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content)
         return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
     }
 
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     fun getLoansMadeByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
         val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
-        val reservationsPage = reservationRepository.findByOwnerIdFiltered(userId, search, UserTypes.PUBLISHER, pageable)
+        val reservationsPage = reservationRepository.findByOwnerIdFiltered(userId, search, UserTypes.READER, pageable)
         val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content, true)
         return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
     }
@@ -105,16 +105,13 @@ class ReservationService(
         }
     }
 
-    @Transactional
+    //@Transactional
     fun rateLoan(reservationId: Long, rating: Int, comment: String, userId: Long) {
-        val reservation = reservationRepository.findById(reservationId).get()
-        val existingReview = reviewRepository.findByReservationId(reservationId)
-        if (existingReview != null) {
-            throw BusinessException("La reserva ya tiene una reseña asignada.")
-        }
-        //.orElseThrow { NotFoundException("Reserva $reservationId no encontrada") }
-        val reviewer = userRepository.findById(userId).get()
-        //.orElseThrow { NotFoundException("Usuario $userId no encontrado") }
+        val reservation = reservationRepository.findById(reservationId)
+            .orElseThrow { BusinessException("Reserva $reservationId no encontrada") }
+
+        val reviewer = userRepository.findById(userId)
+            .orElseThrow { BusinessException("Usuario $userId no encontrado") }
 
         val newReview = Review(
             rating = rating,
