@@ -9,22 +9,6 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class UserController(private val userService: UserService, private val authenticationService: AuthenticationService) {
 
-    @PostMapping("/register")
-    fun createUser(@RequestBody request: AuthRegisterRequest): AuthResponse {
-        val user = User(
-            email = request.email,
-            password = request.password,
-            name = request.name
-        )
-        val savedUser = userService.create(user)
-        return AuthResponse(
-            email = savedUser.email,
-            name = savedUser.name,
-            id = savedUser.id!!  //esto esta garantizado por JPA que no va a venir null ya que el es el encargado de crearlo
-        )
-    }
-
-
     @GetMapping("/profile/{userId}")
     fun getUserProfile(@PathVariable userId: Long): UserDTO =
         userService.getUserProfile(userId).toUserDTO()

@@ -1,8 +1,12 @@
 package ar.edu.unsam.phm.controller.auth
 
+import ar.edu.unsam.phm.domain.User
+import ar.edu.unsam.phm.dto.AuthRegisterRequest
 import ar.edu.unsam.phm.dto.AuthRequest
+import ar.edu.unsam.phm.dto.AuthResponse
 import ar.edu.unsam.phm.dto.AuthenticationResponse
 import ar.edu.unsam.phm.services.AuthenticationService
+import ar.edu.unsam.phm.services.UserService
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -14,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException
 //@CrossOrigin("*")
 @RequestMapping("/api/auth")
 class AuthController(
+    private val userService: UserService,
     private val authenticationService: AuthenticationService,
 ) {
 
@@ -58,5 +63,20 @@ class AuthController(
         response.addHeader(HttpHeaders.SET_COOKIE, newCookie.toString())
 
         return TokenResponse(token = newAccess)
+    }
+
+    @PostMapping("/register")
+    fun createUser(@RequestBody request: AuthRegisterRequest): AuthResponse {
+        val user = User(
+            email = request.email,
+            password = request.password,
+            name = request.name
+        )
+        val savedUser = userService.create(user)
+        return AuthResponse(
+            email = savedUser.email,
+            name = savedUser.name,
+            id = savedUser.id!!  //esto esta garantizado por JPA que no va a venir null ya que el es el encargado de crearlo
+        )
     }
 }

@@ -49,7 +49,7 @@ class SecurityConfiguration(
                     .requestMatchers("/assets/**").permitAll() // para que no rompan las imagenes de perfil
                     .requestMatchers(HttpMethod.OPTIONS)
                     .permitAll() // esto es para react pregunta antes de hacer la request real
-                    .requestMatchers(HttpMethod.POST, "/register").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
 
                     // Endpoints por rol
                     .requestMatchers(HttpMethod.GET, "/filtered-books", "book-detail/**")
