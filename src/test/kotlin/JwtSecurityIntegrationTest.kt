@@ -129,7 +129,7 @@ class JwtSecurityIntegrationTest {
 
         @Test
         fun `register es accesible sin token`() {
-            mockMvc.perform(post("/register")
+            mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""{"name":"Nuevo","email":"nuevo@sectest.com","password":"12345678"}"""))
                 .andExpect { assertSecurityPassed(it.response.status, "register") }
