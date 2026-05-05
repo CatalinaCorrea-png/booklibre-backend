@@ -1,7 +1,7 @@
 package ar.edu.unsam.phm.repository
 
 interface RepositoryElement {
-    var id: Int
+    var id: Long?
 
     fun matchesPartiallyWith(criteria: String, compareTo: String): Boolean =
         compareTo.contains(criteria, ignoreCase = true)
@@ -11,10 +11,10 @@ interface RepositoryElement {
 
     fun isNotEmpty(criteria: String) = criteria.isNotBlank()
 
-    fun meetsSearchCriteria(criteria: String) : Boolean
+    fun meetsSearchCriteria(criteria: String): Boolean
 
-    fun meetsCreationCriteria()
+    fun validate()
 
-    fun meetsNewCriteria(): Boolean = this.id == 0
+    fun meetsNewCriteria(): Boolean = this.id == null
 
 }

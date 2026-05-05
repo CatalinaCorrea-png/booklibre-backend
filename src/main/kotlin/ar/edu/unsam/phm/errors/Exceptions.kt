@@ -20,3 +20,6 @@ class ConflictException(msg: String) : RuntimeException(msg)
 // (e.g., fallo de conexión a la base de datos, un servicio externo no disponible,
 //         o un error no controlado en la lógica del sistema).
 class InternalException(msg: String) : RuntimeException(msg)
+
+// Token expirado. (401)
+class TokenExpiredException(mensaje: String = "Token vencido") : RuntimeException(mensaje)

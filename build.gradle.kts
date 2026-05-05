@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.serialization") version "1.9.0"
     kotlin("plugin.spring") version "1.9.24"
+    kotlin("plugin.jpa") version "1.9.24"
     jacoco
     war
 }
@@ -49,12 +50,33 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+
+    //para posgres y springboot
+    runtimeOnly("org.postgresql:postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    testImplementation("com.h2database:h2")
+
+    // Spring Security (base necesaria para JWT)
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    testImplementation("org.springframework.security:spring-security-test")
+
+    // JWT - JJWT (librería más popular para Java/Kotlin)
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 }
 
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
+}
+// Solves this WARNING when boot "Getter methods of lazy classes cannot be final: ar.edu.unsam.phm.domain.Book#getAuthor..."
+// ~"...In Kotlin, all classes and methods are final by default. Hibernate needs to create proxy subclasses of your @Entity classes
+// to support lazy loading — but it can't subclass or override final methods..."
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
 }
 
 tasks.withType<Test> {

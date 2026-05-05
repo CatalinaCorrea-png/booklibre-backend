@@ -1,70 +1,23 @@
 package ar.edu.unsam.phm.domain
 
-import java.time.LocalDate
+import jakarta.persistence.Entity
+import kotlin.math.ceil
 
-class Common(
-    title: String = "",
-    desc: String = "",
-    gender: Gender = Gender.DRAMA,
-    author: Author = Author("", ""),
-    numPages: Int = 0,
-    isbn: String = "978-3-16-148410-0",
-    language: Language = Language.SPANISH,
-    editorial: String = "",
-    publishDate: LocalDate = LocalDate.now(),
-    condition: BookCondition = BookCondition.EXCELLENT,
-    reservationsIds: MutableList<Int> = mutableListOf(),
-    owner: User = User(),
-    imageSrc: String = "",
-    timestamp: LocalDate = LocalDate.now(),
-    bookType: String = "COMUN"
-)
-    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner, imageSrc, timestamp, bookType) {
-    override fun typeBibliokarmas(userBibliokarmas: Int) : Int = if (userBibliokarmas < 1000) this.numPages * 5 else this.numPages * 2
+@Entity
+class Common : Book(bookType = "COMUN") {
+    override fun typeBibliokarmas(userBibliokarmas: Int): Long = if (userBibliokarmas < 1000) this.numPagesLong() * 5 else this.numPagesLong() * 2
 }
 
-class WithADedication(
-    title: String = "",
-    desc: String = "",
-    gender: Gender = Gender.DRAMA,
-    author: Author = Author("", ""),
-    numPages: Int = 0,
-    isbn: String = "978-3-16-148410-0",
-    language: Language = Language.SPANISH,
-    editorial: String = "",
-    publishDate: LocalDate = LocalDate.now(),
-    condition: BookCondition = BookCondition.EXCELLENT,
-    reservationsIds: MutableList<Int> = mutableListOf(),
-    owner: User = User(),
-    imageSrc: String = "",
-    timestamp: LocalDate = LocalDate.now(),
-    bookType: String = "CON DEDICATORIA"
-)
-    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,  imageSrc, timestamp, bookType) {
-    override fun typeBibliokarmas(userBibliokarmas: Int): Int = 200 + 10 * this.reservationsIds.size
+@Entity
+class WithADedication : Book(bookType = "CON DEDICATORIA") {
+    override fun typeBibliokarmas(userBibliokarmas: Int): Long = 200 + 10 * this.reservationCount()
 }
 
-class Collectable(
-    title: String = "",
-    desc: String = "",
-    gender: Gender = Gender.DRAMA,
-    author: Author = Author("", ""),
-    numPages: Int = 0,
-    isbn: String = "978-3-16-148410-0",
-    language: Language = Language.SPANISH,
-    editorial: String = "",
-    publishDate: LocalDate = LocalDate.now(),
-    condition: BookCondition = BookCondition.EXCELLENT,
-    reservationsIds: MutableList<Int> = mutableListOf(),
-    owner: User = User(),
-    imageSrc: String = "",
-    timestamp: LocalDate = LocalDate.now(),
-    bookType: String = "COLECCIONABLE"
-)
-    : Book(title, desc, gender, author, numPages, isbn, language, editorial, publishDate, condition, reservationsIds, owner,  imageSrc, timestamp, bookType) {
-    override fun typeBibliokarmas(userBibliokarmas: Int): Int {
+@Entity
+class Collectable : Book(bookType = "COLECCIONABLE") {
+    override fun typeBibliokarmas(userBibliokarmas: Int): Long {
         // redondeo hacia arriba
-        val fifthPart = (userBibliokarmas + 4) / 5
-        return fifthPart + this.numPages
+        val fifthPart = ceil(userBibliokarmas / 5.0).toLong()
+        return fifthPart + this.numPagesLong()
     }
 }

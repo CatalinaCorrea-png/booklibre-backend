@@ -2,28 +2,41 @@
 
 > "Que la fuerza te acompañe… y que te devuelvan el libro en fecha."
 
-Backend de la aplicación BookLibre, una plataforma para gestionar préstamos de libros entre usuarios. Desarrollado con **Kotlin + Spring Boot**.
+Backend de **BookLibre**, una plataforma para gestionar préstamos de libros entre usuarios. Desarrollado con **Kotlin + Spring Boot**.
 
 ---
 
-## Tecnologías
+## 🛠️ Tecnologías
 
-- **Kotlin**
-- **Spring Boot**
-- **Spring Data JPA**
-- **PostgreSQL** (base de datos)
-- **Maven / Gradle**
+| Tecnología | Uso |
+|---|---|
+| Kotlin | Lenguaje principal |
+| Spring Boot | Framework web |
+| Spring Data JPA | Persistencia y ORM |
+| PostgreSQL | Base de datos relacional |
+| Gradle | Gestión de dependencias |
+| Docker | Contenedor de base de datos |
+| JWT | Autenticación y seguridad |
 
 ---
 
-## Cómo correr el proyecto
+## 🚀 Cómo correr el proyecto
+
+### Prerequisitos
+- JDK 17+
+- Docker y Docker Compose
+
+### Pasos
 
 ```bash
-# Clonar el repositorio
+# 1. Clonar el repositorio
 git clone https://github.com/tu-usuario/booklibre-backend.git
 cd booklibre-backend
 
-# Correr la aplicación
+# 2. Levantar la base de datos con Docker
+docker-compose up -d
+
+# 3. Correr la aplicación
 ./gradlew bootRun
 ```
 
@@ -82,6 +95,139 @@ src/
 
 ##  Endpoints principales
 TODO
+
+---
+
+## Componentes en la Base de Datos
+
+### 1. Conocer los Libros que reservó un determinado usuario en el corriente año.
+
+```sql
+--  Query function
+CREATE OR REPLACE FUNCTION get_user_reservations(p_user_id INT)
+RETURNS TABLE (
+	name VARCHAR,
+	title VARCHAR,
+	pick_up_date DATE,
+	drop_off_date DATE
+)
+
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF p_user_id <= 0
+        THEN RAISE EXCEPTION 'El ID no puede ser cero o negativo: %', p_user_id;
+    END IF;
+    
+    IF NOT EXISTS( SELECT 1 FROM app_user u WHERE u.id = p_user_id )
+        THEN RAISE EXCEPTION 'No existe un usuario con ese ID: %', p_user_id;
+    END IF;
+
+    RETURN QUERY
+        SELECT u.name, b.title, r.pick_up_date, r.drop_off_date
+        FROM Reservation r
+        INNER JOIN app_user u ON u.id = r.user_id
+        INNER JOIN book b ON b.id = r.book_id
+        WHERE EXTRACT( YEAR FROM r.pick_up_date ) = EXTRACT( YEAR FROM CURRENT_DATE )
+        AND u.id = p_user_id;
+END;
+$$;
+
+-- Function call
+SELECT * get_user_reservations_current_year(1)
+```
+
+### 2. Llevar un control de las veces que un libro actualizó su puntaje, de manera de saber: a) la fecha en la que se actualizó, b) el nuevo valor y el anterior.
+
+```sql
+-- CREAR TABLA PARA GUARDAR ACTUALIZACIONES
+DROP TABLE IF EXISTS historial_puntaje_libro;
+CREATE TABLE historial_puntaje_libro (
+     id SERIAL PRIMARY KEY,
+     id_libro INT NOT NULL,
+     fecha_actualizacion TIMESTAMP,
+     valor_viejo DECIMAL(3,2),
+     valor_nuevo DECIMAL(3,2),
+     veces_actualizado INT
+);
+
+-- LA FUNCION DE INSERT AL HISTORIAL
+CREATE OR REPLACE FUNCTION registrar_cambio_puntaje()
+RETURNS TRIGGER AS $$
+DECLARE
+    acc NUMERIC;
+BEGIN
+    SELECT COUNT(*)
+    INTO acc
+    FROM historial_puntaje_libro
+    WHERE id_libro = NEW.id;
+    
+    -- Guardo todo en el historial con timestamp
+    INSERT INTO historial_puntaje_libro (id_libro, fecha_actualizacion, valor_viejo, valor_nuevo, veces_actualizado)
+    VALUES (NEW.id, NOW(), OLD.rating_avg, NEW.rating_avg, acc+1);
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- EL TRIGGER ESCUCHA A UN UPDATE DE AVGRATING EN BOOK
+CREATE TRIGGER trg_puntaje_libro
+    AFTER UPDATE OF rating_avg ON book
+    FOR EACH ROW
+    EXECUTE FUNCTION registrar_cambio_puntaje();
+
+```
+
+### 3. Saber qué usuarios tienen más de N reservas.
+``` sql
+CREATE OR REPLACE FUNCTION obtener_usuarios_con_n_reservas(n INT)  
+RETURNS TABLE ( 
+	id INT, 
+	name TEXT 
+) 
+AS $$ 
+BEGIN 
+	RETURN QUERY  
+	SELECT u.id, u.name 
+	FROM app_user u 
+	JOIN reservation r ON r.user_id = u.id -- La reserva conoce al usuario
+	GROUP BY u.id, u.name 
+	HAVING COUNT(r.id) > n 
+END; 
+$$ LANGUAGE plpgsql;
+```
+
+### 4. Evitar que los bibliokarmas de un usuario tomen un valor nulo en la base (por fuera de la interfaz de usuario).
+
+``` sql
+ALTER TABLE app_user
+    ALTER COLUMN bibliokarmas SET NOT NULL,
+    ALTER COLUMN bibliokarmas SET DEFAULT 0;
+
+-- Si ya existen filas con NULL se lo saco
+UPDATE app_user SET bibliokarmas = 0 WHERE bibliokarmas IS NULL;
+```
+
+### 5. Listar los usuarios que tengan más de 2 reservas devueltas.
+``` sql
+
+CREATE VIEW users_with_more_than_2_returned_reservations AS
+SELECT 
+    u.id,
+    u.name,
+    u.email,
+    u.user_type,
+    COUNT(r.id) AS returned_reservations
+FROM app_user u
+JOIN reservation r ON r.user_id = u.id
+WHERE r.drop_off_date < CURRENT_DATE
+GROUP BY u.id, u.name, u.email, u.user_type
+HAVING COUNT(r.id) > 2
+ORDER BY returned_reservations DESC;
+
+SELECT * FROM users_with_more_than_2_returned_reservations;
+
+```
 
 ---
 

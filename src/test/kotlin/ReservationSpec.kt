@@ -1,94 +1,73 @@
+package ar.edu.unsam.phm.services
 
-import ar.edu.unsam.phm.domain.Common
-import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.User
-import ar.edu.unsam.phm.domain.UserTypes
+import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.CreateReservationDTO
 import ar.edu.unsam.phm.errors.BusinessException
-import ar.edu.unsam.phm.repository.BookRepository
-import ar.edu.unsam.phm.repository.ReservationRepository
-import ar.edu.unsam.phm.repository.UserRepository
-import ar.edu.unsam.phm.services.ReservationService
+import ar.edu.unsam.phm.repository.*
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec
+import io.mockk.every
+import io.mockk.mockk
 import java.time.LocalDate
+import java.util.Optional
 
-class ReservationSpec: DescribeSpec ({
+class ReservationSpec : DescribeSpec({
     isolationMode = IsolationMode.InstancePerTest
 
-    val owner = User(userType = UserTypes.PUBLISHER)
-    val reader1 = User(userType = UserTypes.READER)
-    val reader2 = User(userType = UserTypes.READER)
+    val reservationRepository = mockk<CrudReservationRepository>()
+    val bookRepository        = mockk<CrudBookRepository>()
+    val userRepository        = mockk<CrudUserRepository>()
+    val reviewRepository      = mockk<CrudReviewRepository>(relaxed = true)
 
-    val commonBook = Common().apply {
-        title = "1984"
-        numPages = 328
+    val reservationService = ReservationService(
+        reservationRepository, bookRepository, userRepository, reviewRepository
+    )
+
+    val owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER, bibliokarmas = 0).apply { id = 1L }
+    val reader = User(name = "Juan", userType = UserTypes.READER, bibliokarmas = 100).apply { id = 2L }
+
+    val book = Common().apply {
+        id = 1L
+        title = "El Señor de los Anillos"
+        numPages = 500
         this.owner = owner
+        author = Author("J.R.R. Tolkien", "")
     }
 
-    describe("Caso feliz y caso triste cuando quiero reservar un libro") {
+    describe("createReservation") {
 
-        it("No puede reservar un libro prestado en esa fecha") {
-            // Arrange
-            val userRepository = UserRepository()
-            val reservaRepository = ReservationRepository()
-            val bookRepository = BookRepository()
-
-            userRepository.create(reader2)
-            bookRepository.create(commonBook)
-
-            val reserveExisting = Reservation(
-                user = reader1,
-                book = commonBook,
-                pickUpDate = LocalDate.of(2026, 4, 1),
-                dropOffDate = LocalDate.of(2026, 4, 10)
-            )
-            reservaRepository.create(reserveExisting)
-
-            val reservationService = ReservationService(reservaRepository, bookRepository, userRepository)
-
-            val newReservation = CreateReservationDTO(
-                bookId = commonBook.id,
-                sessionId = reader2.id,
-                pickUpDate = LocalDate.of(2026, 4, 5), // se superpone con 4/1 - 4/10
-                dropOffDate = LocalDate.of(2026, 4, 20)
+        it("Caso feliz: crea la reserva cuando las fechas están disponibles") {
+            val dto = CreateReservationDTO(
+                bookId = 1L,
+                sessionId = 2L,
+                pickUpDate = LocalDate.of(2030, 6, 1),
+                dropOffDate = LocalDate.of(2030, 6, 10)
             )
 
-            // Act & Assert
-            shouldThrow<BusinessException> { reservationService.createReservation(newReservation) }
+            every { bookRepository.findById(1L) } returns Optional.of(book)
+            every { userRepository.findById(2L) } returns Optional.of(reader)
+            every { reservationRepository.hasOverlappingReservation(any(), any(), any()) } returns false
+            every { userRepository.save(any()) } returns reader
+            every { reservationRepository.save(any()) } answers { firstArg() }
+
+            shouldNotThrow<Exception> { reservationService.createReservation(dto) }
         }
 
-        it("Puede reservar un libro en una fecha libre") {
-            // Arrange
-            val userRepository = UserRepository()
-            val reservaRepository = ReservationRepository()
-            val bookRepository = BookRepository()
-
-            userRepository.create(reader2)
-            bookRepository.create(commonBook)
-
-            val reserveExisting = Reservation(
-                user = reader1,
-                book = commonBook,
-                pickUpDate = LocalDate.of(2026, 4, 1),
-                dropOffDate = LocalDate.of(2026, 4, 10)
-            )
-            reservaRepository.create(reserveExisting)
-
-            val reservationService = ReservationService(reservaRepository, bookRepository, userRepository)
-
-            val newReservation = CreateReservationDTO(
-                bookId = commonBook.id,
-                sessionId = reader2.id,
-                pickUpDate = LocalDate.of(2026, 4, 11), // no se superpone
-                dropOffDate = LocalDate.of(2026, 4, 20)
+        it("Caso triste: lanza BusinessException cuando hay solapamiento de fechas") {
+            val dto = CreateReservationDTO(
+                bookId = 1L,
+                sessionId = 2L,
+                pickUpDate = LocalDate.of(2030, 6, 5),
+                dropOffDate = LocalDate.of(2030, 6, 15)
             )
 
-            // Act & Assert
-            shouldNotThrow<BusinessException> { reservationService.createReservation(newReservation) }
+            every { bookRepository.findById(1L) } returns Optional.of(book)
+            every { userRepository.findById(2L) } returns Optional.of(reader)
+            every { reservationRepository.hasOverlappingReservation(any(), any(), any()) } returns true
+
+            shouldThrow<BusinessException> { reservationService.createReservation(dto) }
         }
     }
-
 })

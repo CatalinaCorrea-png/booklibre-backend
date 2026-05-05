@@ -7,25 +7,21 @@ data class AuthRequest(
 ) {}
 
 // RESPONSE - Lo que devuelve el endpoint, lo que necesita el front
+data class AuthenticationResponse(
+    val accessToken: String,
+    val refreshToken: String,
+    val expirationTime:  Long,
+    val id: Long // pasamos esto por que si no tenemos que cambiar toda la logica en el front y los endpoints
+) {}
+
 data class AuthResponse(
     val name: String,
     val email: String,
-    val id: Int
-//    val nombreLocal: String
+    val id: Long
 ) {}
 
 data class AuthRegisterRequest(
-    val name: String, // Agregar esto en register
+    val name: String,
     val email: String,
-//    val nombreLocal: String,
-    val password: String
-) {}
-
-
-data class AuthUserRegisterRequest(
-    val name: String = "nombre", // Agregar esto en register
-    var lastName: String = "apellido",
-    val email: String,
-//    val nombreLocal: String,
     val password: String
 ) {}

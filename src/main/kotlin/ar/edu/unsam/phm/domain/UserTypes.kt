@@ -2,7 +2,7 @@ package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.errors.ConflictException
 
-enum class UserTypes(val value: String){
+enum class UserTypes(val value: String) {
     PUBLISHER("Publicador"),
     READER("Lector"),
     COMBINED("Lector / Publicador");

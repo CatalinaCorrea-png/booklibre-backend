@@ -5,8 +5,11 @@ import ar.edu.unsam.phm.repository.RepositoryElement
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import jakarta.persistence.*
+import org.hibernate.annotations.Formula
 import java.time.LocalDate
 
+@Entity
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
@@ -17,55 +20,126 @@ import java.time.LocalDate
     Type(value = WithADedication::class, name = "CON DEDICATORIA"),
     Type(value = Collectable::class, name = "COLECCIONABLE"),
 )
-abstract class Book (
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+abstract class Book(
+    @Column(nullable = false, length = 50)
     var title: String = "",
-    var desc: String = "",
-    var gender: Gender = Gender.DRAMA,
-    var author: Author = Author("", ""),
-    var numPages: Int = 0,
-    var isbn: String = "978-3-16-148410-0",
-    var language: Language = Language.SPANISH,
-    var editorial: String = "",
-    var publishDate: LocalDate = LocalDate.now(),
-    var condition: BookCondition = BookCondition.EXCELLENT,
-    var reservationsIds: MutableList<Int> = mutableListOf(),
-    var owner: User = User(),
-    var imageSrc: String = "",
-    var timestamp: LocalDate = LocalDate.now(),
-    val bookType: String
-): RepositoryElement {
-    override var id = 0
 
-    fun addReservation(reservationId: Int) {
-        reservationsIds.add(reservationId)
+    @Column(name = "description", length = 1000, nullable = false)
+    var desc: String = "",
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var gender: Gender = Gender.DRAMA,
+
+    // le decís a JPA: "no cargues esta relación hasta que alguien la pida explícitamente"
+    @ManyToOne(fetch = FetchType.LAZY)
+    var author: Author = Author("", ""),
+
+    @Column(nullable = false)
+    var numPages: Int = 0,
+
+    @Column(length = 17, nullable = false)
+    var isbn: String = "978-3-16-148410-0",
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var language: Language = Language.SPANISH,
+
+    @Column(nullable = false, length =50)
+    var editorial: String = "",
+
+    @Column(nullable = false)
+    var publishDate: LocalDate = LocalDate.now(),
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var condition: BookCondition = BookCondition.EXCELLENT,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+    var owner: User = User(),
+
+    @Column(nullable = false)
+    var imageSrc: String = "",
+
+    @Column(nullable = false)
+    var timestamp: LocalDate = LocalDate.now(),
+
+    @Column(nullable = false)
+    val bookType: String,
+
+    //agrego esta columna para el delete logico
+    @Column(name = "deleted")
+    var deleted: Boolean = false,
+
+    @OneToMany(
+        mappedBy = "book",
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.ALL],
+    ) // Lo cascadeo porque en esta implementación funciona asi...
+    val reviews: MutableList<Review> = mutableListOf(),
+
+    @Column
+    var ratingAvg: Double = 0.0,
+
+    @Formula("(SELECT COUNT(*) FROM reservation r WHERE r.book_id = id)")
+    private var reservationCount: Long = 0,
+
+    ) : RepositoryElement {
+
+    @Id
+    @GeneratedValue
+    override var id: Long? = null
+
+    fun logicDelete() {
+        deleted = true
     }
 
     // Template Method Primitiva
-    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int) : Int = 5 * reservationDays + typeBibliokarmas(userBibliokarmas)
+    fun calculateBibliokarmas(reservationDays: Int, userBibliokarmas: Int): Long =
+        5 * reservationDays + typeBibliokarmas(userBibliokarmas)
 
     // different for every type of book
-    abstract fun typeBibliokarmas(userBibliokarmas: Int) : Int
+    abstract fun typeBibliokarmas(userBibliokarmas: Int): Long
 
-    override fun meetsCreationCriteria() {
-        if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
-        if (!isNotEmpty(desc)) throw ConflictException("El libro tiene que tener descripcion")
-        if (!isNotEmpty(author.toString())) throw ConflictException("El libro tiene que tener autor")
-        if (numPages <= 0) throw ConflictException("El libro tiene que tener cantidad de paginas")
-        if (!isNotEmpty(isbn)) throw ConflictException("El libro tiene que tener ISBN")
-        if (!isNotEmpty(editorial)) throw ConflictException("El libro tiene que tener editorial")
-        if (!isNotEmpty(imageSrc)) throw ConflictException("El libro tiene que tener imagen de referencia")
+    fun addReview(review: Review) {
+        if (review.rating !in 1..5) throw ConflictException("Ingrese una calificaión entre 1 y 5")
+        reviews.add(review)
+        updateRating()
     }
 
-    override fun meetsSearchCriteria(criteria: String) : Boolean =
+    private fun updateRating() {
+        this.ratingAvg = reviews.map { it.rating }.average()
+    }
+
+    fun ownerIsReader(): Boolean = owner.userType == UserTypes.READER
+
+    override fun validate() {
+        if (!isNotEmpty(title)) throw ConflictException("El libro tiene que tener titulo")
+        if (title.length > 50) throw ConflictException("El titulo no debe superar los 50 caracteres")
+        if (!isNotEmpty(desc)) throw ConflictException("El libro tiene que tener descripcion")
+        if (desc.length > 1000) throw ConflictException("La descripcion no debe superar los 1000 caracteres")
+        if (!isNotEmpty(author.toString())) throw ConflictException("El libro tiene que tener autor")
+        if (numPages <= 0) throw ConflictException("El libro tiene que tener cantidad de paginas")
+        if (numPages > 2000) throw ConflictException("El libro no puede superar las 2000 paginas")
+        if (!isNotEmpty(isbn)) throw ConflictException("El libro tiene que tener ISBN")
+        if (!isNotEmpty(editorial)) throw ConflictException("El libro tiene que tener editorial")
+        if (editorial.length > 50) throw ConflictException("La editorial no debe superar los 50 caracteres")
+        if (!isNotEmpty(imageSrc)) throw ConflictException("El libro tiene que tener imagen de referencia")
+        if (imageSrc.length >= 255) throw ConflictException("La imagen del libro tiene demasiados caracteres. Max. 255")
+        if (!isNotEmpty(author.name)) throw ConflictException("El libro tiene que tener un autor")
+        if ((author.name).length > 50) throw ConflictException("El nombre del autor no debe superar los 50 caracteres")
+        if (ownerIsReader()) throw ConflictException("Si sos lector no podes crear un libro. Cambia tu rol.")
+    }
+
+    override fun meetsSearchCriteria(criteria: String): Boolean =
         criteria.isBlank() ||
                 this.title.contains(criteria.trim(), ignoreCase = true)
 //              || this.author.name.contains(criteria.trim(), ignoreCase = true)
 
-    fun meetsPagesCriteria(pagesRangeMin: Int?, pagesRangeMax: Int?): Boolean {
-//        println("pagesRangeMin: $pagesRangeMin - pagesRangeMax: $pagesRangeMax")
-        val min = pagesRangeMin ?: 0
-        val max = pagesRangeMax ?: 1500 // Regla de negocio (Por ahora)
-        return this.numPages in min..max
-    }
+    fun reservationCount(): Long = this.reservationCount
+
+    fun numPagesLong() : Long = this.numPages.toLong()
 
 }

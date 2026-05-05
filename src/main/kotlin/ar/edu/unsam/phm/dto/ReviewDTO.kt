@@ -1,31 +1,33 @@
 package ar.edu.unsam.phm.dto
 
 import ar.edu.unsam.phm.domain.Review
-import java.time.LocalDate
 
 data class ReviewDTO(
-    var id: Int,
-    var reviewerName: String,
-    var rating: Int,
-    var review: String,
-    var timestamp: String
-){
+    var id: Long = 0,
+    var reviewerName: String = "",
+    var rating: Int = 0,
+    var review: String = "",
+    var timestamp: String = "",
+    var reservation: ReservationDTO? = null,
+) {
 
-    fun fromDTO(): Review {
-        return Review(
-            reviewerName = this.reviewerName,
-            rating = this.rating,
-            review = this.review,
-            timestamp= LocalDate.parse(this.timestamp),
-        ).apply {
-            id = this@ReviewDTO.id
-        }
-    }
+//    fun fromDTO(): Review {
+//        return Review(
+//            reviewerName = this.reviewerName,
+//            rating = this.rating,
+//            review = this.review,
+//            timestamp = LocalDate.parse(this.timestamp),
+//            reservation = Reservation(),
+//            book = Common()
+//        ).apply {
+//            id = this@ReviewDTO.id
+//        }
+//    }
 }
 
 fun Review.toDTO(): ReviewDTO {
     return ReviewDTO(
-        id = this.id,
+        id = this.id!!,
         reviewerName = this.reviewerName,
         rating = this.rating,
         review = this.review,

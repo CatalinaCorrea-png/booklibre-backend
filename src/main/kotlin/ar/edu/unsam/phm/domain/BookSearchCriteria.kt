@@ -2,8 +2,8 @@ package ar.edu.unsam.phm.domain
 
 import java.time.LocalDate
 
-data class BookSearchCriteria (
-    val userId: Int,
+data class BookSearchCriteria(
+    val userId: Long?,
     val title: String? = null,
     val genders: List<Gender> = listOf(),
     val pagesRangeMin: Int? = null,

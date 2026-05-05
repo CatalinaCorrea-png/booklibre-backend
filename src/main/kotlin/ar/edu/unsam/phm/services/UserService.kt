@@ -1,92 +1,63 @@
 package ar.edu.unsam.phm.services
 
+import ar.edu.unsam.phm.domain.State
 import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.dto.UpdateUserProfileDTO
-import ar.edu.unsam.phm.dto.UserDTO
-import ar.edu.unsam.phm.dto.toUserDTO
-import ar.edu.unsam.phm.errors.NotFoundException
-import ar.edu.unsam.phm.repository.UserRepository
-import org.springframework.stereotype.Service
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
-import java.util.UUID
-
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.ConflictException
-import org.springframework.web.multipart.MultipartFile
-
+import ar.edu.unsam.phm.errors.NotFoundException
+import ar.edu.unsam.phm.repository.CrudReservationRepository
+import ar.edu.unsam.phm.repository.CrudUserRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
 
 @Service
 class UserService(
-    val userRepository: UserRepository
+    @Autowired
+    val userRepository: CrudUserRepository,
+    @Autowired
+    val reservationRepository: CrudReservationRepository,
+    private val encoder: PasswordEncoder
 ) {
-    fun validate(user: User): User {
-        val userRepo = this.search(user)
-        if (userRepo.password == user.password) {
-            return userRepo
-        }else {
-            throw BusinessException("Las credenciales no coinciden")
-        }
+
+    @Transactional(readOnly = true)
+    fun getUserProfile(userId: Long): User {
+        val persistedUser = userRepository
+            .findById(userId)
+            .orElseThrow {
+                NotFoundException("No se encuentra un usuario registrado con este ID: $userId")
+            }
+        return persistedUser
     }
 
-    fun search( user: User) : User {
-        val userMatch = userRepository.search(user.email)
-        if (userMatch.isEmpty()){
-            throw BusinessException("Credenciales incorrectas")
-        }else{
-            return userMatch.first()
-        }
-    }
-
-    fun create(user: User) {
-        val existingUser: List<User> = userRepository.search(user.email)
-        if (existingUser.isEmpty()) {
-            user.meetsCreationCriteria()
-            userRepository.create(user)
-        }  else {
+    @Transactional
+    fun create(user: User): User {
+        val existingUser: Optional<User> = userRepository.findByEmail(user.email)
+        if (existingUser.isEmpty) {
+            val userCopy = User(
+                name = user.name,
+                email = user.email,
+                password = encoder.encode(user.password)
+            )
+            userCopy.validate()
+            return userRepository.save(userCopy)
+        } else {
             throw ConflictException("Email '${user.email}' ya se encuentra registrado")
-    }}
-
-    fun getUserProfile(userId: Int): UserDTO {
-        val user = userRepository.repositoryObjects().find { user -> user.id == userId }
-        if (user == null) {
-            throw NotFoundException("No se encontro un user con el id: $userId")
         }
-        return user.toUserDTO()
     }
 
-    private fun saveImage(image: MultipartFile): String {
-        val uploadDirectory: Path = Paths.get("uploads")
-
-        if (!Files.exists(uploadDirectory)) {
-            Files.createDirectories(uploadDirectory)
-        }
-
-        val originalFilename = image.originalFilename ?: "image"
-        val extension = originalFilename.substringAfterLast(".", "")
-        val uniqueFilename = if (extension.isNotBlank()) {
-            "${UUID.randomUUID()}.$extension"
-        } else {
-            UUID.randomUUID().toString()
-        }
-
-        val targetPath = uploadDirectory.resolve(uniqueFilename)
-        Files.copy(image.inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING)
-
-        return "uploads/$uniqueFilename"
-    }
-
-    fun updateUserProfile(userData: UpdateUserProfileDTO, image: MultipartFile?): UserDTO {
-        val existingUser = userRepository.getObject(userData.id)
-
-        val finalImagePath = if (image != null && !image.isEmpty) {
-           saveImage(image)
-        } else {
-            existingUser.img
-        }
+    fun updateUserProfile(userData: UpdateUserProfileDTO): User {
+        val existingUser = userRepository
+            .findById(userData.id)
+            .orElseThrow {
+                NotFoundException("No se encuentra un usuario registrado con ese ID ${userData.id}")
+            }
 
         val updatedUser = User(
             name = userData.name,
@@ -98,14 +69,46 @@ class UserService(
             timestamp = userData.timestamp,
             bibliokarmas = userData.bibliokarmas,
             password = existingUser.password,
-            img = finalImagePath
+            img = userData.img
         ).apply {
             id = existingUser.id
         }
 
-        userRepository.update(updatedUser)
+        if (existingUser.userType.name != updatedUser.userType.name) {
+            if (updatedUser.userType.name == UserTypes.READER.name) {
+                validateActiveReservationsAsPublisher(existingUser.id!!)
+            }
+            if (updatedUser.userType.name == UserTypes.PUBLISHER.name) {
+                validateActiveReservationsAsReader(existingUser.id!!)
+            }
+        }
 
-        return updatedUser.toUserDTO()
+        userRepository.save(updatedUser)
+
+        return updatedUser
     }
 
+    @Transactional(readOnly = true)
+    fun getUserByEmail(email: String): User {
+        val persistedUser = userRepository
+            .findByEmail(email)
+            .orElseThrow {
+                NotFoundException("No se encuentra un usuario registrado con este email: $email")
+            }
+        return persistedUser
+    }
+
+    fun validateActiveReservationsAsPublisher(userId: Long) {
+        var reservations = reservationRepository.findAllByBook_Owner_Id(userId)
+        if(reservations.any { it.dropOffDate >= LocalDate.now() }) {
+            throw BusinessException("Tus libros tienen reservas activas. No podés cambiar tu tipo hasta que finalicen todas las reservas de tus libros.")
+        }
+    }
+
+    fun validateActiveReservationsAsReader(userId: Long) {
+            var reservations = reservationRepository.findAllByUser_Id(userId)
+            if(reservations.any { it.dropOffDate >= LocalDate.now() }) {
+                throw BusinessException("Tenés reservas activas en curso. No podés cambiar tu tipo hasta que finalicen todas tus reservas.")
+            }
+    }
 }

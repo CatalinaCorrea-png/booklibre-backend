@@ -4,7 +4,7 @@ import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
 
 data class UserDTO(
-    val id: Int,
+    val id: Long,
     val name: String,
     val description: String,
     val email: String,
@@ -17,23 +17,24 @@ data class UserDTO(
 ) {
     fun fromDTO(): User {
         return User(
-            name= this.name,
-            description= this.description,
-            email= this.email,
-            cel= this.cel,
-            location= this.location,
-            userType= UserTypes.fromValue(this.userType),
-            timestamp= this.timestamp,
-            bibliokarmas= this.bibliokarmas,
+            name = this.name,
+            description = this.description,
+            email = this.email,
+            cel = this.cel,
+            location = this.location,
+            userType = UserTypes.fromValue(this.userType),
+            timestamp = this.timestamp,
+            bibliokarmas = this.bibliokarmas,
             img = this.img
         )
     }
 }
 
 data class UpdateUserProfileDTO(
-    val id: Int,
+    val id: Long,
     val name: String,
     val description: String,
+    val img: String,
     val email: String,
     val cel: String,
     val location: String,
@@ -44,7 +45,7 @@ data class UpdateUserProfileDTO(
 
 fun User.toUserDTO(): UserDTO {
     return UserDTO(
-        id = this.id,
+        id = this.id!!,
         name = this.name,
         description = this.description,
         email = this.email,
@@ -56,3 +57,8 @@ fun User.toUserDTO(): UserDTO {
         img = this.img
     )
 }
+
+data class UpdateProfileResponse(
+    val user: UserDTO,
+    val accessToken: String
+)
