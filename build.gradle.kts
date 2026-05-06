@@ -56,6 +56,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     testImplementation("com.h2database:h2")
 
+    // MongoDB
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
     // Spring Security (base necesaria para JWT)
     implementation("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.security:spring-security-test")

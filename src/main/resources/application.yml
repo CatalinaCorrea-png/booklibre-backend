@@ -18,6 +18,10 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  # base documental
+  data:
+    mongodb:
+      uri: mongodb://admin:admin@127.0.0.1:27019/libros?authSource=admin
 
 # Para activar el Trace
 logging:
@@ -25,6 +29,8 @@ logging:
     root: INFO
     com.zaxxer.hikari: DEBUG
     org.postgresql: DEBUG
+    org.springframework.data: DEBUG
+    org.mongodb.driver.protocol.command: DEBUG
 
 jwt:
   key: ${JWT_KEY}

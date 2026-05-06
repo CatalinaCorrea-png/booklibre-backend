@@ -45,7 +45,7 @@ class SecurityConfiguration(
             .authorizeHttpRequests {
                 it
                     // Endpoints publicos
-                    .requestMatchers("/api/auth", "/api/auth/refresh", "/error").permitAll()
+                    .requestMatchers("/api/auth", "/api/auth/refresh", "/error", "/books/**", "/book-titulo/**").permitAll()
                     .requestMatchers("/assets/**").permitAll() // para que no rompan las imagenes de perfil
                     .requestMatchers(HttpMethod.OPTIONS)
                     .permitAll() // esto es para react pregunta antes de hacer la request real

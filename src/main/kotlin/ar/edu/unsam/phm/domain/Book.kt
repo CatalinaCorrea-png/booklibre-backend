@@ -7,9 +7,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.persistence.*
 import org.hibernate.annotations.Formula
+import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
 
 @Entity
+// @Document(collection = "books")
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
