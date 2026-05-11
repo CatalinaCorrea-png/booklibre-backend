@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -118,37 +119,40 @@ class BookService(
 //        return PagedResult(booksPageContent, booksPage.size, booksPage.totalPages)
 //    }
 
-//    @Transactional(readOnly = true)
-//    fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable): PageResponse<BookDTO> {
-//        // println("Criteria: $searchCriteria")
-//        // println("Pageable: $pageable")
-//
-//        // (1) Query paginada sin coleccion de reservationIDS
-//        val spec = BookSpecifications.byCriteria(searchCriteria)
-//        val page : Page<Book> = bookRepository.findAll(spec, pageable)
-//        // println("Results: ${page.totalElements}")
-//
-//        val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
-//        return PageResponse(
-//            content = booksWithBibliokarmasDTO,
-//            page = page.number,
-//            pageSize = page.size,
-//            totalElements = page.totalElements.toInt(),
-//            totalPages = page.totalPages
-//        )
-//    }
-//
-//    private fun getBooksBibliokarmasDTO(books: List<Book>, criteria: BookSearchCriteria): List<BookDTO> {
-//        val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
-//        val user = userRepository.findById(criteria.userId!!)
-//            .orElseThrow { NotFoundException("No existe user con id: ${criteria.userId}") }
-//        val bookDTOs = books.map { book ->
-//            val bookDTO = book.toDTO()
-//            bookDTO.bookBibliokarmas = book.calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas)
-//            bookDTO
-//        }
-//        return bookDTOs
-//    }
+    @Transactional(readOnly = true)
+    fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable): PageResponse<BookDTO> {
+        // println("Criteria: $searchCriteria")
+        // (1) Traer bookIds con reservas que se superponen (PostgreSQL)
+        val excludedBookIds : List<String> = reservationRepository.findOverlappingBookIds(
+            searchCriteria.pickUpDate, searchCriteria.dropOffDate
+        )
+
+        // (2) Query paginada con Criteria de Mongo
+        val criteria = BookSpecifications.byCriteriaMongo(searchCriteria, excludedBookIds)
+        val page : Page<Book> = bookRepository.findByCriteria(criteria, pageable)
+        // println("Results: ${page.totalElements}")
+
+        val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
+        return PageResponse(
+            content = booksWithBibliokarmasDTO,
+            page = page.number,
+            pageSize = page.size,
+            totalElements = page.totalElements.toInt(),
+            totalPages = page.totalPages
+        )
+    }
+
+    private fun getBooksBibliokarmasDTO(books: List<Book>, criteria: BookSearchCriteria): List<BookDTO> {
+        val reservationTemp = Reservation(pickUpDate = criteria.pickUpDate, dropOffDate = criteria.dropOffDate)
+        val user = userRepository.findById(criteria.userId!!)
+            .orElseThrow { NotFoundException("No existe user con id: ${criteria.userId}") }
+        val bookDTOs = books.map { book ->
+            val bookDTO = book.toDTO()
+            bookDTO.bookBibliokarmas = book.calculateBibliokarmas(reservationTemp.reservationDays(), user.bibliokarmas)
+            bookDTO
+        }
+        return bookDTOs
+    }
 
     // la sesión vive hasta que termina el metodo
     @Transactional(readOnly = true)

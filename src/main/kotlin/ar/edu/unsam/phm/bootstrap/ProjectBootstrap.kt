@@ -1442,6 +1442,17 @@ class ProjectBootstrap : InitializingBean {
         }
     }
 
+    fun initBookReservationCount() {
+        // ── Agregar Reservation COUNT a los libros ──────────────────────────
+        val books = repoBooks.findAll()
+
+        books.forEach { book ->
+            val reservationCount = repoReservations.countByBookId(book.bookId)
+            book.reservationCount(reservationCount)
+            repoBooks.save(book)
+        }
+    }
+
     // ═════════════════════════════════════════════════════════════════════════
     // InitializingBean
     // ═════════════════════════════════════════════════════════════════════════
@@ -1456,6 +1467,7 @@ class ProjectBootstrap : InitializingBean {
         this.initReservations()   // reservaciones ya con users y books
         this.initReviews()        // reviews con reservaciones → se agregan a libros → save
         this.initBookRatingAvg()
+        this.initBookReservationCount()
         println("------------------------------------------------------------------------")
     }
 }

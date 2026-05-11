@@ -2,7 +2,9 @@ package ar.edu.unsam.phm.specification
 
 import ar.edu.unsam.phm.domain.*
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.data.mongodb.core.query.Criteria
 import java.time.LocalDate
+import java.util.regex.Pattern
 
 object BookSpecifications {
 
@@ -99,4 +101,56 @@ object BookSpecifications {
             .and(gendersIn(criteria.genders))
             .and(noOverlappingReservations(criteria.pickUpDate, criteria.dropOffDate))
 
+    // Versión MongoDB con Criteria
+    fun byCriteriaMongo(
+        criteria: BookSearchCriteria,
+        excludedBookIds: List<String> = emptyList()
+    ): Criteria {
+        val criteriaList = mutableListOf<Criteria>()
+
+        criteriaList.add(Criteria.where("deleted").`is`(false))
+
+        criteria.userId?.let {
+            criteriaList.add(Criteria.where("owner.id").ne(it))
+        }
+
+        criteria.userId?.let {
+            criteriaList.add(Criteria.where("owner.userType").ne(UserTypes.READER))
+        }
+
+        criteria.title?.let {
+            criteriaList.add(Criteria.where("title").regex(Pattern.quote(it), "i"))
+        }
+
+        criteria.ownersName?.let {
+            criteriaList.add(Criteria.where("owner.name").regex(Pattern.quote(it), "i"))
+        }
+
+        criteria.isbn?.let {
+            criteriaList.add(Criteria.where("isbn").regex(Pattern.quote(it), "i"))
+        }
+
+        criteria.pagesRangeMin?.let {
+            criteriaList.add(Criteria.where("numPages").gte(it))
+        }
+
+        criteria.pagesRangeMax?.let {
+            criteriaList.add(Criteria.where("numPages").lte(it))
+        }
+
+        if (criteria.genders.isNotEmpty()) {
+            criteriaList.add(Criteria.where("gender").`in`(criteria.genders))
+        }
+
+        // Las reservas están en PostgreSQL, así que se excluyen desde el service
+        if (excludedBookIds.isNotEmpty()) {
+            criteriaList.add(Criteria.where("bookId").nin(excludedBookIds))
+        }
+
+        return if (criteriaList.size == 1) {
+            criteriaList.first()
+        } else {
+            Criteria().andOperator(*criteriaList.toTypedArray())
+        }
+    }
 }

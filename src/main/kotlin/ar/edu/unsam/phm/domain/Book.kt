@@ -102,6 +102,10 @@ abstract class Book(
         this.ratingAvg = newRating
     }
 
+    fun reservationCount(newCount: Long) {
+        this.reservationCount = newCount
+    }
+
     fun ownerIsReader(): Boolean = owner.userType == UserTypes.READER
 
     override fun validate() {

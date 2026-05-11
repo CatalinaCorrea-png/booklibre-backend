@@ -16,15 +16,14 @@ class BookController(
     val bookService: BookService,
     val bookClickService: BookClickService,
 ) {
-//    @GetMapping("/filtered-books")
-//    fun getFilteredBooks(
-//        @ModelAttribute criteria: BookSearchCriteria,
-//
-//        ): PageResponse<BookDTO> {
-//        val direction = if (criteria.ascending) Sort.Direction.ASC else Sort.Direction.DESC
-//        val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
-//        return bookService.searchBooks(criteria, pageable)
-//    }
+    @GetMapping("/filtered-books")
+    fun getFilteredBooks(
+        @ModelAttribute criteria: BookSearchCriteria,
+        ): PageResponse<BookDTO> {
+        val direction = if (criteria.ascending) Sort.Direction.ASC else Sort.Direction.DESC
+        val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
+        return bookService.searchBooks(criteria, pageable)
+    }
 
     @PostMapping("/create-book")
     fun createBook(@RequestBody bookCreateDTO: BookCreateDTO) {

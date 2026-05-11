@@ -72,6 +72,16 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
     //para traer las reservas que tengan ese libro
     fun findByBookId(bookId: String): List<Reservation>
 
+    // taer reservas que se superponen
+    @Query(
+        """
+            SELECT r.bookId FROM Reservation r
+            WHERE r.pickUpDate < :dropOffDate
+            AND r.dropOffDate > :pickUpDate
+        """
+    )
+    fun findOverlappingBookIds(pickUpDate: LocalDate, dropOffDate: LocalDate) : List<String>
+
     @Query(
         """
     SELECT COUNT(r) > 0
@@ -92,7 +102,7 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
     // lo hago asi, para no traer to.do a memoria para hacer un .size en el service y para delegar responsabilidades
     // JPQL retorna long por defecto supuestamente
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.bookId = :bookId")
-    fun countByBookId(@Param("bookId") bookId: String): Int
+    fun countByBookId(@Param("bookId") bookId: String): Long
 
     @Query("SELECT r.bookId, COUNT(r) FROM Reservation r WHERE r.bookId IN :bookIds GROUP BY r.bookId")
     fun countByBookIds(@Param("bookIds") bookIds: List<String>): List<Array<Any>>
