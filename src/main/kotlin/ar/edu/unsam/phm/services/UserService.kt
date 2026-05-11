@@ -27,7 +27,7 @@ class UserService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getUserProfile(userId: Long): User {
+    fun getUserProfile(userId: String): User {
         val persistedUser = userRepository
             .findById(userId)
             .orElseThrow {
@@ -76,7 +76,7 @@ class UserService(
 
         if (existingUser.userType.name != updatedUser.userType.name) {
             if (updatedUser.userType.name == UserTypes.READER.name) {
-                validateActiveReservationsAsPublisher(existingUser.id!!)
+//                validateActiveReservationsAsPublisher(existingUser.id!!)
             }
             if (updatedUser.userType.name == UserTypes.PUBLISHER.name) {
                 validateActiveReservationsAsReader(existingUser.id!!)
@@ -98,14 +98,14 @@ class UserService(
         return persistedUser
     }
 
-    fun validateActiveReservationsAsPublisher(userId: Long) {
-        var reservations = reservationRepository.findAllByBook_Owner_Id(userId)
-        if(reservations.any { it.dropOffDate >= LocalDate.now() }) {
-            throw BusinessException("Tus libros tienen reservas activas. No podés cambiar tu tipo hasta que finalicen todas las reservas de tus libros.")
-        }
-    }
+//    fun validateActiveReservationsAsPublisher(userId: String) {
+//        var reservations = reservationRepository.findAllByBook_Owner_Id(userId)
+//        if(reservations.any { it.dropOffDate >= LocalDate.now() }) {
+//            throw BusinessException("Tus libros tienen reservas activas. No podés cambiar tu tipo hasta que finalicen todas las reservas de tus libros.")
+//        }
+//    }
 
-    fun validateActiveReservationsAsReader(userId: Long) {
+    fun validateActiveReservationsAsReader(userId: String) {
             var reservations = reservationRepository.findAllByUser_Id(userId)
             if(reservations.any { it.dropOffDate >= LocalDate.now() }) {
                 throw BusinessException("Tenés reservas activas en curso. No podés cambiar tu tipo hasta que finalicen todas tus reservas.")

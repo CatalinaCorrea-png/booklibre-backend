@@ -4,7 +4,7 @@ import ar.edu.unsam.phm.domain.Gender
 import java.time.LocalDate
 
 data class ProfileBookDTO(
-    var id: Long?,
+    var id: String?,
     var title: String,
     var author: String,
     var gender: Gender,

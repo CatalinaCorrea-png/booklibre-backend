@@ -20,16 +20,16 @@ class User(
     var userType: UserTypes = UserTypes.COMBINED,
     val timestamp: String = "",
     @Column(nullable = false)
-    var bibliokarmas: Int = 0,
+    var bibliokarmas: Long = 0,
     var password: String = "",
     var img: String = ""
 
 ) : RepositoryElement {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override var id: Long? = null
+    @GeneratedValue(strategy = GenerationType.UUID)
+    override var id: String? = null
 
-    fun addBibliokarmas(bibliokarmas: Int) {
+    fun addBibliokarmas(bibliokarmas: Long) {
         this.bibliokarmas += bibliokarmas
     }
 

@@ -5,7 +5,7 @@ import ar.edu.unsam.phm.domain.User
 import java.time.LocalDate
 
 data class BookDTO(
-    var id: Long,
+    var id: String,
     var title: String,
     var bookType: String, // Para saber que clase instanciar (a chequear despues si usamos un jackson o algo de eso)
     var desc: String,
@@ -18,7 +18,7 @@ data class BookDTO(
     var editorial: String,
     var publishDate: LocalDate,
     var condition: String,
-    var owner: UserDTO,
+    var owner: OwnerDTO,
     var imageSrc: String,
     var bookBibliokarmas: Long = 0,
     var rating: Double = 0.0
@@ -38,7 +38,7 @@ fun Book.toDTO(): BookDTO {
         editorial = this.editorial,
         publishDate = this.publishDate,
         condition = this.condition.value,
-        owner = this.owner.toUserDTO(),
+        owner = this.owner,
         imageSrc = this.imageSrc,
         bookType = this.bookType,
         rating = this.ratingAvg
@@ -47,11 +47,11 @@ fun Book.toDTO(): BookDTO {
 }
 
 data class BookCreateDTO(
-    val ownerId: Long? = null,
+    val ownerId: String,
     val book: Book
 )
 
-fun BookCreateDTO.createFromDTO(owner: User): Book = this.book.apply { this.owner = owner }
+fun BookCreateDTO.createFromDTO(owner: User): Book = this.book.apply { this.owner = owner.toOwnerDTO() }
 
 
 fun Book.toBookCreateDTO() = BookCreateDTO(

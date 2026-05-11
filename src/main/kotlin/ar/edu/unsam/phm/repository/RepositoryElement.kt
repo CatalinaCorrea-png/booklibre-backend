@@ -1,7 +1,7 @@
 package ar.edu.unsam.phm.repository
 
 interface RepositoryElement {
-    var id: Long?
+    var id: String?
 
     fun matchesPartiallyWith(criteria: String, compareTo: String): Boolean =
         compareTo.contains(criteria, ignoreCase = true)

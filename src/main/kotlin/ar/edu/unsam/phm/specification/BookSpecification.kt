@@ -11,14 +11,14 @@ object BookSpecifications {
             criteriaBuilder.equal(root.get<Boolean>("deleted"), false)
         }
 
-    fun notOwner(userId: Long?): Specification<Book> =
+    fun notOwner(userId: String?): Specification<Book> =
         Specification { root, _, cb ->
             userId?.let {
                 cb.notEqual(root.get<User>("owner").get<Long>("id"), it)
             }
         }
 
-    fun ownerIsNotReader(userId: Long?): Specification<Book> =
+    fun ownerIsNotReader(userId: String?): Specification<Book> =
         Specification { root, _, cb ->
             userId?.let {
                 cb.notEqual(root.get<User>("owner").get<UserTypes>("userType"), UserTypes.READER)
