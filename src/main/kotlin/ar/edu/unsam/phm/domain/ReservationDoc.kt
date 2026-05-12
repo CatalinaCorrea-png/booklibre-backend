@@ -9,7 +9,6 @@ import java.time.LocalDate
 data class ReservationDoc(
     @Id var id: String,
     val userId: String,
-    val userName: String,
     val bookId: String,
     val ownerId: String,
     val pickUpDate: LocalDate,
@@ -20,7 +19,6 @@ fun Reservation.toDoc(ownerId: String): ReservationDoc =
     ReservationDoc(
         id = id ?: throw BusinessException("Se tiene que persistir la reserva en Postgre antes de generarla en Mongo. - Reservation.toDoc() exception"),
         userId = user.id!!,
-        userName = user.name,
         bookId = bookId,
         ownerId = ownerId,
         pickUpDate = pickUpDate,
