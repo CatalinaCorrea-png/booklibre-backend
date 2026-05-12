@@ -12,13 +12,16 @@ import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.domain.WithADedication
+import ar.edu.unsam.phm.domain.toDoc
 import ar.edu.unsam.phm.dto.OwnerDTO
+import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.CrudAuthorRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.BookClickRepository
 import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.MongoBookRepository
+import ar.edu.unsam.phm.repository.MongoReservationRepository
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
@@ -43,10 +46,10 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var repoReservations: CrudReservationRepository
 
     @Autowired
-    private lateinit var repoReviews: CrudReviewRepository
+    private lateinit var repoMongoReservations: MongoReservationRepository
 
-//    @Autowired
-//    private lateinit var repoMongoBook: MongoBookRepository
+    @Autowired
+    private lateinit var repoReviews: CrudReviewRepository
 
     @Autowired
     private lateinit var repoBookClicks: BookClickRepository
@@ -248,7 +251,13 @@ class ProjectBootstrap : InitializingBean {
         if (reservationInRepo.isPresent) {
             reservation.id = reservationInRepo.get().id
         } else {
-            repoReservations.save(reservation)
+//            Primero la generamos en postgres
+            val savedRes = repoReservations.save(reservation)
+
+//            Despues hacemos un mirror en mongo
+            val ownerId = savedRes.book?.owner?.id ?: throw BusinessException("Bootstrap: reservation.book necesita setearse antes de crear la reserva")
+            repoMongoReservations.save(savedRes.toDoc(ownerId))
+
             println("Reservation creada para ${reservation.user.name} - ${reservation.book?.title}")
         }
     }
@@ -364,7 +373,6 @@ class ProjectBootstrap : InitializingBean {
     // ─────────────────────────────────────────────────────────────────────────
 
     fun initBooks() {
-        repoBooks.deleteAll()
 
         // ─── Libros Comunes (8) ───────────────────────────────────────────────
 
@@ -1461,6 +1469,8 @@ class ProjectBootstrap : InitializingBean {
         println("************************************************************************")
         println("Running initialization")
         println("************************************************************************")
+        repoMongoReservations.deleteAll()
+        repoBooks.deleteAll()
         this.initUsers()
         this.initAuthors()
         this.initBooks()          // libros sin reviews

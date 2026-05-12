@@ -21,7 +21,7 @@ spring:
   # base documental
   data:
     mongodb:
-      uri: mongodb://admin:admin@127.0.0.1:27019/libros?authSource=admin
+      uri: mongodb://admin:admin@127.0.0.1:27019/book_libre?authSource=admin
 
 # Para activar el Trace
 logging:
