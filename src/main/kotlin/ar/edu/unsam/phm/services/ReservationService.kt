@@ -4,12 +4,15 @@ import ar.edu.unsam.phm.domain.Reservation
 import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.State
 import ar.edu.unsam.phm.domain.UserTypes
+import ar.edu.unsam.phm.domain.toDoc
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.BusinessException
+import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.MongoBookRepository
+import ar.edu.unsam.phm.repository.MongoReservationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -25,39 +28,44 @@ class ReservationService(
     @Autowired
     val userRepository: CrudUserRepository,
     @Autowired
-    val reviewRepository: CrudReviewRepository
+    val reviewRepository: CrudReviewRepository,
+    @Autowired
+    val mongoReservationService: MongoReservationRepository,
 ) {
-//    @Transactional
-//    fun createReservation(reservation: CreateReservationDTO) {
-//        val book = bookRepository.findById(reservation.bookId)
-//            .orElseThrow { NotFoundException("No existe el libro con id: ${reservation.bookId}") }
-//
-//        val user = userRepository.findById(reservation.sessionId)
-//            .orElseThrow { NotFoundException("No existe el usuario con id: ${reservation.sessionId}") }
-//
-//        val reservation = Reservation(
-//            book = book,
-//            user = user,
-//            pickUpDate = reservation.pickUpDate,
-//            dropOffDate = reservation.dropOffDate
-//        )
-//
-//        reservation.validate()
-//
-//        if (reservationRepository.hasOverlappingReservation(
-//                book.id!!,
-//                reservation.pickUpDate,
-//                reservation.dropOffDate
-//            )
-//        ) {
-//            throw BusinessException("Reserva no disponible en esa fecha")
-//        }
-//
-//        user.addBibliokarmas(book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas).toInt())
-//
-//        userRepository.save(user)
-//        reservationRepository.save(reservation)
-//    }
+    @Transactional
+    fun createReservation(reservation: CreateReservationDTO) {
+        val book = bookRepository.findById(reservation.bookId)
+            .orElseThrow { NotFoundException("No existe el libro con id: ${reservation.bookId}") }
+
+        val user = userRepository.findById(reservation.sessionId)
+            .orElseThrow { NotFoundException("No existe el usuario con id: ${reservation.sessionId}") }
+
+        val newReservation = Reservation(
+            user = user,
+            bookId = book.id!!,
+            book = book,
+            pickUpDate = reservation.pickUpDate,
+            dropOffDate = reservation.dropOffDate
+        )
+
+        newReservation.validate()
+
+        if (reservationRepository.hasOverlappingReservation(
+                book.id!!,
+                reservation.pickUpDate,
+                reservation.dropOffDate
+            )
+        ) {
+            throw BusinessException("Reserva no disponible en esa fecha")
+        }
+
+        user.addBibliokarmas(book.calculateBibliokarmas(newReservation.reservationDays(), user.bibliokarmas))
+
+        userRepository.save(user)
+        reservationRepository.save(newReservation)
+
+        mongoReservationService.save(newReservation.toDoc(book.owner.id))
+    }
 
     // esto quiza esta de mas, supongo que regla de negocio?
     //@Transactional(readOnly = true)
