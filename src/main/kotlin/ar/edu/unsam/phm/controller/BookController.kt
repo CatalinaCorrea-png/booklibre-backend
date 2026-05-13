@@ -51,14 +51,13 @@ class BookController(
         bookClickService.registerClick(userId, id)
     }
 
-//    @GetMapping("/userOwnBooks/{userId}")
-//    fun getAllUserBooks(
-//        @PathVariable userId: Long,
-//        @ModelAttribute pageableObject: ProfileBookPageable
-//    ): PagedResult<ProfileBookDTO> {
-//        println(pageableObject)
-//        return bookService.getAllUserBooks(userId, pageableObject)
-//    }
+    @GetMapping("/userOwnBooks/{userId}")
+    fun getAllUserBooks(
+        @PathVariable userId: String,
+        @ModelAttribute pageableObject: ProfileBookPageable
+    ): PagedResult<ProfileBookDTO> {
+        return bookService.getAllUserBooks(userId, pageableObject)
+    }
 
     @GetMapping("/book-detail/{id}/bibliokarmas")
     fun calculateBibliokarmas(
