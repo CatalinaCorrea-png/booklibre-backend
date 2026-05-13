@@ -8,10 +8,11 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.repository.MongoRepository
-import java.util.Optional
+import java.util.*
 
 interface CustomBookRepository {
     fun findByCriteria(criteria: Criteria, pageable: Pageable): Page<Book>
+
 }
 
 class MongoBookRepositoryImpl(
@@ -28,4 +29,6 @@ class MongoBookRepositoryImpl(
 interface MongoBookRepository : MongoRepository<Book, String>, CustomBookRepository {
     fun findByTitle(title: String): Optional<Book>
     fun findByIsbn(isbn: String): MutableList<Book>
+    fun findAllByBookIdIn(bookIds: List<String>): List<Book>
+
 }

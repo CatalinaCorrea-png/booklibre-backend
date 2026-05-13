@@ -1,15 +1,11 @@
 package ar.edu.unsam.phm.services
 
-import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.Review
-import ar.edu.unsam.phm.domain.State
-import ar.edu.unsam.phm.domain.UserTypes
-import ar.edu.unsam.phm.dto.*
+import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.dto.PagedResult
+import ar.edu.unsam.phm.dto.ReservationDTO
+import ar.edu.unsam.phm.dto.ReservedPeriodDTO
 import ar.edu.unsam.phm.errors.BusinessException
-import ar.edu.unsam.phm.repository.CrudReservationRepository
-import ar.edu.unsam.phm.repository.CrudReviewRepository
-import ar.edu.unsam.phm.repository.CrudUserRepository
-import ar.edu.unsam.phm.repository.MongoBookRepository
+import ar.edu.unsam.phm.repository.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -20,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 class ReservationService(
     @Autowired
     val reservationRepository: CrudReservationRepository,
+    @Autowired
+    val mongoReservationRepository: MongoReservationRepository,
     @Autowired
     val bookRepository: MongoBookRepository,
     @Autowired
@@ -61,12 +59,13 @@ class ReservationService(
 
     // esto quiza esta de mas, supongo que regla de negocio?
     //@Transactional(readOnly = true)
-//    fun getReservesByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
-//        val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
-//        val reservationsPage = reservationRepository.findByLectorIdFiltered(userId, search, UserTypes.PUBLISHER,pageable)
-//        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content)
-//        return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
-//    }
+    fun getReservesByUserId(userId: String, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
+        val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
+        // val reservationsPage = reservationRepository.findByLectorIdFiltered(userId, search, UserTypes.PUBLISHER, pageable)
+        val reservationsPage = mongoReservationRepository.findByLectorIdFiltered(userId, search, pageable)
+        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content)
+        return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
+    }
 
     //@Transactional(readOnly = true)
 //    fun getLoansMadeByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
@@ -77,29 +76,39 @@ class ReservationService(
 //    }
 
     private fun getReservationsWithBibliokarmasDTO(
-        reservations: List<Reservation>,
+        reservations: List<ReservationDoc>,
         own: Boolean = false
     ): List<ReservationDTO> {
         if (reservations.isEmpty()) return emptyList()
 
         val reviewMap: Map<String?, Int> = reviewRepository
-            .findRatingsByReservationIdIn(reservations.map { it.id!! })
+            .findRatingsByReservationIdIn(reservations.map { it.id })
             .associate { it.reservationId to it.rating }
+
+        val bookMap: Map<String, Book> = bookRepository
+            .findAllByBookIdIn(reservations.map { it.bookId })
+            .associateBy { it.bookId }
+
+        val userMap: Map<String, User> = userRepository
+            .findAllById(reservations.map { it.userId })
+            .associateBy { it.id!! }
 
         return reservations.map { reservation ->
             val rating = reviewMap[reservation.id]
+            val book = bookMap[reservation.bookId]
+                ?: throw BusinessException("No se encontró el libro ${reservation.bookId}")
+            val user = userMap[reservation.userId]
+                ?: throw BusinessException("No se encontró el usuario ${reservation.userId}")
 
-            val bibliokarmas = reservation.book?.calculateBibliokarmas(
+            val bibliokarmas = book.calculateBibliokarmas(
                 reservation.reservationDays(),
-                reservation.user.bibliokarmas
+                user.bibliokarmas
             )
 
-            reservation.toDTO(rating != null).apply {
-                if (rating != null) {  // el .toDTO se lo pone en 0
-                    this.review = rating
-                }
+            reservation.toDTO(rating != null, book, user).apply {
+                if (rating != null) this.review = rating
                 this.canRate = !own && rating == null && this.state == State.RETURNED
-                this.bibliokarmas = bibliokarmas!!
+                this.bibliokarmas = bibliokarmas
             }
         }
     }
