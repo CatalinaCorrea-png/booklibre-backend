@@ -10,16 +10,20 @@ import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.MongoBookRepository
+import ar.edu.unsam.phm.repository.MongoReservationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class ReservationService(
     @Autowired
     val reservationRepository: CrudReservationRepository,
+    @Autowired
+    val mongoReservationRepository: MongoReservationRepository,
     @Autowired
     val bookRepository: MongoBookRepository,
     @Autowired
@@ -125,8 +129,8 @@ class ReservationService(
 //        reservation.book.addReview(newReview)
     }
 
-//    @Transactional(readOnly = true)
-//    fun getUserLentBooksNumber(userId: String): Long = reservationRepository.countUserReservedBooks(userId)
+    @Transactional(readOnly = true)
+    fun getUserLentBooksNumber(userId: String): Long = mongoReservationRepository.countUserReservedBooks(userId, LocalDate.now())
 
     @Transactional(readOnly = true)
     fun getUserReadBooksNumber(userId: String): Long = reservationRepository.countUserReadBooksNumber(userId)

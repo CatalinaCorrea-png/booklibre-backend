@@ -108,8 +108,7 @@ class BookService(
     ): PagedResult<ProfileBookDTO> {
         val borrowedBookIds: Set<String> = mongoReservationRepository
             .findBooksIdsByActiveReservation(userId, LocalDate.now())
-            .map { it.bookId }
-            .toSet()
+            .mapTo(mutableSetOf()) { it.bookId }
 
         val booksPage = bookRepository.findUserBooks(
             userId,
@@ -117,19 +116,11 @@ class BookService(
             pageableObject.toPageRequest()
         )
 
-        val items = booksPage.content.map { book ->
-            ProfileBookDTO(
-                id = book.id,
-                title = book.title,
-                author = book.author.name,
-                gender = book.gender,
-                timestamp = book.timestamp,
-                imageSrc = book.imageSrc,
-                state = if (book.id in borrowedBookIds) "PRESTADO" else "DISPONIBLE"
-            )
-        }
-
-        return PagedResult(items, booksPage.size, booksPage.totalPages)
+        return PagedResult(
+            items = booksPage.content.map { it.toProfileBookDTO(borrowedBookIds) },
+            total = booksPage.totalElements.toInt(),
+            totalPages = booksPage.totalPages
+        )
     }
 
 //    @Transactional(readOnly = true)

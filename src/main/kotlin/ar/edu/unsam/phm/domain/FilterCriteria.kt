@@ -8,11 +8,11 @@ enum class FilterCriteria {
     },
     AVAILABLE {
         override fun bookFilter(borrowedBookIds: Set<String>): Criteria =
-            Criteria.where("_id").nin(borrowedBookIds)
+            Criteria.where("bookId").nin(borrowedBookIds)
     },
     BORROWED {
         override fun bookFilter(borrowedBookIds: Set<String>): Criteria =
-            Criteria.where("_id").`in`(borrowedBookIds)
+            Criteria.where("bookId").`in`(borrowedBookIds)
     };
 
     abstract fun bookFilter(borrowedBookIds: Set<String>): Criteria

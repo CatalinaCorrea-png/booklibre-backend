@@ -14,4 +14,11 @@ interface MongoReservationRepository : MongoRepository<ReservationDoc, String> {
             "dropOffDate" : { "${"$"}gte": ?1 }
         }""")
     fun findBooksIdsByActiveReservation(ownerId: String, today: LocalDate): List<ActiveReservationBookId>
+
+    @Query("""{
+            "ownerId" : ?0,
+            "pickUpDate" : { "${"$"}lte" : ?1 },
+            "dropOffDate" : { "${"$"}gte": ?1 }
+        }""", count = true)
+    fun countUserReservedBooks(ownerId: String, today: LocalDate): Long
 }
