@@ -42,7 +42,7 @@ class ReservationService(
 
         val newReservation = Reservation(
             user = user,
-            bookId = book.id!!,
+            bookId = book.bookId,
             book = book,
             pickUpDate = reservation.pickUpDate,
             dropOffDate = reservation.dropOffDate
