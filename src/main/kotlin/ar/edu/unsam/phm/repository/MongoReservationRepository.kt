@@ -20,4 +20,21 @@ interface MongoReservationRepository : MongoRepository<ReservationDoc, String> {
     )
     fun findByLectorIdFiltered(userId: String, search: String, pageable: Pageable): Page<ReservationDoc>
 
+
+    @Query(
+        """{ 
+    "ownerId": ?0, 
+    "bookDeleted": false, 
+    "${'$'}or": [ 
+        { "bookTitle": { "${'$'}regex": ?1, "${'$'}options": "i" } }, 
+        { "bookAuthorName": { "${'$'}regex": ?1, "${'$'}options": "i" } } 
+    ] 
+    }"""
+    )
+    fun findByOwnerIdFiltered(userId: String, search: String, pageable: Pageable): Page<ReservationDoc>
+
+
+
+
+
 }

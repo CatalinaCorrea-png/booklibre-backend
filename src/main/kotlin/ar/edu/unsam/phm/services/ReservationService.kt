@@ -68,12 +68,12 @@ class ReservationService(
     }
 
     //@Transactional(readOnly = true)
-//    fun getLoansMadeByUserId(userId: Long, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
-//        val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
-//        val reservationsPage = reservationRepository.findByOwnerIdFiltered(userId, search, UserTypes.READER, pageable)
-//        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content, true)
-//        return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
-//    }
+    fun getLoansMadeByUserId(userId: String, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
+        val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
+        val reservationsPage = mongoReservationRepository.findByOwnerIdFiltered(userId, search, pageable)
+        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content, true)
+        return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
+    }
 
     private fun getReservationsWithBibliokarmasDTO(
         reservations: List<ReservationDoc>,
