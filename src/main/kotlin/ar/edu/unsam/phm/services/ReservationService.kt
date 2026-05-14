@@ -8,11 +8,17 @@ import ar.edu.unsam.phm.dto.ReservedPeriodDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.*
+import ar.edu.unsam.phm.repository.CrudReservationRepository
+import ar.edu.unsam.phm.repository.CrudReviewRepository
+import ar.edu.unsam.phm.repository.CrudUserRepository
+import ar.edu.unsam.phm.repository.MongoBookRepository
+import ar.edu.unsam.phm.repository.MongoReservationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class ReservationService(
@@ -26,8 +32,6 @@ class ReservationService(
     val userRepository: CrudUserRepository,
     @Autowired
     val reviewRepository: CrudReviewRepository,
-    @Autowired
-    val mongoReservationService: MongoReservationRepository,
 ) {
     @Transactional
     fun createReservation(reservation: CreateReservationDTO) {
@@ -61,7 +65,7 @@ class ReservationService(
         userRepository.save(user)
         reservationRepository.save(newReservation)
 
-        mongoReservationService.save(newReservation.toDoc(book.owner.id))
+        mongoReservationRepository.save(newReservation.toDoc(book.owner.id))
     }
 
     // esto quiza esta de mas, supongo que regla de negocio?
@@ -141,8 +145,8 @@ class ReservationService(
 //        reservation.book.addReview(newReview)
     }
 
-//    @Transactional(readOnly = true)
-//    fun getUserLentBooksNumber(userId: String): Long = reservationRepository.countUserReservedBooks(userId)
+    @Transactional(readOnly = true)
+    fun getUserLentBooksNumber(userId: String): Long = mongoReservationRepository.countUserReservedBooks(userId, LocalDate.now())
 
     @Transactional(readOnly = true)
     fun getUserReadBooksNumber(userId: String): Long = reservationRepository.countUserReadBooksNumber(userId)

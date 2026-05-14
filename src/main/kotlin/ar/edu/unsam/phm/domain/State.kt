@@ -16,9 +16,13 @@ enum class State(val value: String) {
     ACTIVE("Activo") {
         override fun matches(today: LocalDate, start: LocalDate, end: LocalDate) = true // Caso por defecto
     },
+    @Deprecated("Use BookAvailability.AVAILABLE instead", ReplaceWith("BookAvailability.AVAILABLE"))
+//    Esto solo devuelve false y yo necesitaba una logica (domain/BookAvailability), por eso lo depreque, si no lo cambian funciona igual es mas de gede que otra cosa ~ Niki
     AVAILABLE("Disponible") {
         override fun matches(t: LocalDate, s: LocalDate, e: LocalDate) = false
     },
+    @Deprecated("Use BookAvailability.BORROWED instead", ReplaceWith("BookAvailability.BORROWED"))
+//    Idem que arriba
     BORROWED("Prestado") {
         override fun matches(t: LocalDate, s: LocalDate, e: LocalDate) = false
     };

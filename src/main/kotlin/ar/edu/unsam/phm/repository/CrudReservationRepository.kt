@@ -107,17 +107,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
     @Query("SELECT r.bookId, COUNT(r) FROM Reservation r WHERE r.bookId IN :bookIds GROUP BY r.bookId")
     fun countByBookIds(@Param("bookIds") bookIds: List<String>): List<Array<Any>>
 
-//    @Query(
-//        """
-//         SELECT count(r)
-//         FROM Reservation r
-//         WHERE r.book.owner.id = :userId
-//         AND r.pickUpDate <= CURRENT_DATE
-//         AND r.dropOffDate >= CURRENT_DATE
-//    """
-//    )
-//    fun countUserReservedBooks(userId: String): Long
-
     @Query(
         """
         SELECT count(r)

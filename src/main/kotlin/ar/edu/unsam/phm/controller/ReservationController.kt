@@ -44,9 +44,9 @@ class ReservationController(
     fun getUserReadBooks(@PathVariable userId: String): Long =
         reservationService.getUserReadBooksNumber(userId)
 
-//    @GetMapping("/userLentBooks/{userId}")
-//    fun getUserLentBooks(@PathVariable userId: String): Long =
-//        reservationService.getUserLentBooksNumber(userId)
+    @GetMapping("/userLentBooks/{userId}")
+    fun getUserLentBooks(@PathVariable userId: String): Long =
+        reservationService.getUserLentBooksNumber(userId)
 
     @GetMapping("/reservations/book/{bookId}/dates")
     fun getReservedDatesByBook(@PathVariable bookId: String): List<ReservedPeriodDTO> =

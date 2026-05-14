@@ -4,11 +4,7 @@ import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
-import ar.edu.unsam.phm.repository.CrudAuthorRepository
-import ar.edu.unsam.phm.repository.CrudReservationRepository
-import ar.edu.unsam.phm.repository.CrudReviewRepository
-import ar.edu.unsam.phm.repository.CrudUserRepository
-import ar.edu.unsam.phm.repository.MongoBookRepository
+import ar.edu.unsam.phm.repository.*
 import ar.edu.unsam.phm.specification.BookSpecifications
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -25,6 +21,8 @@ class BookService(
     val bookRepository: MongoBookRepository,
     @Autowired
     val reservationRepository: CrudReservationRepository,
+    @Autowired
+    val mongoReservationRepository: MongoReservationRepository,
     @Autowired
     val userRepository: CrudUserRepository,
     @Autowired
@@ -105,19 +103,26 @@ class BookService(
         //no hace falta el .save, esta attached y lo detecta el hibernate con el dirty cheking
     }
 
-//    @Transactional(readOnly = true)
-//    fun getAllUserBooks(
-//        userId: Long,
-//        pageableObject: ProfileBookPageable
-//    ): PagedResult<ProfileBookDTO> {
-//        val pageable: PageRequest = pageableObject.toPageRequest()
-//        println(pageable)
-//        val booksPage: Page<ProfileBookDTO> =
-//            bookRepository.getAllUserBooks(userId, pageable, pageableObject.filterCriteria.name)
-//        println(booksPage)
-//        val booksPageContent = booksPage.content // No se que clase es esto (Mutable)List<ProfileBookDTO!>
-//        return PagedResult(booksPageContent, booksPage.size, booksPage.totalPages)
-//    }
+    fun getAllUserBooks(
+        userId: String,
+        pageableObject: ProfileBookPageable
+    ): PagedResult<ProfileBookDTO> {
+        val borrowedBookIds: Set<String> = mongoReservationRepository
+            .findBooksIdsByActiveReservation(userId, LocalDate.now())
+            .mapTo(mutableSetOf()) { it.bookId }
+
+        val booksPage = bookRepository.findUserBooks(
+            userId,
+            pageableObject.filterCriteria.bookFilter(borrowedBookIds),
+            pageableObject.toPageRequest()
+        )
+
+        return PagedResult(
+            items = booksPage.content.map { it.toProfileBookDTO(borrowedBookIds) },
+            total = booksPage.totalElements.toInt(),
+            totalPages = booksPage.totalPages
+        )
+    }
 
     @Transactional(readOnly = true)
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable): PageResponse<BookDTO> {
