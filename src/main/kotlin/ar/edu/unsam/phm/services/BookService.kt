@@ -159,7 +159,7 @@ class BookService(
     fun getBookById(id: String): BookDTO = bookRepository
         .findById(id)
         .orElseThrow {
-            NotFoundException("No se encuentra un libro registrado con el id: $id")
+            NotFoundException("No se encuentra un libro registrado con el id: $id!!!!")
         }
         .toDTO()
 
@@ -184,6 +184,6 @@ class BookService(
     @Transactional(readOnly = true)
     fun getBookReviews(bookId: String, page: Int = 0, pageSize: Int = 2): List<Review> {
         val pageable = PageRequest.of(page, pageSize)
-        return reviewRepository.findAllByBookId(bookId, pageable).content
+        return reviewRepository.findReviewsByBookId(bookId, pageable).content
     }
 }

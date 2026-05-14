@@ -23,8 +23,8 @@ interface CrudReviewRepository : CrudRepository<Review, String> {
     @Query("SELECT r.reservation.id AS reservationId, r.rating AS rating FROM Review r WHERE r.reservation.id IN :ids")
     fun findRatingsByReservationIdIn(ids: List<String>): List<ReservationRatingProjection>
 
-    @Query("SELECT r FROM Review r WHERE r.bookId = :bookId")
-    fun findAllByBookId(@Param("bookId") bookId: String, pageable: Pageable): Page<Review>
+//    @Query("SELECT r FROM Review r WHERE r.bookId = :bookId")
+//    fun findAllByBookId(@Param("bookId") bookId: String, pageable: Pageable): Page<Review>
 
-//    fun findAllByBook_Id(bookId: Long, pageable: Pageable): Page<Review>
+    fun findReviewsByBookId(bookId: String, pageable: Pageable): Page<Review>
 }

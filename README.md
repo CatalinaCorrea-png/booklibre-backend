@@ -231,6 +231,22 @@ SELECT * FROM users_with_more_than_2_returned_reservations;
 
 ---
 
+## Consultas MongoDB
+
+### 1. --
+
+
+### 2. --
+
+
+### 3. Saber qué libros tienen más de 4 puntos de calificación.
+
+```js
+db.books.find({ratingAvg:{$gt:4}})
+```
+
+---
+
 ##  Tutor
 - **Foglia, Pablo**
 
