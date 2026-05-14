@@ -12,7 +12,6 @@ import java.util.*
 
 interface CustomBookRepository {
     fun findByCriteria(criteria: Criteria, pageable: Pageable): Page<Book>
-
 }
 
 class MongoBookRepositoryImpl(

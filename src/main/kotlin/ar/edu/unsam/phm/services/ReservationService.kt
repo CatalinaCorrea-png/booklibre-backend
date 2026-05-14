@@ -1,18 +1,13 @@
 package ar.edu.unsam.phm.services
 
-import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.Review
-import ar.edu.unsam.phm.domain.State
-import ar.edu.unsam.phm.domain.UserTypes
-import ar.edu.unsam.phm.domain.toDoc
-import ar.edu.unsam.phm.dto.*
+import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.dto.CreateReservationDTO
+import ar.edu.unsam.phm.dto.PagedResult
+import ar.edu.unsam.phm.dto.ReservationDTO
+import ar.edu.unsam.phm.dto.ReservedPeriodDTO
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
-import ar.edu.unsam.phm.repository.CrudReservationRepository
-import ar.edu.unsam.phm.repository.CrudReviewRepository
-import ar.edu.unsam.phm.repository.CrudUserRepository
-import ar.edu.unsam.phm.repository.MongoBookRepository
-import ar.edu.unsam.phm.repository.MongoReservationRepository
+import ar.edu.unsam.phm.repository.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
