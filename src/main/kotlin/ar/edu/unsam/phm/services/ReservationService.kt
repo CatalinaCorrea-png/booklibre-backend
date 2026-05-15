@@ -142,7 +142,14 @@ class ReservationService(
         newReview.validate()
 
         reviewRepository.save(newReview)
-//        reservation.book.addReview(newReview)
+
+        val book = bookRepository.findByBookId(reservation.bookId)
+            .orElseThrow { BusinessException("No se encontró el libro ${reservation.bookId}") }
+        val newAvg = reviewRepository.findAllByBookId(reservation.bookId)
+            .map { it.rating }
+            .average()
+        book.updateRating(newAvg)
+        bookRepository.save(book)
     }
 
     @Transactional(readOnly = true)

@@ -1166,252 +1166,252 @@ class ProjectBootstrap : InitializingBean {
             review = "Kafkiano en el mejor sentido. La burocracia como pesadilla existencial, muy bien logrado.",
             reservation = reservaEmiliaPasada1,
             timestamp = today.minusMonths(9).plusDays(21),
-            bookId = elProceso.id!!
+            bookId = elProceso.bookId
         )
         reviewAdiosArmasEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Hemingway en su máxima expresión. El final me dejó sin palabras.",
             reservation = reservaEmiliaPasada2,
             timestamp = today.minusMonths(7).plusDays(20),
-            bookId = adiosArmas.id!!
+            bookId = adiosArmas.bookId
         )
         reviewRayuelaEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Una experiencia única. Lo leí en orden lineal y luego saltando capítulos, totalmente diferente.",
             reservation = reservaEmiliaPasada3,
             timestamp = today.minusMonths(4).plusDays(23),
-            bookId = rayuela.id!!
+            bookId = rayuela.bookId
         )
         reviewGranGatsbyLuciano = Review(
             reviewerName = lucianoVega.name, rating = 3,
             review = "Bella prosa, pero el protagonista me resultó difícil de empatizar. Vale la pena igual.",
             reservation = reservaLucianoPasada1,
             timestamp = today.minusMonths(11).plusDays(21),
-            bookId = granGatsby.id!!
+            bookId = granGatsby.bookId
         )
         reviewCrimenLuciano = Review(
             reviewerName = lucianoVega.name, rating = 5,
             review = "Dostoyevski entiende la psicología humana como nadie. Raskolnikov es aterrador y fascinante.",
             reservation = reservaLucianoPasada2,
             timestamp = today.minusMonths(8).plusDays(22),
-            bookId = crimen.id!!
+            bookId = crimen.bookId
         )
         reviewHuckFinnValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "Una aventura atemporal. Twain critica la sociedad con humor fino.",
             reservation = reservaValentinaPasada1,
             timestamp = today.minusMonths(12).plusDays(22),
-            bookId = huckFinn.id!!
+            bookId = huckFinn.bookId
         )
         reviewN1984Valentina = Review(
             reviewerName = valentinaSosa.name, rating = 5,
             review = "Imprescindible. Cada vez más vigente. Orwell era un visionario.",
             reservation = reservaValentinaPasada2,
             timestamp = today.minusMonths(6).plusDays(21),
-            bookId = n1984.id!!
+            bookId = n1984.bookId
         )
         reviewCaminoSwannValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "Proust exige paciencia pero recompensa con una belleza literaria incomparable.",
             reservation = reservaValentinaPasada3,
             timestamp = today.minusMonths(3).minusDays(14),
-            bookId = caminoSwann.id!!
+            bookId = caminoSwann.bookId
         )
         reviewLosMiserablesMateo = Review(
             reviewerName = mateoLopez.name, rating = 5,
             review = "Monumental. Victor Hugo logra que te importen profundamente personajes de hace dos siglos.",
             reservation = reservaMateoPasada1,
             timestamp = today.minusMonths(10).plusDays(34),
-            bookId = losMiserables.id!!
+            bookId = losMiserables.bookId
         )
         reviewMontagnaMagicaMateo = Review(
             reviewerName = mateoLopez.name, rating = 3,
             review = "Filosóficamente rico pero denso. Hay que entrar con paciencia y tiempo.",
             reservation = reservaMateoPasada2,
             timestamp = today.minusMonths(7).plusDays(39),
-            bookId = montagnaMagica.id!!
+            bookId = montagnaMagica.bookId
         )
         reviewMonteCristoMateo = Review(
             reviewerName = mateoLopez.name, rating = 5,
             review = "La mejor historia de venganza jamás escrita. No pude soltarlo.",
             reservation = reservaMateoPasada3,
             timestamp = today.minusMonths(3).plusDays(24),
-            bookId = monteCristo.id!!
+            bookId = monteCristo.bookId
         )
         reviewElProcesoValentina = Review(
             reviewerName = valentinaSosa.name, rating = 5,
             review = "Una obra que te deja paralizado. La burocracia como metáfora de la existencia.",
             reservation = reservaElProceso2,
             timestamp = today.minusMonths(8).plusDays(16),
-            bookId = elProceso.id!!
+            bookId = elProceso.bookId
         )
         reviewElProcesoMateo = Review(
             reviewerName = mateoLopez.name, rating = 4,
             review = "Kafka logra que te sientas atrapado junto al protagonista. Incómodo pero brillante.",
             reservation = reservaElProceso3,
             timestamp = today.minusMonths(5).plusDays(20),
-            bookId = elProceso.id!!
+            bookId = elProceso.bookId
         )
         reviewElProcesoEmilia2 = Review(
             reviewerName = emiliaRomero.name, rating = 3,
             review = "Me costó entrar pero una vez adentro no pude parar. La angustia de K. se siente real.",
             reservation = reservaElProceso4,
             timestamp = today.minusMonths(11).plusDays(26),
-            bookId = elProceso.id!!
+            bookId = elProceso.bookId
         )
         reviewOrgulloLuciano = Review(
             reviewerName = lucianoVega.name, rating = 5,
             review = "Austen domina la ironía con una precisión quirúrgica. Darcy y Elizabeth son un dueto irresistible.",
             reservation = reservaOrgulloLuciano,
             timestamp = today.minusMonths(10).plusDays(16),
-            bookId = orgullo.id!!
+            bookId = orgullo.bookId
         )
         reviewElProcesoMateo2 = Review(
             reviewerName = mateoLopez.name, rating = 4,
             review = "La culpa sin causa explicada, qué incómodo y qué genial.",
             reservation = reservaElProceso6,
             timestamp = today.minusMonths(7).plusDays(15),
-            bookId = elProceso.id!!
+            bookId = elProceso.bookId
         )
         reviewAdiosArmasValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "La guerra contada sin heroísmo, con una honestidad brutal. Hemingway no decepciona.",
             reservation = reservaAdiosArmas2,
             timestamp = today.minusMonths(10).plusDays(25),
-            bookId = adiosArmas.id!!
+            bookId = adiosArmas.bookId
         )
         reviewAdiosArmasMateo = Review(
             reviewerName = mateoLopez.name, rating = 3,
             review = "Buena prosa, aunque el ritmo se me hizo lento en el medio. El final salva todo.",
             reservation = reservaAdiosArmas3,
             timestamp = today.minusMonths(3).plusDays(10),
-            bookId = adiosArmas.id!!
+            bookId = adiosArmas.bookId
         )
         reviewRayuelaLuciano = Review(
             reviewerName = lucianoVega.name, rating = 4,
             review = "Cortázar rompe todo y lo reconstruye mejor. Exige concentración pero vale cada página.",
             reservation = reservaRayuela2,
             timestamp = today.minusMonths(8).plusDays(25),
-            bookId = rayuela.id!!
+            bookId = rayuela.bookId
         )
         reviewRayuelaMateo = Review(
             reviewerName = mateoLopez.name, rating = 5,
             review = "La mejor novela latinoamericana que leí. La estructura no lineal es un viaje mental.",
             reservation = reservaRayuela3,
             timestamp = today.minusMonths(2).plusDays(21),
-            bookId = rayuela.id!!
+            bookId = rayuela.bookId
         )
         reviewGranGatsbyValentina = Review(
             reviewerName = valentinaSosa.name, rating = 5,
             review = "El sueño americano desnudo. Fitzgerald escribe con una elegancia que duele.",
             reservation = reservaGranGatsby2,
             timestamp = today.minusMonths(10).plusDays(10),
-            bookId = granGatsby.id!!
+            bookId = granGatsby.bookId
         )
         reviewGranGatsbyMateo = Review(
             reviewerName = mateoLopez.name, rating = 4,
             review = "Corto e intenso. La fiesta como fachada del vacío, muy bien retratado.",
             reservation = reservaGranGatsby3,
             timestamp = today.minusMonths(7).plusDays(25),
-            bookId = granGatsby.id!!
+            bookId = granGatsby.bookId
         )
         reviewCrimenEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "La culpa narrada desde adentro. Dostoyevski te mete en la cabeza de Raskolnikov sin escapatoria.",
             reservation = reservaCrimen2,
             timestamp = today.minusMonths(11).plusDays(31),
-            bookId = crimen.id!!
+            bookId = crimen.bookId
         )
         reviewCrimenMateo = Review(
             reviewerName = mateoLopez.name, rating = 4,
             review = "Denso pero absorbente. El juicio final es magistral.",
             reservation = reservaCrimen3,
             timestamp = today.minusMonths(5).plusDays(25),
-            bookId = crimen.id!!
+            bookId = crimen.bookId
         )
         reviewHarryPotterEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Un clásico moderno. La magia de Hogwarts no envejece nunca.",
             reservation = reservaHarryPotter2,
             timestamp = today.minusMonths(12).plusDays(25),
-            bookId = harryPotter.id!!
+            bookId = harryPotter.bookId
         )
         reviewHarryPotterValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "Lo leí por primera vez de adulta y entendí por qué marcó a toda una generación.",
             reservation = reservaHarryPotter3,
             timestamp = today.minusMonths(9).plusDays(25),
-            bookId = harryPotter.id!!
+            bookId = harryPotter.bookId
         )
         reviewHuckFinnLuciano = Review(
             reviewerName = lucianoVega.name, rating = 4,
             review = "Twain disfraza la crítica social de aventura infantil con una habilidad increíble.",
             reservation = reservaHuckFinn2,
             timestamp = today.minusMonths(7).plusDays(15),
-            bookId = huckFinn.id!!
+            bookId = huckFinn.bookId
         )
         reviewHuckFinnMateo = Review(
             reviewerName = mateoLopez.name, rating = 3,
             review = "Entretenido, aunque algunos pasajes se sienten datados. El vínculo Huck-Jim es lo mejor.",
             reservation = reservaHuckFinn3,
             timestamp = today.minusMonths(3).plusDays(25),
-            bookId = huckFinn.id!!
+            bookId = huckFinn.bookId
         )
         reviewN1984Luciano = Review(
             reviewerName = lucianoVega.name, rating = 5,
             review = "Perturbador y necesario. Lo releí y cada vez me parece más actual.",
             reservation = reservaN19842,
             timestamp = today.minusMonths(10).plusDays(10),
-            bookId = n1984.id!!
+            bookId = n1984.bookId
         )
         reviewN1984Mateo = Review(
             reviewerName = mateoLopez.name, rating = 5,
             review = "El Gran Hermano ya existe. Orwell lo supo antes que todos.",
             reservation = reservaN19843,
             timestamp = today.minusMonths(4).plusDays(15),
-            bookId = n1984.id!!
+            bookId = n1984.bookId
         )
         reviewLosMiserablesEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Jean Valjean es uno de los personajes más conmovedores de la literatura universal.",
             reservation = reservaLosMiserables2,
             timestamp = today.minusMonths(9).plusDays(31),
-            bookId = losMiserables.id!!
+            bookId = losMiserables.bookId
         )
         reviewLosMiserablesValentina = Review(
             reviewerName = valentinaSosa.name, rating = 4,
             review = "Largo pero cada página tiene peso. Hugo no desperdicia ni un capítulo.",
             reservation = reservaLosMiserables3,
             timestamp = today.minusMonths(2).plusDays(11),
-            bookId = losMiserables.id!!
+            bookId = losMiserables.bookId
         )
         reviewMontagnaMagicaLuciano = Review(
             reviewerName = lucianoVega.name, rating = 4,
             review = "Mann logra que el tiempo del sanatorio se sienta tan eterno como para el protagonista.",
             reservation = reservaMontagnaMagica2,
             timestamp = today.minusMonths(6).plusDays(16),
-            bookId = montagnaMagica.id!!
+            bookId = montagnaMagica.bookId
         )
         reviewMontagnaMagicaValentina = Review(
             reviewerName = valentinaSosa.name, rating = 3,
             review = "Muy filosófica, quizás demasiado. Los diálogos entre Naphta y Settembrini son brillantes.",
             reservation = reservaMontagnaMagica3,
             timestamp = today.minusMonths(3).plusDays(11),
-            bookId = montagnaMagica.id!!
+            bookId = montagnaMagica.bookId
         )
         reviewMonteCristoEmilia = Review(
             reviewerName = emiliaRomero.name, rating = 5,
             review = "Imposible soltar. La venganza de Dantès es satisfactoria en cada nivel.",
             reservation = reservaMonteCristo2,
             timestamp = today.minusMonths(9).plusDays(15),
-            bookId = monteCristo.id!!
+            bookId = monteCristo.bookId
         )
         reviewMonteCristoLuciano = Review(
             reviewerName = lucianoVega.name, rating = 5,
             review = "Dumas teje una trama perfecta. Cada detalle de los primeros capítulos vuelve al final.",
             reservation = reservaMonteCristo3,
             timestamp = today.minusMonths(6).plusDays(25),
-            bookId = monteCristo.id!!
+            bookId = monteCristo.bookId
         )
 
         listOf(
@@ -1442,7 +1442,7 @@ class ProjectBootstrap : InitializingBean {
             reviews.map { it.rating }.average()
         }
         avgByBookId.forEach { (bookId, avg) ->
-            val book = repoBooks.findById(bookId)
+            val book = repoBooks.findByBookId(bookId)
             if (book.isPresent) {
                 book.get().ratingAvg = avg
                 repoBooks.save(book.get())

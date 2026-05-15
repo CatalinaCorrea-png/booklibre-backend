@@ -27,4 +27,6 @@ interface CrudReviewRepository : CrudRepository<Review, String> {
 //    fun findAllByBookId(@Param("bookId") bookId: String, pageable: Pageable): Page<Review>
 
     fun findReviewsByBookId(bookId: String, pageable: Pageable): Page<Review>
+
+    fun findAllByBookId(bookId: String): List<Review>
 }
