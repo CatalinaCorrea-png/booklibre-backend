@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.controller
 
+import ar.edu.unsam.phm.domain.Book
 import ar.edu.unsam.phm.domain.BookSearchCriteria
 import ar.edu.unsam.phm.domain.Gender
 import ar.edu.unsam.phm.dto.*
@@ -31,8 +32,8 @@ class BookController(
     }
 
     @PutMapping("/edit-book/{id}")
-    fun editBook(@PathVariable id: String, @RequestBody bookCreateDTO: BookCreateDTO) {
-        bookService.updateBook(id, bookCreateDTO)
+    fun editBook(@PathVariable id: String, @RequestBody bookCreateDTO: BookCreateDTO) : Book {
+        return bookService.updateBook(id, bookCreateDTO)
     }
 
     @DeleteMapping("/delete-book/{id}")

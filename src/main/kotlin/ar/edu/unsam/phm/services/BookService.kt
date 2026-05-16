@@ -32,7 +32,7 @@ class BookService(
 ) {
     @Transactional
     fun createBook(bookCreateDTO: BookCreateDTO) {
-        val owner = userRepository.findById(bookCreateDTO.ownerId!!)
+        val owner = userRepository.findById(bookCreateDTO.ownerId)
             .orElseThrow { NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}") }
 
         val author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)
@@ -52,8 +52,8 @@ class BookService(
     }
 
     @Transactional
-    fun updateBook(id: String, bookCreateDTO: BookCreateDTO) {
-        val owner = userRepository.findById(bookCreateDTO.ownerId!!)
+    fun updateBook(id: String, bookCreateDTO: BookCreateDTO) : Book {
+        val bookOwner = userRepository.findById(bookCreateDTO.ownerId)
             .orElseThrow { NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}") }
 
         val existingBook = bookRepository.findById(id)
@@ -63,11 +63,17 @@ class BookService(
             throw ConflictException("No se puede modificar un libro eliminado")
         }
 
-        if (owner.id != existingBook.owner.id) {
+        if (bookOwner.id != existingBook.owner.id) {
             throw ConflictException("No podes modificar un libro que no es tuyo.")
         }
 
-        val author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)
+        val today = LocalDate.now()
+        //val isBorrowed = mongoReservationRepository.findByBookId(existingBook.bookId)
+        //    .any { it.pickUpDate <= today && it.dropOffDate >= today }
+
+        //if (isBorrowed) throw ConflictException("No se puede modificar un libro que está prestado")
+
+        var author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)
             .orElseGet {
                 authorRepository.save(
                     Author(
@@ -77,30 +83,49 @@ class BookService(
                 )
             }
 
-        val newBook = bookCreateDTO.createFromDTO(owner)
-        newBook.id = existingBook.id
-        newBook.author = author
-        newBook.validate()
-        bookRepository.save(newBook)
+        //val newBook = bookCreateDTO.createFromDTO(bookOwner)
+        existingBook.apply {
+            title = bookCreateDTO.book.title
+            desc = bookCreateDTO.book.desc
+            gender = bookCreateDTO.book.gender
+            numPages = bookCreateDTO.book.numPages
+            isbn = bookCreateDTO.book.isbn
+            language = bookCreateDTO.book.language
+            editorial = bookCreateDTO.book.editorial
+            publishDate = bookCreateDTO.book.publishDate
+            condition = bookCreateDTO.book.condition
+            imageSrc = bookCreateDTO.book.imageSrc
+            this.author = author
+            this.owner = bookOwner.toOwnerDTO()
+        }
+        existingBook.validate()
+        return bookRepository.save(existingBook)
     }
 
     @Transactional
     fun deleteBook(bookId: String) {
-        val book = bookRepository.findById(bookId)
-            .orElseThrow { NotFoundException("No existe el libro con id: $bookId") }
+            val book = bookRepository.findById(bookId)
+                .orElseThrow { NotFoundException("No existe el libro con id: $bookId") }
 
-        val reservations = reservationRepository.findByBookId(bookId)
+            val reservations = mongoReservationRepository.findByBookId(book.bookId)
 
-        if (reservations.any { it.state == State.BORROWED || State.RESERVED == it.state || State.ACTIVE == it.state || State.SOON_TO_END == it.state }) {
-            throw ConflictException("No se puede eliminar un libro que está prestado")
-        }
+            println("bookId lógico: ${book.bookId}")
+            println("reservas encontradas: ${reservations.size}")
 
-        reservations
-            .filter { it.state == State.RESERVED }
-            .forEach { reservationRepository.delete(it) }
+            val today = LocalDate.now()
+            val isBorrowed = reservations.any {
+                it.pickUpDate <= today && it.dropOffDate >= today
+            }
 
-        book.logicDelete()
-        //no hace falta el .save, esta attached y lo detecta el hibernate con el dirty cheking
+            if (isBorrowed) {
+                throw ConflictException("No se puede eliminar un libro que está prestado")
+            }
+
+            reservations.forEach { mongoReservationRepository.delete(it) }
+
+            book.logicDelete()
+            bookRepository.save(book)
+
     }
 
     fun getAllUserBooks(
