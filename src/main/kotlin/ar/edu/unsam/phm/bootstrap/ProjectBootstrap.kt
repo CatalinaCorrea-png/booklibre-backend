@@ -14,6 +14,7 @@ import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.domain.WithADedication
 import ar.edu.unsam.phm.domain.toDoc
 import ar.edu.unsam.phm.dto.OwnerDTO
+import ar.edu.unsam.phm.dto.toReservationDate
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.CrudAuthorRepository
 import ar.edu.unsam.phm.repository.CrudReservationRepository
@@ -1455,7 +1456,12 @@ class ProjectBootstrap : InitializingBean {
         val books = repoBooks.findAll()
 
         books.forEach { book ->
-            val reservationCount = repoReservations.countByBookId(book.bookId)
+            val reservations = repoReservations.findByBookId(book.bookId)
+            reservations.forEach { reservation ->
+                val reservationDatesDTO = reservation.toReservationDate()
+                book.addReservation(reservationDatesDTO)
+            }
+            val reservationCount = reservations.size.toLong()
             book.reservationCount(reservationCount)
             repoBooks.save(book)
         }

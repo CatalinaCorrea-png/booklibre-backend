@@ -1,10 +1,7 @@
 package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.*
-import ar.edu.unsam.phm.dto.CreateReservationDTO
-import ar.edu.unsam.phm.dto.PagedResult
-import ar.edu.unsam.phm.dto.ReservationDTO
-import ar.edu.unsam.phm.dto.ReservedPeriodDTO
+import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.*
@@ -52,7 +49,7 @@ class ReservationService(
         newReservation.validate()
 
         if (reservationRepository.hasOverlappingReservation(
-                book.id!!,
+                book.bookId,
                 reservation.pickUpDate,
                 reservation.dropOffDate
             )
@@ -64,6 +61,8 @@ class ReservationService(
 
         userRepository.save(user)
         reservationRepository.save(newReservation)
+        book.addReservation(newReservation.toReservationDate())
+        bookRepository.save(book)
 
         mongoReservationRepository.save(newReservation.toDoc(book.owner.id))
     }
