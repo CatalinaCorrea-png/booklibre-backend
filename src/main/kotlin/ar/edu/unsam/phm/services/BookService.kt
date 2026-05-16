@@ -127,13 +127,9 @@ class BookService(
     @Transactional(readOnly = true)
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable): PageResponse<BookDTO> {
         // println("Criteria: $searchCriteria")
-        // (1) Traer bookIds con reservas que se superponen (PostgreSQL)
-        val excludedBookIds : List<String> = reservationRepository.findOverlappingBookIds(
-            searchCriteria.pickUpDate, searchCriteria.dropOffDate
-        )
 
-        // (2) Query paginada con Criteria de Mongo
-        val criteria = BookSpecifications.byCriteriaMongo(searchCriteria, excludedBookIds)
+        // Query paginada con Criteria de Mongo
+        val criteria = BookSpecifications.byCriteriaMongo(searchCriteria)
         val page : Page<Book> = bookRepository.findByCriteria(criteria, pageable)
         // println("Results: ${page.totalElements}")
 

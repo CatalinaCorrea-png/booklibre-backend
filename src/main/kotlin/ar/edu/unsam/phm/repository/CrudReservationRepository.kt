@@ -72,16 +72,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
     //para traer las reservas que tengan ese libro
     fun findByBookId(bookId: String): List<Reservation>
 
-    // taer reservas que se superponen
-    @Query(
-        """
-            SELECT r.bookId FROM Reservation r
-            WHERE r.pickUpDate < :dropOffDate
-            AND r.dropOffDate > :pickUpDate
-        """
-    )
-    fun findOverlappingBookIds(pickUpDate: LocalDate, dropOffDate: LocalDate) : List<String>
-
     @Query(
         """
     SELECT COUNT(r) > 0

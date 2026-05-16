@@ -1,6 +1,8 @@
 package ar.edu.unsam.phm.domain
 
 import ar.edu.unsam.phm.dto.OwnerDTO
+import ar.edu.unsam.phm.dto.ReservationDatesDTO
+import ar.edu.unsam.phm.dto.ReviewDTO
 import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import com.fasterxml.jackson.annotation.JsonSubTypes
@@ -24,59 +26,30 @@ import java.util.UUID
     Type(value = WithADedication::class, name = "CON DEDICATORIA"),
     Type(value = Collectable::class, name = "COLECCIONABLE"),
 )
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 abstract class Book(
-//    @Column(nullable = false, length = 50)
     var title: String = "",
-//    @Column(name = "description", length = 1000, nullable = false)
     var desc: String = "",
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
     var gender: Gender = Gender.DRAMA,
-    // le decís a JPA: "no cargues esta relación hasta que alguien la pida explícitamente"
-//    @ManyToOne(fetch = FetchType.LAZY)
     var author: Author = Author("",""), // Se mapea solo
-//    @Column(nullable = false)
     var numPages: Int = 0,
-//    @Column(length = 17, nullable = false)
     var isbn: String = "978-3-16-148410-0",
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
     var language: Language = Language.SPANISH,
-//    @Column(nullable = false, length =50)
     var editorial: String = "",
-//    @Column(nullable = false)
     var publishDate: LocalDate = LocalDate.now(),
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
     var condition: BookCondition = BookCondition.EXCELLENT,
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @OnDelete(action = OnDeleteAction.CASCADE)
     var owner: OwnerDTO = OwnerDTO(),
-//    @Column(nullable = false)
     var imageSrc: String = "",
-//    @Column(nullable = false)
     var timestamp: LocalDate = LocalDate.now(),
-//    @Column(nullable = false)
     var bookType: String,
-    //agrego esta columna para el delete logico
-//    @Column(name = "deleted")
     var deleted: Boolean = false,
-//    @OneToMany(
-//        mappedBy = "book",
-//        fetch = FetchType.LAZY,
-//        cascade = [CascadeType.ALL],
-//    ) // Lo cascadeo porque en esta implementación funciona asi...
-//    val reviews: MutableList<Review> = mutableListOf(),
-//    @Column
     var ratingAvg: Double = 0.0,
-//    @Formula("(SELECT COUNT(*) FROM reservation r WHERE r.book_id = id)")
     private var reservationCount: Long = 0,
+    var reservations: MutableList<ReservationDatesDTO> = mutableListOf(),
+    var lastTwoReviews: MutableList<ReviewDTO> = mutableListOf(),
 
     ) : RepositoryElement {
 
 
-//    @GeneratedValue
     @Id
     override var id: String? = null
     var bookId: String = UUID.randomUUID().toString()  // FK lógica
@@ -104,6 +77,10 @@ abstract class Book(
 
     fun reservationCount(newCount: Long) {
         this.reservationCount = newCount
+    }
+
+    fun addReservation(reservationDatesDTO: ReservationDatesDTO) {
+        reservations.add(reservationDatesDTO)
     }
 
     fun ownerIsReader(): Boolean = owner.userType == UserTypes.READER

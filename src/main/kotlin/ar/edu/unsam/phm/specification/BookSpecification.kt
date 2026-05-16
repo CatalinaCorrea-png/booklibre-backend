@@ -142,10 +142,12 @@ object BookSpecifications {
             criteriaList.add(Criteria.where("gender").`in`(criteria.genders))
         }
 
-        // Las reservas están en PostgreSQL, así que se excluyen desde el service
-        if (excludedBookIds.isNotEmpty()) {
-            criteriaList.add(Criteria.where("bookId").nin(excludedBookIds))
-        }
+        criteriaList.add(
+            Criteria.where("reservations").not().elemMatch(
+                Criteria.where("pickUpDate").lt(criteria.dropOffDate)
+                    .and("dropOffDate").gt(criteria.pickUpDate)
+            )
+        )
 
         return if (criteriaList.size == 1) {
             criteriaList.first()
