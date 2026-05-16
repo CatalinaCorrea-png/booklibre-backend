@@ -67,13 +67,8 @@ class BookService(
             throw ConflictException("No podes modificar un libro que no es tuyo.")
         }
 
-        val today = LocalDate.now()
-        //val isBorrowed = mongoReservationRepository.findByBookId(existingBook.bookId)
-        //    .any { it.pickUpDate <= today && it.dropOffDate >= today }
 
-        //if (isBorrowed) throw ConflictException("No se puede modificar un libro que está prestado")
-
-        var author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)
+        val author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)
             .orElseGet {
                 authorRepository.save(
                     Author(
@@ -104,28 +99,18 @@ class BookService(
 
     @Transactional
     fun deleteBook(bookId: String) {
-            val book = bookRepository.findById(bookId)
-                .orElseThrow { NotFoundException("No existe el libro con id: $bookId") }
+        val book = bookRepository.findById(bookId)
+            .orElseThrow { NotFoundException("No existe el libro con id: $bookId") }
 
-            val reservations = mongoReservationRepository.findByBookId(book.bookId)
+        val today = LocalDate.now()
+        val isBorrowed = book.reservations.any {
+            it.pickUpDate <= today && it.dropOffDate >= today
+        }
 
-            println("bookId lógico: ${book.bookId}")
-            println("reservas encontradas: ${reservations.size}")
+        if (isBorrowed) throw ConflictException("No se puede eliminar un libro que está prestado")
 
-            val today = LocalDate.now()
-            val isBorrowed = reservations.any {
-                it.pickUpDate <= today && it.dropOffDate >= today
-            }
-
-            if (isBorrowed) {
-                throw ConflictException("No se puede eliminar un libro que está prestado")
-            }
-
-            reservations.forEach { mongoReservationRepository.delete(it) }
-
-            book.logicDelete()
-            bookRepository.save(book)
-
+        book.logicDelete()
+        bookRepository.save(book)
     }
 
     fun getAllUserBooks(
