@@ -15,12 +15,14 @@ data class ProfileBookDTO(
     var state: BookAvailability
 )
 
-fun Book.toProfileBookDTO(borrowedBookIds: Set<String>) = ProfileBookDTO(
+fun Book.toProfileBookDTO(today: LocalDate) = ProfileBookDTO(
     id = id,
     title = title,
     author = author.name,
     gender = gender,
     timestamp = timestamp,
     imageSrc = imageSrc,
-    state = BookAvailability.of(bookId in borrowedBookIds)
+    state = BookAvailability.of(
+        reservations.any {it.pickUpDate <= today && it.dropOffDate >= today}
+    )
 )
