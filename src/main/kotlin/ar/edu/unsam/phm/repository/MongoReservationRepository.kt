@@ -49,4 +49,6 @@ interface MongoReservationRepository : MongoRepository<ReservationDoc, String> {
     fun countUserReservedBooks(ownerId: String, today: LocalDate): Long
 
     fun findByOwnerId(ownerId: String): List<ReservationDoc>
+
+    fun findByBookId(bookId: String): List<ReservationDoc>
 }

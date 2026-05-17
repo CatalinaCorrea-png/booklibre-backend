@@ -245,6 +245,19 @@ SELECT * FROM users_with_more_than_2_returned_reservations;
 db.books.find({ratingAvg:{$gt:4}})
 ```
 
+### 4. Saber qué libros tienen al menos 3 reservas activas.
+
+```js
+db.books.aggregate([
+    { $match: { "reservations": { $exists: true } } },
+    { $project: { title: 1, activeReservations: { $filter: { input: "$reservations", as: "r", 
+                    cond: { $and: [{ $lte: ["$$r.pickUpDate", new Date()] }, 
+                            { $gte: ["$$r.dropOffDate", new Date()] }] } } } } },
+    { $match: { "activeReservations.2": { $exists: true } } }
+])
+
+```
+
 ---
 
 ##  Tutor
