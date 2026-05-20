@@ -111,6 +111,7 @@ class BookService(
 
         book.logicDelete()
         bookRepository.save(book)
+        reservationRepository.markBookAsDeletedInReservations(book.bookId)
     }
 
     fun getAllUserBooks(

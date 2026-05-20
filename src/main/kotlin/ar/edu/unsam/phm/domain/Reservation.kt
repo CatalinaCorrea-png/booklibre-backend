@@ -3,7 +3,6 @@ package ar.edu.unsam.phm.domain
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import jakarta.persistence.*
-import org.hibernate.usertype.UserType
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -15,9 +14,15 @@ data class Reservation(
     @Column(name = "book_id", nullable = false)
     var bookId: String = "",
     @Transient
-    var book: Book? = null, // // NO se persiste, se carga desde Mongo en el service
+    var book: Book? = null, // NO se persiste, se carga desde Mongo en el service
     var pickUpDate: LocalDate = LocalDate.now(),
     var dropOffDate: LocalDate = LocalDate.now(),
+    var bookTitle: String = "",
+    var bookAuthorName: String = "",
+    var bookImageSrc: String = "",
+    var ownerName: String = "",
+    var bookDeleted: Boolean = false,
+    var bibliokarmas: Long = 0,
 ) : RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
