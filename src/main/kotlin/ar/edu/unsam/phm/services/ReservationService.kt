@@ -66,7 +66,7 @@ class ReservationService(
         book.addReservation(newReservation.toReservationDate())
         bookRepository.save(book)
 
-        mongoReservationRepository.save(newReservation.toDoc(book.owner.id))
+//        mongoReservationRepository.save(newReservation.toDoc(book.owner.id))
     }
 
     // esto quiza esta de mas, supongo que regla de negocio?
@@ -184,6 +184,10 @@ class ReservationService(
         val newAvg = reviewRepository.findAllByBookId(reservation.bookId)
             .map { it.rating }
             .average()
+
+        if (book.lastTwoReviews.size == 2) book.lastTwoReviews.removeLast()
+        book.lastTwoReviews.add(0, newReview.toDTO())
+
         book.updateRating(newAvg)
         bookRepository.save(book)
     }
@@ -195,7 +199,9 @@ class ReservationService(
     @Transactional(readOnly = true)
     fun getUserReadBooksNumber(userId: String): Long = reservationRepository.countUserReadBooksNumber(userId)
 
-    fun getReservedDates(bookId: String): List<ReservedPeriodDTO> =
-        reservationRepository.findAllByBookId(bookId)
-            .map { ReservedPeriodDTO(it.pickUpDate, it.dropOffDate) }
+    fun getReservedDates(bookId: String): List<ReservedPeriodDTO> {
+        val book = bookRepository.findById(bookId)
+            .orElseThrow { NotFoundException("No existe el libro con id: $bookId") }
+        return book.reservations.map { ReservedPeriodDTO(it.pickUpDate, it.dropOffDate)  }
+    }
 }

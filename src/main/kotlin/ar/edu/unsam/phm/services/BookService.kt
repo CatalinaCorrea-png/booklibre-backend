@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -194,7 +195,7 @@ class BookService(
 
     @Transactional(readOnly = true)
     fun getBookReviews(bookId: String, page: Int = 0, pageSize: Int = 2): List<Review> {
-        val pageable = PageRequest.of(page, pageSize)
+        val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "timestamp"))
         val book = bookRepository.findById(bookId)
             .orElseThrow { NotFoundException("No se encuentra un libro registrado con el id: $bookId") }
         return reviewRepository.findReviewsByBookId(book.bookId, pageable).content

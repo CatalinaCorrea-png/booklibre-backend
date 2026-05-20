@@ -21,7 +21,8 @@ data class BookDTO(
     var owner: OwnerDTO,
     var imageSrc: String,
     var bookBibliokarmas: Long = 0,
-    var rating: Double = 0.0
+    var rating: Double = 0.0,
+    var lastTwoReviews: List<ReviewDTO> = emptyList(),
 )
 
 fun Book.toDTO(): BookDTO {
@@ -41,7 +42,8 @@ fun Book.toDTO(): BookDTO {
         owner = this.owner,
         imageSrc = this.imageSrc,
         bookType = this.bookType,
-        rating = this.ratingAvg
+        rating = this.ratingAvg,
+        lastTwoReviews = this.lastTwoReviews,
     )
     return bookDTO
 }
