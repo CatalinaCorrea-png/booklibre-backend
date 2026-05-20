@@ -233,8 +233,14 @@ SELECT * FROM users_with_more_than_2_returned_reservations;
 
 ## Consultas MongoDB
 
-### 1. --
-
+### 1. Saber qué libro es el más clickeado.
+```js
+db.book_clicks.aggregate([
+    { $group: { _id: "$bookId", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 1 }
+])
+```
 
 ### 2. --
 
