@@ -21,6 +21,7 @@ data class Reservation(
     var bookAuthorName: String = "",
     var bookImageSrc: String = "",
     var ownerName: String = "",
+    var ownerId: String = "",
     var bookDeleted: Boolean = false,
     var bibliokarmas: Long = 0,
 ) : RepositoryElement {

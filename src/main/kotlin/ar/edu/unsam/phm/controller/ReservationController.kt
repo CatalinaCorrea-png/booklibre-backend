@@ -26,14 +26,14 @@ class ReservationController(
         reservationService.getReservesByUserId(userId, search, page, pageSize)
 
     // ESTAS SON LAS RESERVAS QUE TE HICIERON A VOS
-//    @GetMapping("/owner/{userId}")
-//    fun getLoansMadeByUserId(
-//        @PathVariable userId: String,
-//        @RequestParam(defaultValue = "") search: String,
-//        @RequestParam(defaultValue = "0") page: Int,
-//        @RequestParam(defaultValue = "4") pageSize: Int
-//    ): PagedResult<ReservationDTO> =
-//        reservationService.getLoansMadeByUserId(userId, search, page, pageSize)
+    @GetMapping("/owner/{userId}")
+    fun getLoansMadeByUserId(
+        @PathVariable userId: String,
+        @RequestParam(defaultValue = "") search: String,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "4") pageSize: Int
+    ): PagedResult<ReservationDTO> =
+        reservationService.getLoansMadeByUserId(userId, search, page, pageSize)
 
     @PostMapping("/{reservationId}/calificar")
     fun rateLoan(@PathVariable reservationId: String, @RequestBody body: ReviewDTO, @RequestParam userId: String) {

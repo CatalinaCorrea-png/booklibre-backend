@@ -35,6 +35,9 @@ import java.time.LocalDate
 class ProjectBootstrap : InitializingBean {
 
     @Autowired
+    private lateinit var userRepository: CrudUserRepository
+
+    @Autowired
     private lateinit var repoAuthors: CrudAuthorRepository
 
     @Autowired
@@ -252,14 +255,34 @@ class ProjectBootstrap : InitializingBean {
         if (reservationInRepo.isPresent) {
             reservation.id = reservationInRepo.get().id
         } else {
-//            Primero la generamos en postgres
+
+            val book = reservation.book
+                ?: throw BusinessException("Bootstrap: reservation.book necesita setearse antes de crear la reserva")
+
+            val user = reservation.user
+
+            // Denormalización
+            reservation.bookTitle = book.title
+            reservation.bookAuthorName = book.author?.name ?: ""
+            reservation.bookImageSrc = book.imageSrc
+            reservation.ownerId = book.owner.id
+            reservation.ownerName = book.owner.name
+            reservation.bookDeleted = book.deleted
+
+            // Bibliokarmas
+            val bibliokarmasValue = book.calculateBibliokarmas(reservation.reservationDays(), user.bibliokarmas)
+            reservation.bibliokarmas = bibliokarmasValue
+            user.addBibliokarmas(bibliokarmasValue)
+            userRepository.save(user)
+
+            // Primero la generamos en postgres
             val savedRes = repoReservations.save(reservation)
 
-//            Despues hacemos un mirror en mongo
-            val ownerId = savedRes.book?.owner?.id ?: throw BusinessException("Bootstrap: reservation.book necesita setearse antes de crear la reserva")
+            // Despues hacemos un mirror en mongo
+            val ownerId = book.owner.id
             repoMongoReservations.save(savedRes.toDoc(ownerId))
 
-            println("Reservation creada para ${reservation.user.name} - ${reservation.book?.title}")
+            println("Reservation creada para ${reservation.user.name} - ${book.title}")
         }
     }
 
@@ -320,7 +343,7 @@ class ProjectBootstrap : InitializingBean {
             timestamp = "27/10/2021",
             userType = UserTypes.COMBINED,
             password = encoder.encode("123456"),
-            bibliokarmas = 110,
+            bibliokarmas = 0,
             img = "/assets/emilia_romero_avatar.png"
         )
 
@@ -331,7 +354,7 @@ class ProjectBootstrap : InitializingBean {
             cel = "1187654321",
             location = "Rosario, AR",
             userType = UserTypes.READER,
-            bibliokarmas = 980,
+            bibliokarmas = 0,
             password = encoder.encode("123456"),
             timestamp = "14/02/2016",
             img = "/assets/luciano_vega_avatar.png"
@@ -344,7 +367,7 @@ class ProjectBootstrap : InitializingBean {
             cel = "1155550000",
             location = "Cordoba, AR",
             userType = UserTypes.PUBLISHER,
-            bibliokarmas = 1500,
+            bibliokarmas = 0,
             timestamp = "10/01/2023",
             img = "/assets/valentina_sosa_avatar.png",
             password = encoder.encode("123456"),
@@ -357,7 +380,7 @@ class ProjectBootstrap : InitializingBean {
             cel = "1133337777",
             location = "Mendoza, AR",
             userType = UserTypes.COMBINED,
-            bibliokarmas = 420,
+            bibliokarmas = 0,
             password = encoder.encode("123456"),
             timestamp = "01/02/2024",
             img = "/assets/mateo_lopez_avatar.png"

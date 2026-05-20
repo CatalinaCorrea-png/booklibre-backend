@@ -1,7 +1,6 @@
 package ar.edu.unsam.phm.repository
 
 import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.UserTypes
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -38,31 +37,25 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
 
     // Reservas donde el usuario es el OWNER
     // Si vas a usar un campo en el WHERE, siempre asignale un alias en el JOIN
-//    @EntityGraph(
-//        attributePaths = [
-//            "book",
-//            "book.owner",
-//            "book.author",
-//            //"review",
-//            "user"]
-//    )
-//    @Query(
-//        """
-//        SELECT r FROM Reservation r
-//        WHERE r.book.owner.id = :userId
-//        AND r.book.deleted = false
-//        AND r.user.userType <> :userType
-//        AND (
-//            LOWER(r.book.title) LIKE LOWER(CONCAT('%', :search, '%'))
-//            OR LOWER(r.book.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
-//        )"""
-//    )
-//    fun findByOwnerIdFiltered(
-//        @Param("userId") userId: Long,
-//        @Param("search") search: String,
-//        @Param("userType") userType: UserTypes,
-//        pageable: Pageable
-//    ): Page<Reservation>
+    @EntityGraph(attributePaths = ["user"])
+    @Query(
+        """
+    SELECT r FROM Reservation r
+    WHERE r.ownerId = :userId
+    AND r.bookDeleted = false
+    AND r.user.userType <> :userType
+    AND (
+        :search = ''
+        OR LOWER(r.bookTitle) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(r.bookAuthorName) LIKE LOWER(CONCAT('%', :search, '%'))
+    )"""
+    )
+    fun findByOwnerIdFiltered(
+        @Param("userId") userId: String,
+        @Param("search") search: String,
+        @Param("userType") userType: UserTypes,
+        pageable: Pageable
+    ): Page<Reservation>
 
     //para traer las reservas que tengan ese libro
     fun findByBookId(bookId: String): List<Reservation>

@@ -87,6 +87,14 @@ class ReservationService(
         return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
     }
 
+    fun getLoansMadeByUserId(userId: String, search: String, page: Int, pageSize: Int): PagedResult<ReservationDTO> {
+        val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "pickUpDate"))
+        val reservationsPage =
+            reservationRepository.findByOwnerIdFiltered(userId, search, UserTypes.PUBLISHER, pageable)
+        val reservationsDTOs = getReservationsWithBibliokarmasDTO(reservationsPage.content, true)
+        return PagedResult(reservationsDTOs, reservationsPage.size, reservationsPage.totalPages)
+    }
+
     private fun getReservationsWithBibliokarmasDTO(
         reservations: List<Reservation>,
         own: Boolean = false
@@ -97,8 +105,14 @@ class ReservationService(
             .findRatingsByReservationIdIn(reservations.map { it.id!! })
             .associate { it.reservationId to it.rating }
 
+        val bookIds = reservations.map { it.bookId }.distinct()
+        val bookMap: Map<String, Book> = bookRepository
+            .findAllByBookIdIn(bookIds)
+            .associateBy { it.bookId }
+
         return reservations.map { reservation ->
             val rating = reviewMap[reservation.id]
+            reservation.book = bookMap[reservation.bookId]
 
             reservation.toDTO(rating != null).apply {
                 if (rating != null) this.review = rating

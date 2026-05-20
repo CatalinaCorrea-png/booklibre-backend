@@ -18,6 +18,7 @@ data class ReservationDTO(
     var loanedTo: String,
 )
 
+// Esto lo hice asi para no cambiar el front
 fun Reservation.toDTO(hasReview: Boolean): ReservationDTO =
     ReservationDTO(
         book = BookDTO(
