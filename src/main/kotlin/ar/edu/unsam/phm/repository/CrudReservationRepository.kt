@@ -1,11 +1,11 @@
 package ar.edu.unsam.phm.repository
 
 import ar.edu.unsam.phm.domain.Reservation
-import ar.edu.unsam.phm.domain.Review
 import ar.edu.unsam.phm.domain.UserTypes
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -14,60 +14,48 @@ import java.time.LocalDate
 interface CrudReservationRepository : CrudRepository<Reservation, String> {
     // Reservas donde el usuario es el LECTOR
     // esta es la solucion de dodino para el problema de N + 1 Querys
-//    @EntityGraph(
-//        attributePaths = [
-//            "book",
-//            "book.owner", // esto por que el dto necesita el nombre
-//            "book.author", // esto por el nombre de el autor para el filtro
-//            //"review", // la review para el can rate
-//            "user"]
-//    )
-//    @Query(
-//        """
-//    SELECT r FROM Reservation r
-//    WHERE r.user.id = :userId
-//    AND r.book.deleted = false
-//    AND r.user.userType <> :userType
-//    AND (
-//        LOWER(r.book.title) LIKE LOWER(CONCAT('%', :search, '%'))
-//        OR LOWER(r.book.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
-//    )"""
-//    )
-//    fun findByLectorIdFiltered(
-//        @Param("userId") userId: Long,
-//        @Param("search") search: String,
-//        @Param("userType") userType: UserTypes,
-//        pageable: Pageable
-//    ): Page<Reservation> // todo: !important la tercera query es por esto
-    // estos son de spring Data, lo tengo que usar si o si por que page me devuleve la cantidad de elementos y la cantidad de paginas segun el tamaño de la pagina
+    // EntityGraph solo sobre "user" porque "book" es @Transient — los datos del libro vienen de Mongo en el service
+    @EntityGraph(attributePaths = ["user"])
+    @Query(
+        """
+    SELECT r FROM Reservation r
+    WHERE r.user.id = :userId
+    AND r.bookDeleted = false
+    AND r.user.userType <> :userType
+    AND (
+        :search = ''
+        OR LOWER(r.bookTitle) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(r.bookAuthorName) LIKE LOWER(CONCAT('%', :search, '%'))
+    )"""
+    )
+    fun findByLectorIdFiltered(
+        @Param("userId") userId: String,
+        @Param("search") search: String,
+        @Param("userType") userType: UserTypes,
+        pageable: Pageable
+    ): Page<Reservation>
 
     // Reservas donde el usuario es el OWNER
     // Si vas a usar un campo en el WHERE, siempre asignale un alias en el JOIN
-//    @EntityGraph(
-//        attributePaths = [
-//            "book",
-//            "book.owner",
-//            "book.author",
-//            //"review",
-//            "user"]
-//    )
-//    @Query(
-//        """
-//        SELECT r FROM Reservation r
-//        WHERE r.book.owner.id = :userId
-//        AND r.book.deleted = false
-//        AND r.user.userType <> :userType
-//        AND (
-//            LOWER(r.book.title) LIKE LOWER(CONCAT('%', :search, '%'))
-//            OR LOWER(r.book.author.name) LIKE LOWER(CONCAT('%', :search, '%'))
-//        )"""
-//    )
-//    fun findByOwnerIdFiltered(
-//        @Param("userId") userId: Long,
-//        @Param("search") search: String,
-//        @Param("userType") userType: UserTypes,
-//        pageable: Pageable
-//    ): Page<Reservation>
+    @EntityGraph(attributePaths = ["user"])
+    @Query(
+        """
+    SELECT r FROM Reservation r
+    WHERE r.ownerId = :userId
+    AND r.bookDeleted = false
+    AND r.user.userType <> :userType
+    AND (
+        :search = ''
+        OR LOWER(r.bookTitle) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(r.bookAuthorName) LIKE LOWER(CONCAT('%', :search, '%'))
+    )"""
+    )
+    fun findByOwnerIdFiltered(
+        @Param("userId") userId: String,
+        @Param("search") search: String,
+        @Param("userType") userType: UserTypes,
+        pageable: Pageable
+    ): Page<Reservation>
 
     //para traer las reservas que tengan ese libro
     fun findByBookId(bookId: String): List<Reservation>
@@ -107,5 +95,8 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
     )
     fun countUserReadBooksNumber(userId: String): Long
     fun findAllByUser_Id(userId: String): MutableList<Reservation>
-//    fun findAllByBook_Owner_Id(bookOwnerId: String): MutableList<Reservation>
+
+    @Modifying
+    @Query("UPDATE Reservation r SET r.bookDeleted = true WHERE r.bookId = :bookId")
+    fun markBookAsDeletedInReservations(@Param("bookId") bookId: String)
 }
