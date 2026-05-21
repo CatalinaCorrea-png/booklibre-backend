@@ -1,7 +1,7 @@
 spring:
   #   base de datos posta
   datasource:
-    url: jdbc:postgresql://localhost:5433/booklibre
+    url: jdbc:postgresql://localhost:5433/booklibre?sslmode=disable
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -21,7 +21,7 @@ spring:
   # base documental
   data:
     mongodb:
-      uri: mongodb://admin:admin@127.0.0.1:27019/book_libre?authSource=admin
+      uri: mongodb://127.0.0.1:27117/book_libre
 
 # Para activar el Trace
 logging:

@@ -241,7 +241,10 @@ class ProjectBootstrap : InitializingBean {
     }
 
     fun createBook(book: Book) {
-        val bookEnRepo = repoBooks.findByTitle(book.title)
+        // findFirst en vez de find: tolera múltiples matches (puede haber libros
+        // de Faker con el mismo título que un curado, ej. "1984"). Si hay varios,
+        // reutilizamos cualquiera con ese título.
+        val bookEnRepo = repoBooks.findFirstByTitle(book.title)
         if (bookEnRepo.isPresent) {
             book.id = bookEnRepo.get().id
         } else {
@@ -1499,7 +1502,10 @@ class ProjectBootstrap : InitializingBean {
         println("Running initialization")
         println("************************************************************************")
         repoMongoReservations.deleteAll()
-        repoBooks.deleteAll()
+
+        // No borramos books: los métodos createUser/Author/Book/Reservation son
+        // idempotentes (find-by-key + save-si-no-existe), así que el bootstrap
+        // convive con el dataset shardeado de ~1M docs cargado por el script.
         this.initUsers()
         this.initAuthors()
         this.initBooks()          // libros sin reviews
