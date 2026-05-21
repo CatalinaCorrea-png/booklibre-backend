@@ -1479,17 +1479,22 @@ class ProjectBootstrap : InitializingBean {
 
     fun initBookReservationCount() {
         // ── Agregar Reservation COUNT a los libros ──────────────────────────
-        val books = repoBooks.findAll()
+        // Itera sobre las reservas existentes (~decenas) agrupadas por bookId,
+        // en lugar de sobre repoBooks.findAll() (que con dataset shardeado
+        // shardeado de 500k+ libros tardaba ~3 horas haciendo updates inútiles
+        // sobre libros sin reservas).
+        val reservationsByBookId = repoReservations.findAll().groupBy { it.bookId }
 
-        books.forEach { book ->
-            val reservations = repoReservations.findByBookId(book.bookId)
-            reservations.forEach { reservation ->
-                val reservationDatesDTO = reservation.toReservationDate()
-                book.addReservation(reservationDatesDTO)
+        reservationsByBookId.forEach { (bookId, reservations) ->
+            val bookOpt = repoBooks.findByBookId(bookId)
+            if (bookOpt.isPresent) {
+                val book = bookOpt.get()
+                reservations.forEach { reservation ->
+                    book.addReservation(reservation.toReservationDate())
+                }
+                book.reservationCount(reservations.size.toLong())
+                repoBooks.save(book)
             }
-            val reservationCount = reservations.size.toLong()
-            book.reservationCount(reservationCount)
-            repoBooks.save(book)
         }
     }
 
