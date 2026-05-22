@@ -1,10 +1,6 @@
 import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.*
-import ar.edu.unsam.phm.repository.CrudAuthorRepository
-import ar.edu.unsam.phm.repository.CrudBookRepository
-import ar.edu.unsam.phm.repository.CrudReservationRepository
-import ar.edu.unsam.phm.repository.CrudReviewRepository
-import ar.edu.unsam.phm.repository.CrudUserRepository
+import ar.edu.unsam.phm.repository.*
 import ar.edu.unsam.phm.services.BookService
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec
@@ -21,40 +17,73 @@ import java.time.LocalDate
 class ProfileSpec : DescribeSpec({
     isolationMode = IsolationMode.InstancePerTest
 
-    // --- Mocks (replaces in-memory repos — BookService requires JPA interfaces) ---
-    val bookRepository = mockk<CrudBookRepository>()
+    val bookRepository = mockk<MongoBookRepository>()
+    val mongoReservationRepository = mockk<MongoReservationRepository>(relaxed = true)
     val reservationRepository = mockk<CrudReservationRepository>()
     val userRepository = mockk<CrudUserRepository>()
     val authorRepository = mockk<CrudAuthorRepository>()
-    val reviewRepository   = mockk<CrudReviewRepository>(relaxed = true)
-    val bookService = BookService(bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository)
+    val reviewRepository = mockk<CrudReviewRepository>(relaxed = true)
+    val bookService = BookService(bookRepository, reservationRepository, mongoReservationRepository, userRepository, authorRepository, reviewRepository)
 
-    val userId = 1L
+    val userId = "user-id-1"
 
-    // --- Sample DTOs (flat, no longer wrapped in Reservation) ---
-    val bookADTO = ProfileBookDTO(
-        id = 1L, title = "1984", author = "George Orwell",
-        gender = Gender.DRAMA, timestamp = LocalDate.of(2024, 1, 1),
-        imageSrc = "", state = "PRESTADO"
-    )
-    val bookBDTO = ProfileBookDTO(
-        id = 2L, title = "Rayuela", author = "Julio Cortázar",
-        gender = Gender.DRAMA, timestamp = LocalDate.of(2024, 2, 1),
-        imageSrc = "", state = "DISPONIBLE"
-    )
-    val bookCDTO = ProfileBookDTO(
-        id = 3L, title = "El Aleph", author = "Jorge Luis Borges",
-        gender = Gender.DRAMA, timestamp = LocalDate.of(2024, 3, 1),
-        imageSrc = "", state = "DISPONIBLE"
-    )
+    val owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER).apply { id = userId }
+
+    val bookA = Common().apply {
+        id = "1"
+        title = "1984"
+        this.author = Author("George Orwell", "avatar.jpg")
+        gender = Gender.DRAMA
+        timestamp = LocalDate.of(2024, 1, 1)
+        imageSrc = ""
+        this.owner = owner.toOwnerDTO()
+        desc = "Descripcion"
+        numPages = 300
+        isbn = "978-0-00-000001-1"
+        editorial = "Editorial"
+        // reserva activa → PRESTADO
+        reservations = mutableListOf(ReservationDatesDTO(
+            resevationId = "res-1",
+            pickUpDate = LocalDate.now().minusDays(5),
+            dropOffDate = LocalDate.now().plusDays(5)
+        ))
+    }
+
+    val bookB = Common().apply {
+        id = "2"
+        title = "Rayuela"
+        this.author = Author("Julio Cortázar", "avatar.jpg")
+        gender = Gender.DRAMA
+        timestamp = LocalDate.of(2024, 2, 1)
+        imageSrc = ""
+        this.owner = owner.toOwnerDTO()
+        desc = "Descripcion"
+        numPages = 300
+        isbn = "978-0-00-000002-2"
+        editorial = "Editorial"
+    }
+
+    val bookC = Common().apply {
+        id = "3"
+        title = "El Aleph"
+        this.author = Author("Jorge Luis Borges", "avatar.jpg")
+        gender = Gender.DRAMA
+        timestamp = LocalDate.of(2024, 3, 1)
+        imageSrc = ""
+        this.owner = owner.toOwnerDTO()
+        desc = "Descripcion"
+        numPages = 300
+        isbn = "978-0-00-000003-3"
+        editorial = "Editorial"
+    }
 
     describe("getAllUserBooks devuelve todos los libros del usuario") {
 
         it("Cada libro aparece exactamente una vez con su estado actual") {
             val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "timestamp"))
             every {
-                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.ALL.name)
-            } returns PageImpl(listOf(bookADTO, bookBDTO, bookCDTO), pageable, 3)
+                bookRepository.findUserBooks(userId, any(), any())
+            } returns PageImpl(listOf(bookA, bookB, bookC), pageable, 3)
 
             val result = bookService.getAllUserBooks(
                 userId,
@@ -62,21 +91,21 @@ class ProfileSpec : DescribeSpec({
             )
 
             result.items shouldHaveSize 3
-            result.items.map { it.id } shouldContainAll listOf(1L, 2L, 3L)
+            result.items.map { it.id } shouldContainAll listOf("1", "2", "3")
         }
 
         it("Un libro con reserva activa aparece como PRESTADO") {
             val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "timestamp"))
             every {
-                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.ALL.name)
-            } returns PageImpl(listOf(bookADTO), pageable, 1)
+                bookRepository.findUserBooks(userId, any(), any())
+            } returns PageImpl(listOf(bookA), pageable, 1)
 
             val result = bookService.getAllUserBooks(
                 userId,
                 ProfileBookPageable(FilterCriteria.ALL, SortCriteria.DATE_DESC, 0, 10)
             )
 
-            result.items.first().state shouldBe "PRESTADO"
+            result.items.first().state shouldBe BookAvailability.BORROWED
         }
     }
 
@@ -86,32 +115,29 @@ class ProfileSpec : DescribeSpec({
             val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "timestamp"))
 
             every {
-                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.ALL.name)
-            } returns PageImpl(listOf(bookADTO, bookBDTO, bookCDTO), pageable, 3)
+                bookRepository.findUserBooks(userId, any(), any())
+            } returns PageImpl(listOf(bookA, bookB, bookC), pageable, 3)
 
-            every {
-                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.BORROWED.name)
-            } returns PageImpl(listOf(bookADTO), pageable, 1)
-
-            every {
-                bookRepository.getAllUserBooks(userId, any(), FilterCriteria.AVAILABLE.name)
-            } returns PageImpl(listOf(bookBDTO, bookCDTO), pageable, 2)
-
-            // ALL → 3 libros
             val allBooks = bookService.getAllUserBooks(
                 userId, ProfileBookPageable(FilterCriteria.ALL, SortCriteria.DATE_DESC, 0, 10)
             )
             allBooks.items shouldHaveSize 3
 
-            // BORROWED → solo bookA (PRESTADO)
+            every {
+                bookRepository.findUserBooks(userId, any(), any())
+            } returns PageImpl(listOf(bookA), pageable, 1)
+
             val borrowedBooks = bookService.getAllUserBooks(
                 userId, ProfileBookPageable(FilterCriteria.BORROWED, SortCriteria.DATE_DESC, 0, 10)
             )
             borrowedBooks.items shouldHaveSize 1
             borrowedBooks.items.first().title shouldBe "1984"
-            borrowedBooks.items.first().state shouldBe "PRESTADO"
+            borrowedBooks.items.first().state shouldBe BookAvailability.BORROWED
 
-            // AVAILABLE → bookB y bookC (DISPONIBLE)
+            every {
+                bookRepository.findUserBooks(userId, any(), any())
+            } returns PageImpl(listOf(bookB, bookC), pageable, 2)
+
             val availableBooks = bookService.getAllUserBooks(
                 userId, ProfileBookPageable(FilterCriteria.AVAILABLE, SortCriteria.DATE_DESC, 0, 10)
             )

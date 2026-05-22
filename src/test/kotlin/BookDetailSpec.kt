@@ -1,6 +1,7 @@
 package ar.edu.unsam.phm.services
 
 import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.dto.toOwnerDTO
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.*
 import io.kotest.assertions.throwables.shouldThrow
@@ -15,19 +16,20 @@ import java.util.Optional
 class BookDetailSpec : DescribeSpec({
     isolationMode = IsolationMode.InstancePerTest
 
-    val bookRepository     = mockk<CrudBookRepository>()
-    val reservationRepository = mockk<CrudReservationRepository>(relaxed = true)
-    val userRepository     = mockk<CrudUserRepository>(relaxed = true)
-    val authorRepository   = mockk<CrudAuthorRepository>(relaxed = true)
-    val reviewRepository   = mockk<CrudReviewRepository>(relaxed = true)
+    val bookRepository            = mockk<MongoBookRepository>()
+    val mongoReservationRepository = mockk<MongoReservationRepository>(relaxed = true)
+    val reservationRepository     = mockk<CrudReservationRepository>(relaxed = true)
+    val userRepository            = mockk<CrudUserRepository>(relaxed = true)
+    val authorRepository          = mockk<CrudAuthorRepository>(relaxed = true)
+    val reviewRepository          = mockk<CrudReviewRepository>(relaxed = true)
 
     val bookService = BookService(
-        bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository
+        bookRepository, reservationRepository ,mongoReservationRepository, userRepository, authorRepository, reviewRepository
     )
 
-    val owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER).apply { id = 1 }
+    val owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER).apply { id = "user-id-1" }
     val book = Common().apply {
-        id = 1
+        id = "book-id-1"           // ← String en MongoDB
         title = "El Señor de los Anillos"
         desc = "Épica de fantasía"
         gender = Gender.DRAMA
@@ -38,24 +40,24 @@ class BookDetailSpec : DescribeSpec({
         editorial = "Minotauro"
         publishDate = LocalDate.of(1954, 7, 29)
         condition = BookCondition.EXCELLENT
-        this.owner = owner
+        this.owner = owner.toOwnerDTO()  // ← OwnerDTO
         imageSrc = "lotr.jpg"
     }
 
     describe("getBookById") {
         it("Caso feliz: devuelve el BookDTO cuando el libro existe") {
-            every { bookRepository.findById(1) } returns Optional.of(book)
+            every { bookRepository.findById("book-id-1") } returns Optional.of(book)
 
-            val result = bookService.getBookById(1)
+            val result = bookService.getBookById("book-id-1")
 
             result.title shouldBe "El Señor de los Anillos"
-            result.id shouldBe 1
+            result.id shouldBe "book-id-1"
         }
 
         it("Caso triste: lanza NotFoundException cuando el libro no existe") {
-            every { bookRepository.findById(999) } returns Optional.empty()
+            every { bookRepository.findById("id-inexistente") } returns Optional.empty()
 
-            shouldThrow<NotFoundException> { bookService.getBookById(999) }
+            shouldThrow<NotFoundException> { bookService.getBookById("id-inexistente") }
         }
     }
 })
