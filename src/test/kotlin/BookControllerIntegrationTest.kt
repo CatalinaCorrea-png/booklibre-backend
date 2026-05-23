@@ -66,7 +66,7 @@ class BookControllerIntegrationTest {
             this.author = this@BookControllerIntegrationTest.author
             numPages = 400
             isbn = "978-0-00-000001-1"
-            owner = this@BookControllerIntegrationTest.owner.toOwnerDTO()  // ← OwnerDTO
+            owner = this@BookControllerIntegrationTest.owner.toOwnerDTO()
             imageSrc = "img1.jpg"
             editorial = "Sudamericana"
         })
@@ -77,7 +77,7 @@ class BookControllerIntegrationTest {
             this.author = this@BookControllerIntegrationTest.author
             numPages = 200
             isbn = "978-0-00-000002-2"
-            owner = this@BookControllerIntegrationTest.owner.toOwnerDTO()  // ← OwnerDTO
+            owner = this@BookControllerIntegrationTest.owner.toOwnerDTO()
             imageSrc = "img2.jpg"
             editorial = "Sudamericana"
         })
@@ -195,7 +195,7 @@ class BookControllerIntegrationTest {
     @Test
     fun `excluye libros eliminados logicamente`() {
         book1.logicDelete()
-        bookRepository.save(book1)  // ← hay que guardar el cambio en MongoDB
+        bookRepository.save(book1)
 
         mockMvc.perform(get("/filtered-books").param("userId", otherUser.id.toString()))
             .andExpect(status().isOk)

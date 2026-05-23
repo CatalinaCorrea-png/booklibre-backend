@@ -59,7 +59,7 @@ class BookDetailSecurityTest {
             editorial = "Minotauro"
             publishDate = LocalDate.of(1954, 7, 29)
             condition = BookCondition.EXCELLENT
-            this.owner = owner.toOwnerDTO()  // ← OwnerDTO
+            this.owner = owner.toOwnerDTO()
             imageSrc = "lotr.jpg"
         })
     }
@@ -67,7 +67,7 @@ class BookDetailSecurityTest {
     @Test
     @WithMockUser(authorities = ["READER"])
     fun `Caso feliz - un LECTOR puede acceder al detalle del libro`() {
-        mockMvc.perform(get("/book-detail/${book.id}"))
+        mockMvc.perform(get("/book-detail/${book.id}").param("userId", "some-user-id"))
             .andExpect(status().isOk)
     }
 }

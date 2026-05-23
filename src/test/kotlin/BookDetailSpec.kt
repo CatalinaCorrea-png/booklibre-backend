@@ -29,7 +29,7 @@ class BookDetailSpec : DescribeSpec({
 
     val owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER).apply { id = "user-id-1" }
     val book = Common().apply {
-        id = "book-id-1"           // ← String en MongoDB
+        id = "book-id-1"
         title = "El Señor de los Anillos"
         desc = "Épica de fantasía"
         gender = Gender.DRAMA
@@ -40,7 +40,7 @@ class BookDetailSpec : DescribeSpec({
         editorial = "Minotauro"
         publishDate = LocalDate.of(1954, 7, 29)
         condition = BookCondition.EXCELLENT
-        this.owner = owner.toOwnerDTO()  // ← OwnerDTO
+        this.owner = owner.toOwnerDTO()
         imageSrc = "lotr.jpg"
     }
 

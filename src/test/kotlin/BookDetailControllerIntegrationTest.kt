@@ -53,14 +53,14 @@ class BookDetailControllerIntegrationTest {
             editorial = "Minotauro"
             publishDate = LocalDate.of(1954, 7, 29)
             condition = BookCondition.EXCELLENT
-            this.owner = owner.toOwnerDTO()  // ← OwnerDTO
+            this.owner = owner.toOwnerDTO()
             imageSrc = "lotr.jpg"
         })
     }
 
     @Test
     fun `Caso feliz - retorna el libro cuando existe`() {
-        mockMvc.perform(get("/book-detail/${book.id}"))
+        mockMvc.perform(get("/book-detail/${book.id}").param("userId", "some-user-id"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.title").value("El Señor de los Anillos"))
             .andExpect(jsonPath("$.id").value(book.id))
@@ -68,7 +68,7 @@ class BookDetailControllerIntegrationTest {
 
     @Test
     fun `Caso triste - retorna 404 cuando el libro no existe`() {
-        mockMvc.perform(get("/book-detail/id-inexistente"))
+        mockMvc.perform(get("/book-detail/id-inexistente").param("userId", "some-user-id"))
             .andExpect(status().isNotFound)
     }
 }

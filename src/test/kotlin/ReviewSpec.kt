@@ -9,6 +9,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldBeEmpty
+import org.springframework.data.domain.PageImpl
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import java.time.LocalDate
@@ -64,9 +65,8 @@ class ReviewSpec : DescribeSpec({
                 reservation = reservation,
                 timestamp = LocalDate.of(2026, 2, 1)
             )
-            every { bookRepository.findByBookId(book.bookId) } returns Optional.of(book)
-            every { reviewRepository.findAllByBookId(book.bookId) } returns listOf(review)
-            every { bookRepository.findByBookId(book.bookId) } returns Optional.of(book)
+            every { bookRepository.findById(book.bookId) } returns Optional.of(book)
+            every { reviewRepository.findReviewsByBookId(book.bookId, any()) } returns PageImpl(listOf(review))
             val result = bookService.getBookReviews(book.bookId, 0, 10)
 
             result.size shouldBe 1
@@ -74,10 +74,9 @@ class ReviewSpec : DescribeSpec({
         }
 
         it("Caso triste: devuelve lista vacía cuando el libro no tiene reseñas") {
-            every { bookRepository.findByBookId("id-inexistente") } returns Optional.empty()
-            every { reviewRepository.findAllByBookId("id-inexistente") } returns emptyList()
-            every { bookRepository.findByBookId(book.bookId) } returns Optional.of(book)
-            val result = bookService.getBookReviews("id-inexistente", 0, 10)
+            every { bookRepository.findById(book.bookId) } returns Optional.of(book)
+            every { reviewRepository.findReviewsByBookId(book.bookId, any()) } returns PageImpl(emptyList())
+            val result = bookService.getBookReviews(book.bookId, 0, 10)
 
             result.shouldBeEmpty()
         }
@@ -87,10 +86,12 @@ class ReviewSpec : DescribeSpec({
         it("Caso feliz: guarda la reseña con un rating válido") {
             every { reservationRepository.findById("reservation-id-1") } returns Optional.of(reservation)
             every { userRepository.findById("reader-id-1") } returns Optional.of(reader)
-            every { reviewRepository.save(any()) } answers { firstArg<Review>() }
             every { bookRepository.findByBookId(book.bookId) } returns Optional.of(book)
-            every { reviewRepository.findAllByBookId(book.bookId) } returns listOf()
-            every { bookRepository.save(any()) } answers { firstArg<Book>() }
+            every { reviewRepository.findAllByBookId(book.bookId) } returns emptyList()
+            every { reviewRepository.save(any()) } answers {
+                firstArg<Review>().also { it.id = "review-id-1" }
+            }
+            every { bookRepository.save(any<Book>()) } answers { firstArg() }
 
             reservationService.rateLoan("reservation-id-1", 5, "Muy bueno", "reader-id-1")
 
@@ -109,5 +110,7 @@ class ReviewSpec : DescribeSpec({
 
             shouldThrow<BusinessException> { reservationService.rateLoan("id-inexistente", 5, "Review", "reader-id-1") }
         }
+
     }
+
 })

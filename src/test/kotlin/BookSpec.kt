@@ -70,32 +70,6 @@ class BookTest : DescribeSpec({
         }
     }
 
-//    describe("addReview") {
-//        it("agrega la review y actualiza el rating promedio") {
-//            val book = validBook()
-//            val reservation = Reservation()
-//            book.addReview(Review(rating = 5, review = "Excelente", book = book, reservation = reservation))
-//            book.addReview(Review(rating = 3, review = "Regular", book = book, reservation = reservation))
-//            book.ratingAvg shouldBeExactly 4.0
-//        }
-//
-//        it("lanza ConflictException si el rating es menor a 1") {
-//            val book = validBook()
-//            val reservation = Reservation()
-//            shouldThrow<ConflictException> {
-//                book.addReview(Review(rating = 0, review = "Malo", book = book, reservation = reservation))
-//            }
-//        }
-//
-//        it("lanza ConflictException si el rating es mayor a 5") {
-//            val book = validBook()
-//            val reservation = Reservation()
-//            shouldThrow<ConflictException> {
-//                book.addReview(Review(rating = 6, review = "Increíble", book = book, reservation = reservation))
-//            }
-//        }
-//    }
-
     describe("calculateBibliokarmas - Template Method") {
         it("Common: 5 * días de reserva + numPages * 5") {
             val book = validBook(Common())
