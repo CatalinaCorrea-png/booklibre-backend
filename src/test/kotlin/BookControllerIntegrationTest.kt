@@ -1,12 +1,17 @@
 package ar.edu.unsam.phm.controller
 
 import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.dto.UserDTO
+import ar.edu.unsam.phm.dto.toOwnerDTO
+import ar.edu.unsam.phm.dto.ReservationDatesDTO
 import ar.edu.unsam.phm.repository.*
 import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.mongodb.core.aggregation.BooleanOperators.Not.not
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -16,18 +21,15 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @SpringBootTest
-//@org.springframework.test.context.junit.jupiter.SpringJUnitConfig
-@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
-@Transactional
 class BookControllerIntegrationTest {
 
     @Autowired lateinit var mockMvc: MockMvc
-    @Autowired lateinit var bookRepository: CrudBookRepository
+    @Autowired lateinit var bookRepository: MongoBookRepository
     @Autowired lateinit var userRepository: CrudUserRepository
     @Autowired lateinit var authorRepository: CrudAuthorRepository
     @Autowired lateinit var reservationRepository: CrudReservationRepository
-    @Autowired lateinit var entityManager: EntityManager
 
     lateinit var owner: User
     lateinit var otherUser: User
@@ -61,10 +63,10 @@ class BookControllerIntegrationTest {
             title = "Cien años de soledad"
             desc = "Novela"
             gender = Gender.DRAMA
-            author = this@BookControllerIntegrationTest.author
+            this.author = this@BookControllerIntegrationTest.author
             numPages = 400
             isbn = "978-0-00-000001-1"
-            owner = this@BookControllerIntegrationTest.owner
+            owner = this@BookControllerIntegrationTest.owner.toOwnerDTO()
             imageSrc = "img1.jpg"
             editorial = "Sudamericana"
         })
@@ -72,10 +74,10 @@ class BookControllerIntegrationTest {
             title = "El amor en los tiempos del cólera"
             desc = "Romance"
             gender = Gender.ROMANCE
-            author = this@BookControllerIntegrationTest.author
+            this.author = this@BookControllerIntegrationTest.author
             numPages = 200
             isbn = "978-0-00-000002-2"
-            owner = this@BookControllerIntegrationTest.owner
+            owner = this@BookControllerIntegrationTest.owner.toOwnerDTO()
             imageSrc = "img2.jpg"
             editorial = "Sudamericana"
         })
@@ -83,24 +85,27 @@ class BookControllerIntegrationTest {
             title = "Otro libro"
             desc = "Descripción"
             gender = Gender.DRAMA
-            author = this@BookControllerIntegrationTest.author
+            this.author = this@BookControllerIntegrationTest.author
             numPages = 600
             isbn = "978-0-00-000003-3"
-            owner = this@BookControllerIntegrationTest.otherUser  // de otro owner
+            owner = this@BookControllerIntegrationTest.otherUser.toOwnerDTO()  // ← OwnerDTO
             imageSrc = "img3.jpg"
             editorial = "Otra"
         })
-        entityManager.flush()
     }
 
     @Test
     fun `devuelve solo libros que no son del usuario consultante`() {
-        mockMvc.perform(get("/filtered-books").param("userId", otherUser.id.toString()))
+        mockMvc.perform(
+            get("/filtered-books")
+                .param("userId", otherUser.id.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
             .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content").isArray)
             .andExpect(jsonPath("$.content.length()").value(2))
-            .andExpect(jsonPath("$.content[*].title", org.hamcrest.Matchers.not(
-                org.hamcrest.Matchers.hasItem("Otro libro")
-            )))
+            .andExpect(jsonPath("$.content[0].title").value("Cien años de soledad"))
+            .andExpect(jsonPath("$.content[1].title").value("El amor en los tiempos del cólera"))
     }
 
     @Test
@@ -154,13 +159,12 @@ class BookControllerIntegrationTest {
 
     @Test
     fun `excluye libros con reservas que se solapan con el rango de fechas`() {
-        // Reserva book1 del 10 al 20
-        reservationRepository.save(Reservation(
-            book = book1,
-            user = otherUser,
+        book1.reservations.add(ReservationDatesDTO(
+            resevationId = "test-id",
             pickUpDate = LocalDate.of(2026, 5, 10),
             dropOffDate = LocalDate.of(2026, 5, 20)
         ))
+        bookRepository.save(book1)
 
         mockMvc.perform(get("/filtered-books")
             .param("userId", otherUser.id.toString())
@@ -173,12 +177,12 @@ class BookControllerIntegrationTest {
 
     @Test
     fun `incluye libros si las fechas no se solapan con la reserva`() {
-        reservationRepository.save(Reservation(
-            book = book1,
-            user = otherUser,
+        book1.reservations.add(ReservationDatesDTO(
+            resevationId = "test-id",
             pickUpDate = LocalDate.of(2026, 5, 10),
             dropOffDate = LocalDate.of(2026, 5, 20)
         ))
+        bookRepository.save(book1)
 
         mockMvc.perform(get("/filtered-books")
             .param("userId", otherUser.id.toString())
@@ -191,6 +195,7 @@ class BookControllerIntegrationTest {
     @Test
     fun `excluye libros eliminados logicamente`() {
         book1.logicDelete()
+        bookRepository.save(book1)
 
         mockMvc.perform(get("/filtered-books").param("userId", otherUser.id.toString()))
             .andExpect(status().isOk)

@@ -1,6 +1,7 @@
 package ar.edu.unsam.phm.controller
 
 import ar.edu.unsam.phm.domain.*
+import ar.edu.unsam.phm.dto.toOwnerDTO
 import ar.edu.unsam.phm.repository.*
 import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.BeforeEach
@@ -22,17 +23,15 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @SpringBootTest
-@AutoConfigureMockMvc   // sin addFilters = false → los filtros de seguridad están activos
+@AutoConfigureMockMvc
 @ActiveProfiles("sectest")
-@Transactional
 class BookDetailSecurityTest {
 
     @Autowired lateinit var mockMvc: MockMvc
-    @Autowired lateinit var bookRepository: CrudBookRepository
+    @Autowired lateinit var bookRepository: MongoBookRepository
     @Autowired lateinit var userRepository: CrudUserRepository
     @Autowired lateinit var authorRepository: CrudAuthorRepository
     @Autowired lateinit var reservationRepository: CrudReservationRepository
-    @Autowired lateinit var entityManager: EntityManager
 
     lateinit var book: Book
 
@@ -60,16 +59,15 @@ class BookDetailSecurityTest {
             editorial = "Minotauro"
             publishDate = LocalDate.of(1954, 7, 29)
             condition = BookCondition.EXCELLENT
-            this.owner = owner
+            this.owner = owner.toOwnerDTO()
             imageSrc = "lotr.jpg"
         })
-        entityManager.flush()
     }
 
     @Test
     @WithMockUser(authorities = ["READER"])
     fun `Caso feliz - un LECTOR puede acceder al detalle del libro`() {
-        mockMvc.perform(get("/book-detail/${book.id}"))
+        mockMvc.perform(get("/book-detail/${book.id}").param("userId", "some-user-id"))
             .andExpect(status().isOk)
     }
 }

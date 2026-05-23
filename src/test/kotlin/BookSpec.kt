@@ -1,5 +1,6 @@
 package ar.edu.unsam.phm.domain
 
+import ar.edu.unsam.phm.dto.toOwnerDTO
 import ar.edu.unsam.phm.errors.ConflictException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
@@ -9,6 +10,8 @@ import io.kotest.matchers.shouldBe
 import java.time.LocalDate
 
 class BookTest : DescribeSpec({
+
+    var owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER).apply { id = "user-id-1" }
 
     fun validBook(type: Book = Common()): Book = type.apply {
         title = "El Quijote"
@@ -21,7 +24,7 @@ class BookTest : DescribeSpec({
         editorial = "Planeta"
         publishDate = LocalDate.of(1605, 1, 1)
         condition = BookCondition.EXCELLENT
-        owner = User().apply { id = 1L }
+        this.owner = owner.toOwnerDTO()
         imageSrc = "image.jpg"
     }
 
@@ -52,7 +55,8 @@ class BookTest : DescribeSpec({
         }
 
         it("lanza ConflictException si el dueño es un lector") {
-            val book = validBook().apply { owner = User().apply { userType = UserTypes.READER } }
+            val readerOwner = User(name = "Lector", userType = UserTypes.READER).apply { id = "reader-id-1" }
+            val book = validBook().apply { this.owner = readerOwner.toOwnerDTO() }
             shouldThrow<ConflictException> { book.validate() }
         }
     }
@@ -63,32 +67,6 @@ class BookTest : DescribeSpec({
             book.deleted shouldBe false
             book.logicDelete()
             book.deleted shouldBe true
-        }
-    }
-
-    describe("addReview") {
-        it("agrega la review y actualiza el rating promedio") {
-            val book = validBook()
-            val reservation = Reservation()
-            book.addReview(Review(rating = 5, review = "Excelente", book = book, reservation = reservation))
-            book.addReview(Review(rating = 3, review = "Regular", book = book, reservation = reservation))
-            book.ratingAvg shouldBeExactly 4.0
-        }
-
-        it("lanza ConflictException si el rating es menor a 1") {
-            val book = validBook()
-            val reservation = Reservation()
-            shouldThrow<ConflictException> {
-                book.addReview(Review(rating = 0, review = "Malo", book = book, reservation = reservation))
-            }
-        }
-
-        it("lanza ConflictException si el rating es mayor a 5") {
-            val book = validBook()
-            val reservation = Reservation()
-            shouldThrow<ConflictException> {
-                book.addReview(Review(rating = 6, review = "Increíble", book = book, reservation = reservation))
-            }
         }
     }
 

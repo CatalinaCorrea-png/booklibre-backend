@@ -47,7 +47,7 @@ class BookService(
 
         val newBook = bookCreateDTO.createFromDTO(owner)
         newBook.author = author
-        println("author name del DTO: ${bookCreateDTO.book.author.name}")
+        //println("author name del DTO: ${bookCreateDTO.book.author.name}")
         newBook.validate()
         bookRepository.save(newBook)
     }
