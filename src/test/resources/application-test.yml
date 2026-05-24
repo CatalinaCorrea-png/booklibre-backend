@@ -1,4 +1,8 @@
 spring:
+  spring:
+    data:
+      mongodb:
+        uri: mongodb://localhost:27017/booklibre_test
   datasource:
     url: jdbc:h2:mem:booklibre_test;DATABASE_TO_LOWER=TRUE
     username: sa
@@ -25,3 +29,5 @@ logging:
     root: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.tool.schema: DEBUG
+
+
