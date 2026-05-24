@@ -1,3 +1,5 @@
+![Coverage](.github/badges/jacoco.svg)
+
 # 📚 BookLibre - Backend
 
 > "Que la fuerza te acompañe… y que te devuelvan el libro en fecha."
