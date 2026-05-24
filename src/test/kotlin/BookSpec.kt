@@ -70,6 +70,8 @@ class BookTest : DescribeSpec({
         }
     }
 
+
+
     describe("calculateBibliokarmas - Template Method") {
         it("Common: 5 * días de reserva + numPages * 5") {
             val book = validBook(Common())

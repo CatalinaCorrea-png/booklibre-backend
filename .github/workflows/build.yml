@@ -19,6 +19,19 @@ jobs:
     # "runs-on" es el encargado de correr el job. En nuestro caso una VM con ubuntu.
     runs-on: ubuntu-latest
     # "steps" enumera todos los pasos a seguir cuando se ejecute este job.
+    jobs:
+      gradle-plus-coverage:
+        runs-on: ubuntu-latest
+        services:
+          mongodb:
+            image: mongo:6
+            ports:
+              - 27017:27017
+            options: >-
+              --health-cmd "mongosh --eval 'db.runCommand(\"ping\").ok'"
+              --health-interval 10s
+              --health-timeout 5s
+              --health-retries 5
     steps:
       # Primero hacemos checkout a nuestro repo para que el job pueda acceder al mismo.
       - name: Checkout Repo
