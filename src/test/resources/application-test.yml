@@ -1,15 +1,14 @@
 spring:
-  spring:
     data:
       mongodb:
         uri: mongodb://localhost:27017/booklibre_test
-  datasource:
+datasource:
     url: jdbc:h2:mem:booklibre_test;DATABASE_TO_LOWER=TRUE
     username: sa
     password:
     driver-class-name: org.h2.Driver
 
-  jpa:
+jpa:
     open-in-view: false
     show-sql: true
     hibernate:
