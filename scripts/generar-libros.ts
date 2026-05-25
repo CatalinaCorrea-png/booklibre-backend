@@ -24,6 +24,8 @@
 import 'dotenv/config'
 import { faker } from '@faker-js/faker'
 import { randomUUID } from 'node:crypto'
+import { readFileSync, existsSync } from 'node:fs'
+import path from 'node:path'
 import { Long, MongoClient, type Document } from 'mongodb'
 
 // ─── Valores válidos de los enums del dominio (coinciden con Kotlin) ──────────
@@ -104,10 +106,41 @@ function generarISBN(): string {
     return `978-${grupo}-${editor}-${titulo}-${verif}`
 }
 
-function crearAuthor(): AuthorEmbedded {
+// ─── Pool de libros REALES (Open Library) ───────────────────────────────────
+// Si existe scripts/data/libros-pool.json (creado por fetch-libros-reales.ts),
+// usamos esos títulos/autores/ISBN/año para tener distribución alfabética real
+// (clave para evaluar el sharding por rango sobre `title`).
+// Si no existe, caemos a Faker como en el setup de hash sharding.
+interface PoolBook {
+    title: string
+    author: string
+    isbn?: string
+    publishYear?: number
+    coverId?: number
+    gender: typeof GENDERS[number]
+}
+
+const POOL_FILE = path.join('scripts', 'data', 'libros-pool.json')
+
+function cargarPool(): PoolBook[] | null {
+    if (!existsSync(POOL_FILE)) return null
+    try {
+        const raw = readFileSync(POOL_FILE, 'utf8')
+        const pool = JSON.parse(raw) as PoolBook[]
+        if (!Array.isArray(pool) || pool.length === 0) return null
+        return pool
+    } catch (err) {
+        console.warn(`⚠️  No se pudo leer ${POOL_FILE}: ${err}. Uso Faker.`)
+        return null
+    }
+}
+
+const POOL = cargarPool()
+
+function crearAuthor(name?: string): AuthorEmbedded {
     return {
         _id: randomUUID(),
-        name: faker.person.fullName(),
+        name: name ?? faker.person.fullName(),
         avatar: 'assets/author_default.jpg',
     }
 }
@@ -126,22 +159,35 @@ function crearLibro(): Book {
     // bookType y _class deben ser coherentes: se eligen juntos del mismo map
     const tipo = faker.helpers.arrayElement(BOOK_TYPE_MAP)
 
+    // Si tenemos pool de libros reales, tomamos uno al azar para usar sus
+    // datos "auténticos" (título, autor, año, ISBN, género) en lugar de Faker.
+    const real = POOL ? faker.helpers.arrayElement(POOL) : null
+
+    const publishDate = real?.publishYear
+        ? new Date(Date.UTC(real.publishYear, faker.number.int({ min: 0, max: 11 }), 1))
+        : faker.date.between({ from: '1900-01-01', to: new Date() })
+
+    const imageSrc = real?.coverId
+        ? `https://covers.openlibrary.org/b/id/${real.coverId}-M.jpg`
+        : faker.image.urlPicsumPhotos({ width: 400, height: 600 })
+
     return {
         _class: tipo.clazz,
-        // book_id propio: UUID de alta cardinalidad para que el hash distribuya parejo
+        // book_id propio: UUID de alta cardinalidad. En range sharding sobre
+        // { title, bookId } provee splitabilidad cuando hay títulos repetidos.
         bookId: randomUUID(),
-        title: faker.book.title(),
+        title: real?.title ?? faker.book.title(),
         desc: faker.lorem.paragraph({ min: 3, max: 6 }),
-        gender: faker.helpers.arrayElement(GENDERS),
-        author: crearAuthor(),
+        gender: real?.gender ?? faker.helpers.arrayElement(GENDERS),
+        author: crearAuthor(real?.author),
         numPages: faker.number.int({ min: 50, max: 1500 }),
-        isbn: generarISBN(),
+        isbn: real?.isbn ?? generarISBN(),
         language: faker.helpers.arrayElement(LANGUAGES),
         editorial: faker.helpers.arrayElement(EDITORIALES),
-        publishDate: faker.date.between({ from: '1900-01-01', to: new Date() }),
+        publishDate,
         condition: faker.helpers.arrayElement(CONDITIONS),
         owner: crearOwner(),
-        imageSrc: faker.image.urlPicsumPhotos({ width: 400, height: 600 }),
+        imageSrc,
         timestamp: faker.date.between({ from: '2024-01-01', to: new Date() }),
         bookType: tipo.bookType,
         deleted: faker.datatype.boolean({ probability: 0.05 }),
@@ -161,11 +207,16 @@ function* generarLibros(cantidad: number): Generator<Book> {
 function obtenerConfiguracion() {
     return {
         insertar: process.argv.includes('--insertar'),
-        uri: process.env.MONGODB_URI || 'mongodb://localhost:27117',
+        // 127.0.0.1 fuerza IPv4: con `localhost`, Node a veces resuelve a
+        // `[::1]` (IPv6). Incluimos los 2 routers para que el driver alterne
+        // heartbeats y haga failover automático si uno se satura bajo carga.
+        uri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27117,127.0.0.1:27118',
         dbName: process.env.DB_NAME || 'book_libre',
         collectionName: process.env.COLLECTION_NAME || 'books',
         total: 500_000,
-        batchSize: 10_000,
+        // 10k saturaba al router cuando el balancer estaba moviendo chunks
+        // (range sharding sobre colección creciendo desde 0). 2k da margen.
+        batchSize: 2_000,
     }
 }
 
@@ -192,6 +243,10 @@ async function insertarLotes(
                 const segundos = ((Date.now() - inicio) / 1000).toFixed(1)
                 console.log(`  ${total.toLocaleString()} insertados... (${segundos}s)`)
             }
+            // Backpressure: un respiro corto para que mongos atienda heartbeats
+            // sin ahogarse. Sin esto, el monitor del driver timeouteaba bajo
+            // carga sostenida.
+            await new Promise((r) => setTimeout(r, 25))
         }
     }
 
@@ -221,6 +276,12 @@ async function main() {
     console.log(`Generando ${config.total.toLocaleString()} libros ficticios...`)
     console.log(`Router: ${config.uri}`)
     console.log(`Destino: ${config.dbName}.${config.collectionName}`)
+    if (POOL) {
+        console.log(`Fuente:  pool real de ${POOL.length.toLocaleString()} libros (Open Library)`)
+    } else {
+        console.log(`Fuente:  Faker (no se encontró ${POOL_FILE})`)
+        console.log(`         Para usar datos reales: npx tsx scripts/fetch-libros-reales.ts`)
+    }
     console.log(`Modo: ${config.insertar ? 'INSERTAR' : 'DRY-RUN (sin insertar)'}`)
     console.log('')
 
@@ -230,7 +291,16 @@ async function main() {
     let resultado
 
     if (config.insertar) {
-        const client = new MongoClient(config.uri)
+        // Timeouts generosos: bajo bulk pesado, mongos a veces tarda más de los
+        // 10s default en responder al heartbeat → el driver marcaba el server
+        // UNKNOWN y abortaba el insertMany en vuelo.
+        const client = new MongoClient(config.uri, {
+            serverSelectionTimeoutMS: 60_000,
+            socketTimeoutMS: 120_000,
+            connectTimeoutMS: 60_000,
+            heartbeatFrequencyMS: 30_000,
+            maxPoolSize: 8,
+        })
         await client.connect()
         const collection = client.db(config.dbName).collection<Book>(config.collectionName)
 
