@@ -244,7 +244,10 @@ db.book_clicks.aggregate([
 ])
 ```
 
-### 2. --
+### 2. Saber cuantos libros son del tipo coleccionable
+```js
+db["books"].find({ "bookType" : "COLECCIONABLE" }).count()
+```
 
 
 ### 3. Saber qué libros tienen más de 4 puntos de calificación.
