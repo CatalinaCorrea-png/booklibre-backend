@@ -105,14 +105,8 @@ class ReservationService(
             .findRatingsByReservationIdIn(reservations.map { it.id!! })
             .associate { it.reservationId to it.rating }
 
-        val bookIds = reservations.map { it.bookId }.distinct()
-        val bookMap: Map<String, Book> = bookRepository
-            .findAllByBookIdIn(bookIds)
-            .associateBy { it.bookId }
-
         return reservations.map { reservation ->
             val rating = reviewMap[reservation.id]
-            reservation.book = bookMap[reservation.bookId]
 
             reservation.toDTO(rating != null).apply {
                 if (rating != null) this.review = rating
