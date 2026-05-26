@@ -20,7 +20,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
         """
     SELECT r FROM Reservation r
     WHERE r.user.id = :userId
-    AND r.bookDeleted = false
     AND r.user.userType <> :userType
     AND (
         :search = ''
@@ -42,7 +41,6 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
         """
     SELECT r FROM Reservation r
     WHERE r.ownerId = :userId
-    AND r.bookDeleted = false
     AND r.user.userType <> :userType
     AND (
         :search = ''
