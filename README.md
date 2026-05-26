@@ -266,6 +266,18 @@ db.books.aggregate([
 
 ```
 
+### 5. Saber qué libros tienen todos las reservas cumplidas (ya devolvieron los libros)
+
+```js
+db["books"].find({
+  "reservations": {
+    $not: {
+      $elemMatch: { "dropOffDate": { $gte: ISODate() } }
+    }
+  }
+})
+```
+
 ---
 
 ##  Tutor
