@@ -12,7 +12,8 @@ data class ProfileBookDTO(
     var gender: Gender,
     var timestamp: LocalDate,
     var imageSrc: String,
-    var state: BookAvailability
+    var state: BookAvailability,
+    var clicks: Int,
 )
 
 fun Book.toProfileBookDTO(today: LocalDate) = ProfileBookDTO(
@@ -24,5 +25,6 @@ fun Book.toProfileBookDTO(today: LocalDate) = ProfileBookDTO(
     imageSrc = imageSrc,
     state = BookAvailability.of(
         reservations.any {it.pickUpDate <= today && it.dropOffDate >= today}
-    )
+    ),
+    clicks = bookClicks
 )

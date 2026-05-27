@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 
 class MongoBookRepositoryCustomImpl(
     private val mongoTemplate: MongoTemplate
@@ -36,5 +37,13 @@ class MongoBookRepositoryCustomImpl(
         val total = mongoTemplate.count(Query(criteria), Book::class.java)
 
         return PageImpl(books, pageable, total)
+    }
+
+    override fun incrementClicks(bookId: String) {
+        mongoTemplate.updateFirst(
+            Query.query(Criteria.where("_id").`is`(bookId)),
+            Update().inc("bookClicks", 1),
+            Book::class.java
+        )
     }
 }

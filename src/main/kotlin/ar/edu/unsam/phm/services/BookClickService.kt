@@ -27,5 +27,6 @@ class BookClickService(
             this.username = user.name
         }
         bookClickRepository.save(bookClick)
+        bookRepository.incrementClicks(bookId)
     }
 }

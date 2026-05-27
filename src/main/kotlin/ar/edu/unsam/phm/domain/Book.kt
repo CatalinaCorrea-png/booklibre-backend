@@ -46,6 +46,7 @@ abstract class Book(
     private var reservationCount: Long = 0,
     var reservations: MutableList<ReservationDatesDTO> = mutableListOf(),
     var lastTwoReviews: MutableList<ReviewDTO> = mutableListOf(),
+    var bookClicks: Int = 0
 
     ) : RepositoryElement {
 

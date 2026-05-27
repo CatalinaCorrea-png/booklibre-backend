@@ -6,5 +6,7 @@ enum class SortCriteria(val sortBy: Sort) {
     DATE_ASC(Sort.by(Sort.Direction.ASC, "timestamp")),
     DATE_DESC(Sort.by(Sort.Direction.DESC, "timestamp")),
     ALPHABETICAL_ASC(Sort.by(Sort.Direction.ASC, "title")),
-    ALPHABETICAL_DESC(Sort.by(Sort.Direction.DESC, "title"))
+    ALPHABETICAL_DESC(Sort.by(Sort.Direction.DESC, "title")),
+    CLICKS_ASC(Sort.by(Sort.Direction.ASC, "bookClicks")),
+    CLICKS_DESC(Sort.by(Sort.Direction.DESC, "bookClicks"))
 }

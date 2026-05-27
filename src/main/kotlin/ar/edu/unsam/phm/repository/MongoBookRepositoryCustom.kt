@@ -16,4 +16,8 @@ interface MongoBookRepositoryCustom {
         criteria: Criteria,
         pageable: Pageable
     ): Page<Book>
+
+    fun incrementClicks(
+        bookId: String
+    ): Unit
 }
