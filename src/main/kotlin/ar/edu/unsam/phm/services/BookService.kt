@@ -38,7 +38,8 @@ class BookService(
             .orElseGet {
                 authorRepository.save(
                     Author(
-                        name = bookCreateDTO.book.author.name
+                        name = bookCreateDTO.book.author.name ,
+                        avatar = bookCreateDTO.book.author.avatar
                     )
                 )
             }
@@ -52,11 +53,11 @@ class BookService(
 
     @Transactional
     fun updateBook(id: String, bookCreateDTO: BookCreateDTO) : Book {
-        val bookOwner = userRepository.findById(bookCreateDTO.ownerId)
-            .orElseThrow { NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}") }
-
         val existingBook = bookRepository.findById(id)
             .orElseThrow { NotFoundException("No existe el libro con id: $id") }
+
+        val bookOwner = userRepository.findById(bookCreateDTO.ownerId)
+            .orElseThrow { NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}") }
 
         if (existingBook.deleted) {
             throw ConflictException("No se puede modificar un libro eliminado")
@@ -90,7 +91,7 @@ class BookService(
             condition = bookCreateDTO.book.condition
             imageSrc = bookCreateDTO.book.imageSrc
             this.author = author
-            this.owner = bookOwner.toOwnerDTO()
+            //this.owner = bookOwner.toOwnerDTO()
         }
         existingBook.validate()
         return bookRepository.save(existingBook)
@@ -110,7 +111,7 @@ class BookService(
 
         book.logicDelete()
         bookRepository.save(book)
-        reservationRepository.markBookAsDeletedInReservations(book.bookId)
+        //reservationRepository.markBookAsDeletedInReservations(book.bookId)
     }
 
     fun getAllUserBooks(
