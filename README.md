@@ -237,7 +237,7 @@ SELECT * FROM users_with_more_than_2_returned_reservations;
 
 ### 1. Saber qué libro es el más clickeado.
 ```js
-db.books.sort({ bookClicks: -1 }).limit(1)
+db.books.find().sort({ bookClicks: -1 }).limit(1)
 ```
 
 ### 2. Saber cuantos libros son del tipo coleccionable
