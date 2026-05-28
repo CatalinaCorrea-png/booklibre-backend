@@ -85,6 +85,17 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
 
     @Query(
         """
+            SELECT count(r)
+            FROM Reservation r
+            WHERE r.ownerId = :userId
+            AND r.pickUpDate <= CURRENT_DATE 
+            AND r.dropOffDate >= CURRENT_DATE
+        """
+    )
+    fun countUserReservedBooks(userId: String): Long
+
+    @Query(
+        """
         SELECT count(r)
         FROM Reservation r
         WHERE r.user.id = :userId
@@ -97,4 +108,5 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
     @Modifying
     @Query("UPDATE Reservation r SET r.bookDeleted = true WHERE r.bookId = :bookId")
     fun markBookAsDeletedInReservations(@Param("bookId") bookId: String)
+    fun findByOwnerId(ownerId: String): MutableList<Reservation>
 }

@@ -12,7 +12,6 @@ import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudReservationRepository
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.MongoBookRepository
-import ar.edu.unsam.phm.repository.MongoReservationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -28,8 +27,6 @@ class UserService(
     @Autowired
     val reservationRepository: CrudReservationRepository,
     private val encoder: PasswordEncoder,
-    @Autowired
-    val mongoReservationRepository: MongoReservationRepository,
     @Autowired
     val mongoBookRepository: MongoBookRepository
 ) {
@@ -116,7 +113,7 @@ class UserService(
     }
 
     fun validateActiveReservationsAsPublisher(userId: String) {
-        val reservations = mongoReservationRepository.findByOwnerId(userId)
+        val reservations = reservationRepository.findByOwnerId(ownerId = userId)
         if(reservations.any { it.dropOffDate >= LocalDate.now() }) {
             throw BusinessException("Tus libros tienen reservas activas. No podés cambiar tu tipo hasta que finalicen todas las reservas de tus libros.")
         }

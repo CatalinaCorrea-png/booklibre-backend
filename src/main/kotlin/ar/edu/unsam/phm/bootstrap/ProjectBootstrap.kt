@@ -22,7 +22,6 @@ import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.BookClickRepository
 import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.MongoBookRepository
-import ar.edu.unsam.phm.repository.MongoReservationRepository
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
@@ -48,9 +47,6 @@ class ProjectBootstrap : InitializingBean {
 
     @Autowired
     private lateinit var repoReservations: CrudReservationRepository
-
-    @Autowired
-    private lateinit var repoMongoReservations: MongoReservationRepository
 
     @Autowired
     private lateinit var repoReviews: CrudReviewRepository
@@ -277,10 +273,6 @@ class ProjectBootstrap : InitializingBean {
 
             // Primero la generamos en postgres
             val savedRes = repoReservations.save(reservation)
-
-            // Despues hacemos un mirror en mongo
-            val ownerId = book.owner.id
-            repoMongoReservations.save(savedRes.toDoc(ownerId))
 
             println("Reservation creada para ${reservation.user.name} - ${book.title}")
         }
@@ -1521,7 +1513,6 @@ class ProjectBootstrap : InitializingBean {
         println("************************************************************************")
         println("Running initialization")
         println("************************************************************************")
-        repoMongoReservations.deleteAll()
         repoBooks.deleteAll()
         this.initUsers()
         this.initAuthors()

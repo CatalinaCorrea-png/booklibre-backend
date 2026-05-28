@@ -17,14 +17,13 @@ class BookDetailSpec : DescribeSpec({
     isolationMode = IsolationMode.InstancePerTest
 
     val bookRepository            = mockk<MongoBookRepository>()
-    val mongoReservationRepository = mockk<MongoReservationRepository>(relaxed = true)
     val reservationRepository     = mockk<CrudReservationRepository>(relaxed = true)
     val userRepository            = mockk<CrudUserRepository>(relaxed = true)
     val authorRepository          = mockk<CrudAuthorRepository>(relaxed = true)
     val reviewRepository          = mockk<CrudReviewRepository>(relaxed = true)
 
     val bookService = BookService(
-        bookRepository, reservationRepository ,mongoReservationRepository, userRepository, authorRepository, reviewRepository
+        bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository
     )
 
     val owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER).apply { id = "user-id-1" }

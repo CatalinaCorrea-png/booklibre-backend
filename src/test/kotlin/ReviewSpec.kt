@@ -19,17 +19,16 @@ class ReviewSpec : DescribeSpec({
     isolationMode = IsolationMode.InstancePerTest
 
     val bookRepository             = mockk<MongoBookRepository>(relaxed = true)
-    val mongoReservationRepository = mockk<MongoReservationRepository>(relaxed = true)
     val reservationRepository      = mockk<CrudReservationRepository>(relaxed = true)
     val userRepository             = mockk<CrudUserRepository>(relaxed = true)
     val authorRepository           = mockk<CrudAuthorRepository>(relaxed = true)
     val reviewRepository           = mockk<CrudReviewRepository>()
 
     val bookService = BookService(
-        bookRepository, reservationRepository, mongoReservationRepository, userRepository, authorRepository, reviewRepository
+        bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository
     )
     val reservationService = ReservationService(
-        reservationRepository, mongoReservationRepository, bookRepository, userRepository, reviewRepository
+        reservationRepository, bookRepository, userRepository, reviewRepository
     )
 
     val owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER).apply { id = "owner-id-1" }

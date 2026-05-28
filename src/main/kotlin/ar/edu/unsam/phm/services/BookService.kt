@@ -23,8 +23,6 @@ class BookService(
     @Autowired
     val reservationRepository: CrudReservationRepository,
     @Autowired
-    val mongoReservationRepository: MongoReservationRepository,
-    @Autowired
     val userRepository: CrudUserRepository,
     @Autowired
     val authorRepository: CrudAuthorRepository,

@@ -18,12 +18,11 @@ class ProfileSpec : DescribeSpec({
     isolationMode = IsolationMode.InstancePerTest
 
     val bookRepository = mockk<MongoBookRepository>()
-    val mongoReservationRepository = mockk<MongoReservationRepository>(relaxed = true)
     val reservationRepository = mockk<CrudReservationRepository>()
     val userRepository = mockk<CrudUserRepository>()
     val authorRepository = mockk<CrudAuthorRepository>()
     val reviewRepository = mockk<CrudReviewRepository>(relaxed = true)
-    val bookService = BookService(bookRepository, reservationRepository, mongoReservationRepository, userRepository, authorRepository, reviewRepository)
+    val bookService = BookService(bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository)
 
     val userId = "user-id-1"
 
