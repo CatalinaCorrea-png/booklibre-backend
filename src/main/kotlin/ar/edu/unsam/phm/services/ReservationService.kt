@@ -17,8 +17,6 @@ class ReservationService(
     @Autowired
     val reservationRepository: CrudReservationRepository,
     @Autowired
-    val mongoReservationRepository: MongoReservationRepository,
-    @Autowired
     val bookRepository: MongoBookRepository,
     @Autowired
     val userRepository: CrudUserRepository,
@@ -65,8 +63,6 @@ class ReservationService(
         reservationRepository.save(newReservation)
         book.addReservation(newReservation.toReservationDate())
         bookRepository.save(book)
-
-//        mongoReservationRepository.save(newReservation.toDoc(book.owner.id))
     }
 
     // esto quiza esta de mas, supongo que regla de negocio?
@@ -188,7 +184,7 @@ class ReservationService(
 
     @Transactional(readOnly = true)
     fun getUserLentBooksNumber(userId: String): Long =
-        mongoReservationRepository.countUserReservedBooks(userId, LocalDate.now())
+        reservationRepository.countUserReservedBooks(userId)
 
     @Transactional(readOnly = true)
     fun getUserReadBooksNumber(userId: String): Long = reservationRepository.countUserReadBooksNumber(userId)
