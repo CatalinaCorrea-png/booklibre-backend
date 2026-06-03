@@ -4,14 +4,14 @@ import ar.edu.unsam.phm.domain.User
 import ar.edu.unsam.phm.domain.UserTypes
 
 data class UserDTO(
-    val id: Long,
+    val id: String,
     val name: String,
     val description: String,
     val email: String,
     val cel: String,
     val location: String,
     val timestamp: String,
-    val bibliokarmas: Int,
+    val bibliokarmas: Long,
     val userType: String,
     val img: String
 ) {
@@ -31,7 +31,7 @@ data class UserDTO(
 }
 
 data class UpdateUserProfileDTO(
-    val id: Long,
+    val id: String,
     val name: String,
     val description: String,
     val img: String,
@@ -39,7 +39,7 @@ data class UpdateUserProfileDTO(
     val cel: String,
     val location: String,
     val timestamp: String,
-    val bibliokarmas: Int,
+    val bibliokarmas: Long,
     val userType: String
 )
 
@@ -62,3 +62,20 @@ data class UpdateProfileResponse(
     val user: UserDTO,
     val accessToken: String
 )
+
+data class OwnerDTO(
+    val id: String = "",
+    val name: String = "",
+    val bibliokarmas: Long = 0,
+    val userType: UserTypes = UserTypes.READER,
+    val img: String = ""
+)
+fun User.toOwnerDTO() : OwnerDTO {
+    return OwnerDTO(
+        id = this.id!!,
+        name = this.name,
+        bibliokarmas = this.bibliokarmas,
+        userType = this.userType,
+        img = this.img
+    )
+}

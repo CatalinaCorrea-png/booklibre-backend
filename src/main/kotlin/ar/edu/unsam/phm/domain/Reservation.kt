@@ -3,7 +3,6 @@ package ar.edu.unsam.phm.domain
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import jakarta.persistence.*
-import org.hibernate.usertype.UserType
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -11,14 +10,24 @@ import java.time.temporal.ChronoUnit
 data class Reservation(
     @ManyToOne(fetch = FetchType.LAZY)
     var user: User = User(),
-    @ManyToOne(fetch = FetchType.LAZY)
-    var book: Book = Common(),
+//    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "book_id", nullable = false)
+    var bookId: String = "",
+    @Transient
+    var book: Book? = null, // NO se persiste, se carga desde Mongo en el service
     var pickUpDate: LocalDate = LocalDate.now(),
     var dropOffDate: LocalDate = LocalDate.now(),
+    var bookTitle: String = "",
+    var bookAuthorName: String = "",
+    var bookImageSrc: String = "",
+    var ownerName: String = "",
+    var ownerId: String = "",
+    var bookDeleted: Boolean = false,
+    var bibliokarmas: Long = 0,
 ) : RepositoryElement {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override var id: Long? = null
+    @GeneratedValue(strategy = GenerationType.UUID)
+    override var id: String? = null
 
     val state: State
         get() = State.get(
@@ -55,7 +64,7 @@ data class Reservation(
     }
 
     private fun ownerIsReader(): Boolean {
-        return if (this.book.ownerIsReader()) {
+        return if (this.book?.ownerIsReader()!!) {
             throw BusinessException("Este libro ya no está disponible.")
         } else true
     }

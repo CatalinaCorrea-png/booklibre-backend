@@ -4,7 +4,7 @@ import ar.edu.unsam.phm.domain.User
 import org.springframework.data.repository.CrudRepository
 import java.util.*
 
-interface CrudUserRepository : CrudRepository<User, Long> {
+interface CrudUserRepository : CrudRepository<User, String> {
 
     fun findByEmail(email: String): Optional<User>
 

@@ -3,19 +3,19 @@ package ar.edu.unsam.phm.domain
 import jakarta.persistence.Entity
 import kotlin.math.ceil
 
-@Entity
+//@Entity
 class Common : Book(bookType = "COMUN") {
-    override fun typeBibliokarmas(userBibliokarmas: Int): Long = if (userBibliokarmas < 1000) this.numPagesLong() * 5 else this.numPagesLong() * 2
+    override fun typeBibliokarmas(userBibliokarmas: Long): Long = if (userBibliokarmas < 1000) this.numPagesLong() * 5 else this.numPagesLong() * 2
 }
 
-@Entity
+//@Entity
 class WithADedication : Book(bookType = "CON DEDICATORIA") {
-    override fun typeBibliokarmas(userBibliokarmas: Int): Long = 200 + 10 * this.reservationCount()
+    override fun typeBibliokarmas(userBibliokarmas: Long): Long = 200 + 10 * this.reservationCount()
 }
 
-@Entity
+//@Entity
 class Collectable : Book(bookType = "COLECCIONABLE") {
-    override fun typeBibliokarmas(userBibliokarmas: Int): Long {
+    override fun typeBibliokarmas(userBibliokarmas: Long): Long {
         // redondeo hacia arriba
         val fifthPart = ceil(userBibliokarmas / 5.0).toLong()
         return fifthPart + this.numPagesLong()

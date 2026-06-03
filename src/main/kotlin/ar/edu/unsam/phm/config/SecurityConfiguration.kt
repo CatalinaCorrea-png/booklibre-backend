@@ -45,15 +45,17 @@ class SecurityConfiguration(
             .authorizeHttpRequests {
                 it
                     // Endpoints publicos
-                    .requestMatchers("/api/auth", "/api/auth/refresh", "/error").permitAll()
+                    .requestMatchers("/api/auth", "/api/auth/refresh", "/error", "/books/**", "/book-titulo/**").permitAll()
                     .requestMatchers("/assets/**").permitAll() // para que no rompan las imagenes de perfil
                     .requestMatchers(HttpMethod.OPTIONS)
                     .permitAll() // esto es para react pregunta antes de hacer la request real
                     .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
 
                     // Endpoints por rol
-                    .requestMatchers(HttpMethod.GET, "/filtered-books", "book-detail/**")
+                    .requestMatchers(HttpMethod.GET, "/filtered-books")
                     .hasAnyAuthority(UserTypes.READER.name, UserTypes.COMBINED.name)
+                    .requestMatchers(HttpMethod.GET, "/book-detail/**")
+                    .hasAnyAuthority(UserTypes.READER.name, UserTypes.COMBINED.name, UserTypes.PUBLISHER.name)
                     .requestMatchers(HttpMethod.POST, "/create-book")
                     .hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
                     .requestMatchers(HttpMethod.POST, "/create-reservation")

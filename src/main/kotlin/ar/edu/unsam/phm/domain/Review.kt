@@ -20,14 +20,13 @@ data class Review(
     @JoinColumn(name = "reservation_id")
     val reservation: Reservation,
 
-    @ManyToOne
-    @JoinColumn(name = "book_id")
-    val book: Book,
+    @Column(name = "book_id")
+    val bookId: String = "",
 
     ) : RepositoryElement {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override var id: Long? = null
+    @GeneratedValue(strategy = GenerationType.UUID)
+    override var id: String? = null
 
     override fun meetsSearchCriteria(criteria: String): Boolean {
         TODO("Not yet implemented")

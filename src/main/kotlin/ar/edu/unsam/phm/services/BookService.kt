@@ -4,16 +4,14 @@ import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.errors.NotFoundException
-import ar.edu.unsam.phm.repository.CrudAuthorRepository
-import ar.edu.unsam.phm.repository.CrudBookRepository
-import ar.edu.unsam.phm.repository.CrudReservationRepository
-import ar.edu.unsam.phm.repository.CrudReviewRepository
-import ar.edu.unsam.phm.repository.CrudUserRepository
+import ar.edu.unsam.phm.repository.*
 import ar.edu.unsam.phm.specification.BookSpecifications
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -21,7 +19,7 @@ import java.time.LocalDate
 @Service
 class BookService(
     @Autowired
-    val bookRepository: CrudBookRepository,
+    val bookRepository: MongoBookRepository,
     @Autowired
     val reservationRepository: CrudReservationRepository,
     @Autowired
@@ -33,40 +31,42 @@ class BookService(
 ) {
     @Transactional
     fun createBook(bookCreateDTO: BookCreateDTO) {
-        val owner = userRepository.findById(bookCreateDTO.ownerId!!)
+        val owner = userRepository.findById(bookCreateDTO.ownerId)
             .orElseThrow { NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}") }
 
         val author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)
             .orElseGet {
                 authorRepository.save(
                     Author(
-                        name = bookCreateDTO.book.author.name
+                        name = bookCreateDTO.book.author.name ,
+                        avatar = bookCreateDTO.book.author.avatar
                     )
                 )
             }
 
         val newBook = bookCreateDTO.createFromDTO(owner)
         newBook.author = author
-        println("author name del DTO: ${bookCreateDTO.book.author.name}")
+        //println("author name del DTO: ${bookCreateDTO.book.author.name}")
         newBook.validate()
         bookRepository.save(newBook)
     }
 
     @Transactional
-    fun updateBook(id: Long, bookCreateDTO: BookCreateDTO) {
-        val owner = userRepository.findById(bookCreateDTO.ownerId!!)
-            .orElseThrow { NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}") }
-
+    fun updateBook(id: String, bookCreateDTO: BookCreateDTO) : Book {
         val existingBook = bookRepository.findById(id)
             .orElseThrow { NotFoundException("No existe el libro con id: $id") }
+
+        val bookOwner = userRepository.findById(bookCreateDTO.ownerId)
+            .orElseThrow { NotFoundException("No existe el usuario con id: ${bookCreateDTO.ownerId}") }
 
         if (existingBook.deleted) {
             throw ConflictException("No se puede modificar un libro eliminado")
         }
 
-        if (owner.id != existingBook.owner.id) {
+        if (bookOwner.id != existingBook.owner.id) {
             throw ConflictException("No podes modificar un libro que no es tuyo.")
         }
+
 
         val author: Author = authorRepository.findByName(bookCreateDTO.book.author.name)
             .orElseGet {
@@ -78,54 +78,69 @@ class BookService(
                 )
             }
 
-        val newBook = bookCreateDTO.createFromDTO(owner)
-        newBook.id = existingBook.id
-        newBook.author = author
-        newBook.validate()
-        bookRepository.save(newBook)
+        //val newBook = bookCreateDTO.createFromDTO(bookOwner)
+        existingBook.apply {
+            title = bookCreateDTO.book.title
+            desc = bookCreateDTO.book.desc
+            gender = bookCreateDTO.book.gender
+            numPages = bookCreateDTO.book.numPages
+            isbn = bookCreateDTO.book.isbn
+            language = bookCreateDTO.book.language
+            editorial = bookCreateDTO.book.editorial
+            publishDate = bookCreateDTO.book.publishDate
+            condition = bookCreateDTO.book.condition
+            imageSrc = bookCreateDTO.book.imageSrc
+            this.author = author
+            //this.owner = bookOwner.toOwnerDTO()
+        }
+        existingBook.validate()
+        return bookRepository.save(existingBook)
     }
 
     @Transactional
-    fun deleteBook(bookId: Long) {
+    fun deleteBook(bookId: String) {
         val book = bookRepository.findById(bookId)
             .orElseThrow { NotFoundException("No existe el libro con id: $bookId") }
 
-        val reservations = reservationRepository.findByBookId(bookId)
-
-        if (reservations.any { it.state == State.BORROWED || State.RESERVED == it.state || State.ACTIVE == it.state || State.SOON_TO_END == it.state }) {
-            throw ConflictException("No se puede eliminar un libro que está prestado")
+        val today = LocalDate.now()
+        val isBorrowed = book.reservations.any {
+            it.pickUpDate <= today && it.dropOffDate >= today
         }
 
-        reservations
-            .filter { it.state == State.RESERVED }
-            .forEach { reservationRepository.delete(it) }
+        if (isBorrowed) throw ConflictException("No se puede eliminar un libro que está prestado")
 
         book.logicDelete()
-        //no hace falta el .save, esta attached y lo detecta el hibernate con el dirty cheking
+        bookRepository.save(book)
+        //reservationRepository.markBookAsDeletedInReservations(book.bookId)
     }
 
-    @Transactional(readOnly = true)
     fun getAllUserBooks(
-        userId: Long,
+        userId: String,
         pageableObject: ProfileBookPageable
     ): PagedResult<ProfileBookDTO> {
-        val pageable: PageRequest = pageableObject.toPageRequest()
-        println(pageable)
-        val booksPage: Page<ProfileBookDTO> =
-            bookRepository.getAllUserBooks(userId, pageable, pageableObject.filterCriteria.name)
-        println(booksPage)
-        val booksPageContent = booksPage.content // No se que clase es esto (Mutable)List<ProfileBookDTO!>
-        return PagedResult(booksPageContent, booksPage.size, booksPage.totalPages)
+        val today = LocalDate.now()
+
+        val booksPage = bookRepository.findUserBooks(
+            userId,
+            pageableObject.filterCriteria.bookFilter(today),
+            pageableObject.toPageRequest()
+        )
+
+        return PagedResult(
+            items = booksPage.content.map { it.toProfileBookDTO(today) },
+            total = booksPage.totalElements.toInt(),
+            totalPages = booksPage.totalPages
+        )
     }
 
-//    @Transactional(readOnly = true)
+
+    @Transactional(readOnly = true)
     fun searchBooks(searchCriteria: BookSearchCriteria, pageable: Pageable): PageResponse<BookDTO> {
         // println("Criteria: $searchCriteria")
-        // println("Pageable: $pageable")
 
-        // (1) Query paginada sin coleccion de reservationIDS
-        val spec = BookSpecifications.byCriteria(searchCriteria)
-        val page : Page<Book> = bookRepository.findAll(spec, pageable)
+        // Query paginada con Criteria de Mongo
+        val criteria = BookSpecifications.byCriteriaMongo(searchCriteria)
+        val page : Page<Book> = bookRepository.findByCriteria(criteria, pageable)
         // println("Results: ${page.totalElements}")
 
         val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
@@ -152,19 +167,19 @@ class BookService(
 
     // la sesión vive hasta que termina el metodo
     @Transactional(readOnly = true)
-    fun getBookById(id: Long): BookDTO = bookRepository
+    fun getBookById(id: String): BookDTO = bookRepository
         .findById(id)
         .orElseThrow {
-            NotFoundException("No se encuentra un libro registrado con el id: $id")
+            NotFoundException("No se encuentra un libro registrado con el id: $id!!!!")
         }
         .toDTO()
 
     //trae todos los libros menos los que fueron eliminados logicamente IMPORTANTE USAR ESTE METODO SINO VA A TRAER LIBROS QUE FUERON BORRADOS LOGICAMENTEEEE
-    @Transactional(readOnly = true)
-    fun getAllBooks(): List<Book> = bookRepository.findAllByDeletedIsFalse()
+//    @Transactional(readOnly = true)
+//    fun getAllBooks(): List<Book> = bookRepository.findAllByDeletedIsFalse()
 
     @Transactional(readOnly = true)
-    fun recalculateBibliokarmas(bookId: Long, userId: Long, pickUpDate: LocalDate, dropOffDate: LocalDate): Long {
+    fun recalculateBibliokarmas(bookId: String, userId: String, pickUpDate: LocalDate, dropOffDate: LocalDate): Long {
         val book = bookRepository.findById(bookId)
             .orElseThrow {
                 NotFoundException("No se encuentra un libro registrado con el id: $bookId")
@@ -178,8 +193,10 @@ class BookService(
     }
 
     @Transactional(readOnly = true)
-    fun getBookReviews(bookId: Long, page: Int = 0, pageSize: Int = 2): List<Review> {
-        val pageable = PageRequest.of(page, pageSize)
-        return reviewRepository.findAllByBookId(bookId, pageable).content
+    fun getBookReviews(bookId: String, page: Int = 0, pageSize: Int = 2): List<Review> {
+        val pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "timestamp"))
+        val book = bookRepository.findById(bookId)
+            .orElseThrow { NotFoundException("No se encuentra un libro registrado con el id: $bookId") }
+        return reviewRepository.findReviewsByBookId(book.bookId, pageable).content
     }
 }

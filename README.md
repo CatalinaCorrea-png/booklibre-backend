@@ -1,3 +1,5 @@
+![Coverage](.github/badges/jacoco.svg)
+
 # 📚 BookLibre - Backend
 
 > "Que la fuerza te acompañe… y que te devuelvan el libro en fecha."
@@ -227,6 +229,52 @@ ORDER BY returned_reservations DESC;
 
 SELECT * FROM users_with_more_than_2_returned_reservations;
 
+```
+
+---
+
+## Consultas MongoDB
+
+### 1. Saber qué libro es el más clickeado.
+```js
+db.books.find().sort({ bookClicks: -1 }).limit(1)
+```
+
+### 2. Saber cuantos libros son del tipo coleccionable
+```js
+db["books"].find({ "bookType" : "COLECCIONABLE" }).count()
+```
+
+
+### 3. Saber qué libros tienen más de 4 puntos de calificación.
+
+```js
+db.books.find({ratingAvg:{$gt:4}})
+```
+
+### 4. Saber qué libros tienen al menos 3 reservas activas.
+
+```js
+db.books.aggregate([
+    { $match: { "reservations": { $exists: true } } },
+    { $project: { title: 1, activeReservations: { $filter: { input: "$reservations", as: "r", 
+                    cond: { $and: [{ $lte: ["$$r.pickUpDate", new Date()] }, 
+                            { $gte: ["$$r.dropOffDate", new Date()] }] } } } } },
+    { $match: { "activeReservations.2": { $exists: true } } }
+])
+
+```
+
+### 5. Saber qué libros tienen todos las reservas cumplidas (ya devolvieron los libros)
+
+```js
+db["books"].find({
+  "reservations": {
+    $not: {
+      $elemMatch: { "dropOffDate": { $gte: ISODate() } }
+    }
+  }
+})
 ```
 
 ---

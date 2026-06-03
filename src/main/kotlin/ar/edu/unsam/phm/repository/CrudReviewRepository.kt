@@ -9,20 +9,24 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.query.Param
 
 interface ReservationRatingProjection {
-    val reservationId: Long
+    val reservationId: String
     val rating: Int
 }
 
 @Repository
-interface CrudReviewRepository : CrudRepository<Review, Long> {
+interface CrudReviewRepository : CrudRepository<Review, String> {
 
-    fun findByReservationId(reservationId: Long): Review?
+    fun findByReservationId(reservationId: String): Review?
 
-    fun findAllByReservationIdIn(reservationIds: Collection<Long>): List<Review>
+    fun findAllByReservationIdIn(reservationIds: Collection<String>): List<Review>
 
     @Query("SELECT r.reservation.id AS reservationId, r.rating AS rating FROM Review r WHERE r.reservation.id IN :ids")
-    fun findRatingsByReservationIdIn(ids: List<Long>): List<ReservationRatingProjection>
+    fun findRatingsByReservationIdIn(ids: List<String>): List<ReservationRatingProjection>
 
-    @Query("SELECT r FROM Review r WHERE r.book.id = :bookId")
-    fun findAllByBookId(@Param("bookId") bookId: Long, pageable: Pageable): Page<Review>
+//    @Query("SELECT r FROM Review r WHERE r.bookId = :bookId")
+//    fun findAllByBookId(@Param("bookId") bookId: String, pageable: Pageable): Page<Review>
+
+    fun findReviewsByBookId(bookId: String, pageable: Pageable): Page<Review>
+
+    fun findAllByBookId(bookId: String): List<Review>
 }

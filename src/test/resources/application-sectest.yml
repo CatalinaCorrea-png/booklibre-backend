@@ -1,18 +1,20 @@
 spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/booklibre_test
   datasource:
-    url: jdbc:h2:mem:booklibre_sectest;DATABASE_TO_LOWER=TRUE
+    url: jdbc:h2:mem:booklibre_test;DATABASE_TO_LOWER=TRUE
     username: sa
     password:
     driver-class-name: org.h2.Driver
-
   jpa:
     open-in-view: false
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: create-drop
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
 
 jwt:
@@ -22,4 +24,6 @@ jwt:
 
 logging:
   level:
-    root: WARN
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.tool.schema: DEBUG

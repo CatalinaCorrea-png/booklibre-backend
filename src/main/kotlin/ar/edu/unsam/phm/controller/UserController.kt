@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 class UserController(private val userService: UserService, private val authenticationService: AuthenticationService) {
 
     @GetMapping("/profile/{userId}")
-    fun getUserProfile(@PathVariable userId: Long): UserDTO =
+    fun getUserProfile(@PathVariable userId: String): UserDTO =
         userService.getUserProfile(userId).toUserDTO()
 
     @PutMapping("/updateProfile")

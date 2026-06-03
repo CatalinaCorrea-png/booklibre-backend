@@ -3,7 +3,7 @@ package ar.edu.unsam.phm.dto
 import ar.edu.unsam.phm.domain.Review
 
 data class ReviewDTO(
-    var id: Long = 0,
+    var id: String = "",
     var reviewerName: String = "",
     var rating: Int = 0,
     var review: String = "",
