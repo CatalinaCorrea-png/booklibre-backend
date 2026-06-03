@@ -338,6 +338,162 @@ a partir del `bookId` sin consultar a los demás. Esto valida la elección de
 `{ bookId: "hashed" }` como shard key: maximiza el porcentaje de **targeted
 queries** sobre el conjunto de operaciones reales del sistema.
 
+## Tolerancia a fallos: replicación intra-shard vs particionamiento entre shards
+
+Esta prueba demuestra los **dos niveles de redundancia distintos** de un
+cluster shardeado, y son conceptos independientes:
+
+1. **Replicación dentro de un shard** (alta disponibilidad): cada shard es un
+   replica set de 3 nodos. Si cae un nodo, los otros mantienen el shard
+   operativo. **No se pierde nada.**
+2. **Particionamiento entre shards** (NO hay redundancia cruzada): cada shard
+   guarda una porción distinta de los datos. Si cae un shard **entero** (sus 3
+   nodos), se pierde el acceso a *su* porción — pero las porciones de los demás
+   shards siguen disponibles. **Se pierden ciertos datos, no todos.**
+
+Estado de partida: `book_libre.books` con `{ bookId: "hashed" }`, 500.024 docs,
+2 chunks (1 por shard). Distribución medida:
+
+| Shard | Documentos | % |
+|---|---|---|
+| `rs-shard-01` | 249.812 | 49,96 % |
+| `rs-shard-02` | 250.212 | 50,03 % |
+
+### Fase 1 — Cae un nodo: la replicación lo cubre
+
+Estado inicial de `rs-shard-02` (el nodo `shard02-c` es el PRIMARY):
+
+```javascript
+docker exec shard-02-node-a mongosh --port 27017 --quiet --eval "rs.status().members.map(m => ({name: m.name, state: m.stateStr, health: m.health}))"
+```
+```
+[
+  { name: 'shard02-a:27017', state: 'SECONDARY', health: 1 },
+  { name: 'shard02-b:27017', state: 'SECONDARY', health: 1 },
+  { name: 'shard02-c:27017', state: 'PRIMARY',   health: 1 }
+]
+```
+
+Tiramos el **PRIMARY** (caso más exigente — fuerza una re-elección):
+
+```powershell
+docker stop shard-02-node-c
+```
+
+> Ojo con los nombres: el hostname interno del replicaset es `shard02-c`,
+> pero el **container** se llama `shard-02-node-c`.
+
+A los pocos segundos el replicaset re-eligió PRIMARY entre los 2 nodos
+sobrevivientes (quórum 2 de 3):
+
+```
+[
+  { name: 'shard02-a:27017', state: 'PRIMARY',                  health: 1 },
+  { name: 'shard02-b:27017', state: 'SECONDARY',                health: 1 },
+  { name: 'shard02-c:27017', state: '(not reachable/healthy)',  health: 0 }
+]
+```
+
+Y el cluster sigue sirviendo **el 100 % de los datos**, desde el router:
+
+```javascript
+db.getSiblingDB("book_libre").books.countDocuments({})   // 500024
+db.getSiblingDB("book_libre").books.getShardDistribution()  // sigue 50/50
+```
+
+**Conclusión Fase 1**: con 1 de 3 nodos caído (incluso siendo el primary), el
+shard mantiene disponibilidad total gracias a las réplicas. Cero pérdida.
+
+### Fase 2 — Cae un shard entero: se pierde su partición
+
+Primero capturamos un `bookId` que vive **físicamente** en cada shard,
+conectándonos directo a un nodo de cada uno:
+
+```powershell
+docker exec shard-01-node-a mongosh --port 27017 --quiet --eval "db.getMongo().setReadPref('primaryPreferred'); JSON.stringify(db.getSiblingDB('book_libre').books.findOne({}, {bookId:1,title:1,_id:0}))"
+docker exec shard-02-node-a mongosh --port 27017 --quiet --eval "db.getMongo().setReadPref('primaryPreferred'); JSON.stringify(db.getSiblingDB('book_libre').books.findOne({}, {bookId:1,title:1,_id:0}))"
+```
+```
+shard-01 →  {"title":"1984","bookId":"5910c6fe-c165-4a12-9a70-c15977be9e76"}
+shard-02 →  {"title":"Orgullo y Prejuicio","bookId":"9796270d-f22f-4314-bfaa-106a5a536e10"}
+```
+
+Ahora tumbamos **los 3 nodos** de `rs-shard-02` (el primary `shard02-c` ya
+estaba caído de la Fase 1, faltaban `a` y `b`):
+
+```powershell
+docker stop shard-02-node-a shard-02-node-b
+```
+
+**a) El conteo total falla** — el router no puede contactar a `rs-shard-02`:
+
+```javascript
+db.getSiblingDB("book_libre").books.countDocuments({})
+// MongoServerError[FailedToSatisfyReadPreference]:
+//   Could not find host matching read preference { mode: "primary" } for set rs-shard-02
+```
+
+**b) `allowPartialResults` también falla** (matiz importante):
+
+```javascript
+db.getSiblingDB("book_libre").books.find({}).allowPartialResults().itcount()
+// mismo error: FailedToSatisfyReadPreference
+```
+
+`allowPartialResults` tolera shards que fallan **durante la ejecución** del
+query, pero acá `rs-shard-02` está **completamente inalcanzable** y el mongos
+falla antes, en la fase de *routing* (no puede ni resolver el read
+preference). De los 500.024 documentos, los **249.812 de `rs-shard-01`
+siguen intactos y accesibles** (ver punto c); solo se perdió el acceso a los
+~250.212 de `rs-shard-02`.
+
+**c) Un libro que vive en `rs-shard-01` (vivo) → se accede sin problema**:
+
+```javascript
+db.getSiblingDB("book_libre").books.findOne({ bookId: "5910c6fe-c165-4a12-9a70-c15977be9e76" })
+// devuelve el documento completo de "1984"  ✅
+```
+
+**d) Un libro que vive en `rs-shard-02` (caído) → inaccesible**:
+
+```javascript
+db.getSiblingDB("book_libre").books.findOne({ bookId: "9796270d-f22f-4314-bfaa-106a5a536e10" })
+// MongoServerError[FailedToSatisfyReadPreference]:
+//   Could not find host matching read preference { mode: "primary" } for set rs-shard-02   ❌
+```
+
+El contraste **"1984" (shard-01) accesible / "Orgullo y Prejuicio" (shard-02)
+inaccesible** es la prueba directa de que los datos están *particionados*: se
+pierden *ciertos* datos (los del shard caído), no todos.
+
+### Restauración
+
+```powershell
+docker start shard-02-node-a shard-02-node-b shard-02-node-c
+```
+
+A los ~20 segundos el shard vuelve a estar operativo y el conteo total se
+recupera:
+
+```javascript
+db.getSiblingDB("book_libre").books.countDocuments({})   // 500024
+```
+
+### Lecturas para el TP
+
+| Escenario | Datos accesibles | Por qué |
+|---|---|---|
+| Todo sano | 500.024 (100 %) | — |
+| Cae 1 nodo de un shard | 500.024 (100 %) | La **replicación** (3 nodos) cubre el fallo |
+| Cae un shard entero (3 nodos) | 249.812 (~50 %) | El **particionamiento** no replica entre shards |
+
+Conclusión: la disponibilidad de cada *porción* de datos depende de la salud
+de **su** replica set. El sharding reparte carga y almacenamiento, pero NO
+agrega redundancia entre shards — esa redundancia la da la replicación
+*dentro* de cada shard. Para sobrevivir a la caída de un shard entero habría
+que aumentar el número de nodos del replica set y distribuirlos en zonas de
+falla independientes, no agregar más shards.
+
 ## Archivos en esta carpeta
 
 | Archivo | Propósito |
