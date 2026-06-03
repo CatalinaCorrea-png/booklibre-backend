@@ -70,6 +70,10 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+
+    // graphql -> la 10.5.0 funciona ok, la 11 falla para Spring Boot 3.5.10
+    implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:10.5.0"))
+    implementation("com.netflix.graphql.dgs:dgs-starter")
 }
 
 kotlin {
