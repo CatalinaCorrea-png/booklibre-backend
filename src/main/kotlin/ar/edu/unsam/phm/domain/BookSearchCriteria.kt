@@ -14,17 +14,12 @@ data class BookSearchCriteria(
     val ownersName: String? = null,
     val page: Int = 0,
     val pageSize: Int = 6,
-    val sortBy: String = "title",
+    val sortBy: String = "title", // "author.name", "owner.name", "bookClicks"
     val ascending: Boolean = true,
 )
 
-// Volaron para utilizar el Sort y Pageable de Spring
-//data class SortingCriteria (
-//    val sortedBy: BookSortCriteria = SortByTitle,
-//    val ascending: Boolean = true,
-//)
-//
-//data class PageRequest (
-//    val page: Int = 0,
-//    val pageSize: Int = 6
-//)
+// NOTAS sobre el SORTING:
+// `ascending` se interpreta RELATIVO al orden natural de cada campo (no es ASC literal):
+// texto (title/author.name/owner.name) → natural ASC.
+// bookClicks (relevancia) → natural DESC.
+// La conversión a Sort.Direction se hace en BookController.getFilteredBooks().

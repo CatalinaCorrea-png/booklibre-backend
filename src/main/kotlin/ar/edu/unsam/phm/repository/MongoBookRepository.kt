@@ -6,6 +6,7 @@ import java.util.Optional
 
 interface MongoBookRepository : MongoRepository<Book, String>, MongoBookRepositoryCustom {
     fun findByTitle(title: String): Optional<Book>
+    fun findFirstByTitle(title: String): Optional<Book>
     fun findByIsbn(isbn: String): MutableList<Book>
     fun findByBookId(bookId: String): Optional<Book>
     fun findAllByBookIdIn(bookIds: List<String>): List<Book>

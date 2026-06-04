@@ -46,4 +46,14 @@ class MongoBookRepositoryCustomImpl(
             Book::class.java
         )
     }
+
+    override fun findTop10ByOrderByBookClicksDesc(): Page<Book> {
+        // En realidad es un Top 12, para q sea multiplo de 6 (pageSize) :P
+        TODO("Not yet implemented")
+        TODO(
+    "d.books.find({ deleted: false }, { title: 1, bookClicks: 1, _id: 0 })" +
+            ".sort({ bookClicks: -1 })" +
+            ".limit(12);"
+        )
+    }
 }

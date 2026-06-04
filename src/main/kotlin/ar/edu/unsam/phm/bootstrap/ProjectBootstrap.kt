@@ -237,7 +237,10 @@ class ProjectBootstrap : InitializingBean {
     }
 
     fun createBook(book: Book) {
-        val bookEnRepo = repoBooks.findByTitle(book.title)
+        // findFirst en vez de find: tolera múltiples matches (puede haber libros
+        // con el mismo título, ej. "1984"). Si hay varios,
+        // reutilizamos cualquiera con ese título.
+        val bookEnRepo = repoBooks.findFirstByTitle(book.title)
         if (bookEnRepo.isPresent) {
             book.id = bookEnRepo.get().id
         } else {
@@ -1491,17 +1494,21 @@ class ProjectBootstrap : InitializingBean {
 
     fun initBookReservationCount() {
         // ── Agregar Reservation COUNT a los libros ──────────────────────────
-        val books = repoBooks.findAll()
+        // Arrancamos desde las reservas (decenas), NO desde repoBooks.findAll()
+        // (500k+ docs en el cluster shardeado). Solo tocamos los libros que
+        // realmente tienen reservas. Mismo patrón que initBookRatingAvg().
+        val reservationsByBookId = repoReservations.findAll().groupBy { it.bookId }
 
-        books.forEach { book ->
-            val reservations = repoReservations.findByBookId(book.bookId)
-            reservations.forEach { reservation ->
-                val reservationDatesDTO = reservation.toReservationDate()
-                book.addReservation(reservationDatesDTO)
+        reservationsByBookId.forEach { (bookId, reservations) ->
+            val bookOpt = repoBooks.findByBookId(bookId)
+            if (bookOpt.isPresent) {
+                val book = bookOpt.get()
+                reservations.forEach { reservation ->
+                    book.addReservation(reservation.toReservationDate())
+                }
+                book.reservationCount(reservations.size.toLong())
+                repoBooks.save(book)
             }
-            val reservationCount = reservations.size.toLong()
-            book.reservationCount(reservationCount)
-            repoBooks.save(book)
         }
     }
 
@@ -1513,7 +1520,9 @@ class ProjectBootstrap : InitializingBean {
         println("************************************************************************")
         println("Running initialization")
         println("************************************************************************")
-        repoBooks.deleteAll()
+        // No borramos books: los métodos createUser/Author/Book/Reservation son
+        // idempotentes (find-by-key + save-si-no-existe), así que el bootstrap
+        // convive con el dataset shardeado de ~1M docs cargado por el script.
         this.initUsers()
         this.initAuthors()
         this.initBooks()          // libros sin reviews

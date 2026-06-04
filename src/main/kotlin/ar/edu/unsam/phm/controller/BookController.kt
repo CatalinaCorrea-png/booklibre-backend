@@ -21,7 +21,18 @@ class BookController(
     fun getFilteredBooks(
         @ModelAttribute criteria: BookSearchCriteria,
         ): PageResponse<BookDTO> {
-        val direction = if (criteria.ascending) Sort.Direction.ASC else Sort.Direction.DESC
+        // El orden "natural" depende del campo:
+        //   - bookClicks (relevancia)  → DESC: más clicks primero
+        //   - title / author.name / owner.name → ASC: alfabético
+        // El toggle `ascending` que manda el front se interpreta RELATIVO a ese natural:
+        //   - ascending = true  → orden natural del campo
+        //   - ascending = false → invertido
+        // Ej: ordenar por relevancia con el toggle por defecto (true) muestra primero los más populares.
+        // Para sumar otro campo que vaya al revés (rating, fecha) basta agregarlo a `descendingByNature`.
+        val descendingByNature = setOf("bookClicks")
+        val naturalAsc = criteria.sortBy !in descendingByNature
+        val ascending = if (criteria.ascending) naturalAsc else !naturalAsc
+        val direction = if (ascending) Sort.Direction.ASC else Sort.Direction.DESC
         val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
         return bookService.searchBooks(criteria, pageable)
     }

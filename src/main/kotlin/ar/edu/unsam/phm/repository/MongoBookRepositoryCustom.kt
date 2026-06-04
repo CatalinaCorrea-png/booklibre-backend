@@ -20,4 +20,6 @@ interface MongoBookRepositoryCustom {
     fun incrementClicks(
         bookId: String
     ): Unit
+
+    fun findTop10ByOrderByBookClicksDesc(): Page<Book>
 }

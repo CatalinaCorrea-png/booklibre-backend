@@ -62,6 +62,9 @@ dependencies {
     // MongoDB
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
     // Spring Security (base necesaria para JWT)
     implementation("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.security:spring-security-test")
