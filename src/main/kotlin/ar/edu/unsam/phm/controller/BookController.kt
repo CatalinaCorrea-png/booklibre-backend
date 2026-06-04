@@ -6,6 +6,7 @@ import ar.edu.unsam.phm.domain.Gender
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.services.BookClickService
 import ar.edu.unsam.phm.services.BookService
+import ar.edu.unsam.phm.services.PopularBooksService
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.web.bind.annotation.*
@@ -16,6 +17,7 @@ import java.time.LocalDate
 class BookController(
     val bookService: BookService,
     val bookClickService: BookClickService,
+    val popularBooksService: PopularBooksService,
 ) {
     @GetMapping("/filtered-books")
     fun getFilteredBooks(
@@ -34,6 +36,13 @@ class BookController(
         val ascending = if (criteria.ascending) naturalAsc else !naturalAsc
         val direction = if (ascending) Sort.Direction.ASC else Sort.Direction.DESC
         val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
+
+        // Home "populares" (sin filtros, orden por relevancia): lo maneja PopularBooksService,
+        // que sirve las primeras páginas desde Redis y el resto desde Mongo con la MISMA query
+        // global. Cualquier búsqueda con filtros va por el camino normal de Mongo (searchBooks).
+        if (criteria.isPopularHomeView()) {
+            return popularBooksService.getPopularPage(criteria, pageable)
+        }
         return bookService.searchBooks(criteria, pageable)
     }
 

@@ -5,6 +5,7 @@ import ar.edu.unsam.phm.dto.ReservationDatesDTO
 import ar.edu.unsam.phm.dto.ReviewDTO
 import ar.edu.unsam.phm.errors.ConflictException
 import ar.edu.unsam.phm.repository.RepositoryElement
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
@@ -43,6 +44,10 @@ abstract class Book(
     var bookType: String,
     var deleted: Boolean = false,
     var ratingAvg: Double = 0.0,
+    // @field:JsonProperty fuerza a Jackson a serializar/deserializar este campo private
+    // (su getter no es un bean getter), necesario para que reservationCount sobreviva
+    // el round-trip por Redis y WithADedication calcule bien sus bibliokarmas.
+    @field:JsonProperty("reservationCount")
     private var reservationCount: Long = 0,
     var reservations: MutableList<ReservationDatesDTO> = mutableListOf(),
     var lastTwoReviews: MutableList<ReviewDTO> = mutableListOf(),

@@ -16,7 +16,17 @@ data class BookSearchCriteria(
     val pageSize: Int = 6,
     val sortBy: String = "title", // "author.name", "owner.name", "bookClicks"
     val ascending: Boolean = true,
-)
+) {
+    // Vista "populares" del Home: ordenada por relevancia (DESC natural) y sin filtros de
+    // texto/género. Solo en ese caso sirve el ranking global cacheado en Redis.
+    // Ignoramos a propósito pagesRange y las fechas: el front SIEMPRE los manda con sus
+    // defaults (slider completo 0..max, fechas de hoy), así que no cuentan como "filtrar".
+    // Si el usuario filtra por género/título/ISBN/dueño o invierte el orden, va a Mongo.
+    fun isPopularHomeView(): Boolean =
+        sortBy == "bookClicks" && ascending &&
+            title.isNullOrBlank() && genders.isEmpty() &&
+            isbn.isNullOrBlank() && ownersName.isNullOrBlank()
+}
 
 // NOTAS sobre el SORTING:
 // `ascending` se interpreta RELATIVO al orden natural de cada campo (no es ASC literal):

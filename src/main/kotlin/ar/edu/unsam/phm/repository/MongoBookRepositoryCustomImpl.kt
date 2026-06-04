@@ -1,9 +1,12 @@
 package ar.edu.unsam.phm.repository
 
 import ar.edu.unsam.phm.domain.Book
+import ar.edu.unsam.phm.domain.UserTypes
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -47,13 +50,30 @@ class MongoBookRepositoryCustomImpl(
         )
     }
 
+    // Criterio del ranking "populares" (global): no eliminados y cuyo dueño NO sea READER
+    // (un lector no presta, así que su libro es como un deleted: no se puede reservar).
+    // Lo comparten el feeder del caché, el fallback paginado y el count, para que las 3
+    // vistas sean consistentes entre sí.
+    private fun popularCriteria(): Criteria =
+        Criteria.where("deleted").`is`(false)
+            .and("owner.userType").ne(UserTypes.READER.name)
+
     override fun findTop10ByOrderByBookClicksDesc(): Page<Book> {
-        // En realidad es un Top 12, para q sea multiplo de 6 (pageSize) :P
-        TODO("Not yet implemented")
-        TODO(
-    "d.books.find({ deleted: false }, { title: 1, bookClicks: 1, _id: 0 })" +
-            ".sort({ bookClicks: -1 })" +
-            ".limit(12);"
-        )
+        // "Top 10" por convención del equipo, pero traemos 12 (múltiplo de 6, el pageSize del Home).
+        // Solo lo llama el job @Scheduled que refresca el caché; el Home nunca dispara esta query.
+        val pageable = PageRequest.of(0, 12, Sort.by(Sort.Direction.DESC, "bookClicks"))
+        val books = mongoTemplate.find(Query(popularCriteria()).with(pageable), Book::class.java)
+        return PageImpl(books, pageable, books.size.toLong())
     }
+
+    // Fallback paginado: páginas que ya no entran en el caché (de la 3ª en adelante).
+    // Usa EXACTAMENTE el mismo criterio y orden que el caché, así la paginación
+    // Redis→Mongo no salta en el borde.
+    override fun findPopularBooks(pageable: Pageable): List<Book> =
+        mongoTemplate.find(Query(popularCriteria()).with(pageable), Book::class.java)
+
+    // Total del ranking populares, para reportar la paginación. Lo calcula el job 1 vez
+    // cada 5 min y se guarda en Redis; el Home no lo recalcula.
+    override fun countPopularBooks(): Long =
+        mongoTemplate.count(Query(popularCriteria()), Book::class.java)
 }
