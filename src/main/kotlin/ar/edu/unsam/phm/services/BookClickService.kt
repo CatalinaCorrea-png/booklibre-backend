@@ -20,7 +20,9 @@ class BookClickService(
     @Autowired
     val userRepository: CrudUserRepository,
     @Autowired
-    val clickDedupRepository: MongoClickDeduplicationRepository
+    val clickDedupRepository: MongoClickDeduplicationRepository,
+    @Autowired
+    val clickRankingService: ClickRankingService,
 ) {
     fun registerClick(userId: String, bookId: String) {
         val user = userRepository.findById(userId)
@@ -39,5 +41,8 @@ class BookClickService(
         }
         bookClickRepository.save(bookClick)
         bookRepository.incrementClicks(bookId)
+        // +1 al ranking vivo en Redis. Usamos book.bookId (UUID), para poder
+        // cruzar después con Postgres (Reservation.bookId) en la métrica de GraphQL.
+        clickRankingService.registerClick(book.bookId)
     }
 }

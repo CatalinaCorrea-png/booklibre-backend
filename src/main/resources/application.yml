@@ -22,7 +22,12 @@ spring:
   data:
     mongodb:
       uri: mongodb://admin:admin@127.0.0.1:27019/book_libre?authSource=admin
+      # uri para cluster shardeado:
+#      uri: mongodb://127.0.0.1:27117,127.0.0.1:27118/book_libre
       auto-index-creation: true
+    redis:
+      host: localhost
+      port: 6379
 
 # Para activar el Trace
 logging:

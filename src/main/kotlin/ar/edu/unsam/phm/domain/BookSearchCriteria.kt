@@ -14,17 +14,22 @@ data class BookSearchCriteria(
     val ownersName: String? = null,
     val page: Int = 0,
     val pageSize: Int = 6,
-    val sortBy: String = "title",
+    val sortBy: String = "title", // "author.name", "owner.name", "bookClicks"
     val ascending: Boolean = true,
-)
+) {
+    // Vista "populares" del Home: ordenada por relevancia (DESC natural) y sin filtros de
+    // texto/género. Solo en ese caso sirve el ranking global cacheado en Redis.
+    // Ignoramos a propósito pagesRange y las fechas: el front SIEMPRE los manda con sus
+    // defaults (slider completo 0..max, fechas de hoy), así que no cuentan como "filtrar".
+    // Si el usuario filtra por género/título/ISBN/dueño o invierte el orden, va a Mongo.
+    fun isFirstHomeView(): Boolean =
+        sortBy == "title" && ascending &&
+            title.isNullOrBlank() && genders.isEmpty() &&
+            isbn.isNullOrBlank() && ownersName.isNullOrBlank()
+}
 
-// Volaron para utilizar el Sort y Pageable de Spring
-//data class SortingCriteria (
-//    val sortedBy: BookSortCriteria = SortByTitle,
-//    val ascending: Boolean = true,
-//)
-//
-//data class PageRequest (
-//    val page: Int = 0,
-//    val pageSize: Int = 6
-//)
+// NOTAS sobre el SORTING:
+// `ascending` se interpreta RELATIVO al orden natural de cada campo (no es ASC literal):
+// texto (title/author.name/owner.name) → natural ASC.
+// bookClicks (relevancia) → natural DESC.
+// La conversión a Sort.Direction se hace en BookController.getFilteredBooks().

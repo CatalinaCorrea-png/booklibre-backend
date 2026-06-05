@@ -42,6 +42,25 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: admin
       MONGO_INITDB_DATABASE: book_libre
 
+  redis-booklibre:
+    container_name: redis-booklibre
+    hostname: redis
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+
+  redisinsight:
+    container_name: redis-insight-booklibre
+    image: redis/redisinsight:latest
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight-data:/data
+    depends_on:
+      - redis-booklibre
+
 volumes:
   db:
   pgadmin-data:
+  redisinsight-data:

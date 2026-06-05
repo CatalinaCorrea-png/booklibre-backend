@@ -6,6 +6,7 @@ import ar.edu.unsam.phm.domain.Gender
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.services.BookClickService
 import ar.edu.unsam.phm.services.BookService
+import ar.edu.unsam.phm.services.PopularBooksService
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.web.bind.annotation.*
@@ -16,13 +17,31 @@ import java.time.LocalDate
 class BookController(
     val bookService: BookService,
     val bookClickService: BookClickService,
+    val popularBooksService: PopularBooksService,
 ) {
     @GetMapping("/filtered-books")
     fun getFilteredBooks(
         @ModelAttribute criteria: BookSearchCriteria,
         ): PageResponse<BookDTO> {
-        val direction = if (criteria.ascending) Sort.Direction.ASC else Sort.Direction.DESC
+        // El orden "natural" depende del campo:
+        //   - bookClicks (relevancia)  → DESC: más clicks primero
+        //   - title / author.name / owner.name → ASC: alfabético
+        // El toggle `ascending` que manda el front se interpreta RELATIVO a ese natural:
+        //   - ascending = true  → orden natural del campo
+        //   - ascending = false → invertido
+        // Ej: ordenar por relevancia con el toggle por defecto (true) muestra primero los más populares.
+        // Para sumar otro campo que vaya al revés (rating, fecha) basta agregarlo a `descendingByNature`.
+        val descendingByNature = setOf("bookClicks")
+        val naturalAsc = criteria.sortBy !in descendingByNature
+        val ascending = if (criteria.ascending) naturalAsc else !naturalAsc
+        val direction = if (ascending) Sort.Direction.ASC else Sort.Direction.DESC
         val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
+
+        // Solo la PRIMERA página del Home sin filtros (populares por clicks) sale de Redis.
+        // Página 1+ o cualquier búsqueda con filtros van al camino normal de Mongo (por título).
+        if (criteria.isFirstHomeView() && criteria.page == 0) {
+            return popularBooksService.getPopularFirstPage(criteria)
+        }
         return bookService.searchBooks(criteria, pageable)
     }
 
