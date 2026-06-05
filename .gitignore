@@ -47,3 +47,4 @@ bin/
 
 uploads
 .claude/
+node_modules/
