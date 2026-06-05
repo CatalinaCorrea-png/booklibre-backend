@@ -12,4 +12,7 @@ interface MongoBookRepository : MongoRepository<Book, String>, MongoBookReposito
     fun findAllByBookIdIn(bookIds: List<String>): List<Book>
     fun findAllByOwnerId(ownerId: String): List<Book>
 
+    // Libros que tienen al menos un click. Para sembrar el ZSET de ranking al arrancar.
+    fun findByBookClicksGreaterThan(clicks: Int): List<Book>
+
 }

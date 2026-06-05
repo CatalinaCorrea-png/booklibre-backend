@@ -22,8 +22,8 @@ data class BookSearchCriteria(
     // Ignoramos a propósito pagesRange y las fechas: el front SIEMPRE los manda con sus
     // defaults (slider completo 0..max, fechas de hoy), así que no cuentan como "filtrar".
     // Si el usuario filtra por género/título/ISBN/dueño o invierte el orden, va a Mongo.
-    fun isPopularHomeView(): Boolean =
-        sortBy == "bookClicks" && ascending &&
+    fun isFirstHomeView(): Boolean =
+        sortBy == "title" && ascending &&
             title.isNullOrBlank() && genders.isEmpty() &&
             isbn.isNullOrBlank() && ownersName.isNullOrBlank()
 }

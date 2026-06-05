@@ -37,11 +37,10 @@ class BookController(
         val direction = if (ascending) Sort.Direction.ASC else Sort.Direction.DESC
         val pageable = PageRequest.of(criteria.page, criteria.pageSize, Sort.by(direction, criteria.sortBy))
 
-        // Home "populares" (sin filtros, orden por relevancia): lo maneja PopularBooksService,
-        // que sirve las primeras páginas desde Redis y el resto desde Mongo con la MISMA query
-        // global. Cualquier búsqueda con filtros va por el camino normal de Mongo (searchBooks).
-        if (criteria.isPopularHomeView()) {
-            return popularBooksService.getPopularPage(criteria, pageable)
+        // Solo la PRIMERA página del Home sin filtros (populares por clicks) sale de Redis.
+        // Página 1+ o cualquier búsqueda con filtros van al camino normal de Mongo (por título).
+        if (criteria.isFirstHomeView() && criteria.page == 0) {
+            return popularBooksService.getPopularFirstPage(criteria)
         }
         return bookService.searchBooks(criteria, pageable)
     }

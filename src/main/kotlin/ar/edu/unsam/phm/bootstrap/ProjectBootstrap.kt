@@ -22,6 +22,7 @@ import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.BookClickRepository
 import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.MongoBookRepository
+import ar.edu.unsam.phm.services.ClickRankingService
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
@@ -53,6 +54,9 @@ class ProjectBootstrap : InitializingBean {
 
     @Autowired
     private lateinit var repoBookClicks: BookClickRepository
+
+    @Autowired
+    private lateinit var clickRankingService: ClickRankingService
 
     @Autowired
     private lateinit var encoder: PasswordEncoder
@@ -1512,6 +1516,13 @@ class ProjectBootstrap : InitializingBean {
         }
     }
 
+    fun initClicksRanking() {
+        // ── Sembrar el ZSET de ranking de clicks en Redis ───────────────────
+        // Si el sorted set está vacío (Redis recién levantado), lo puebla con los
+        // bookClicks que ya hay en Mongo. La lógica vive en ClickRankingService.
+        clickRankingService.seedFromMongoIfEmpty()
+    }
+
     // ═════════════════════════════════════════════════════════════════════════
     // InitializingBean
     // ═════════════════════════════════════════════════════════════════════════
@@ -1530,6 +1541,7 @@ class ProjectBootstrap : InitializingBean {
         this.initReviews()        // reviews con reservaciones → se agregan a libros → save
         this.initBookRatingAvg()
         this.initBookReservationCount()
+        this.initClicksRanking()  // siembra el ZSET de ranking de clicks en Redis
         println("------------------------------------------------------------------------")
     }
 }

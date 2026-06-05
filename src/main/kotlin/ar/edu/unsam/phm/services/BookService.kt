@@ -28,6 +28,8 @@ class BookService(
     val authorRepository: CrudAuthorRepository,
     @Autowired
     val reviewRepository: CrudReviewRepository,
+    @Autowired
+    val bookCacheService: BookCacheService,
 ) {
     @Transactional
     fun createBook(bookCreateDTO: BookCreateDTO) {
@@ -142,6 +144,10 @@ class BookService(
         val criteria = BookSpecifications.byCriteriaMongo(searchCriteria)
         val page : Page<Book> = bookRepository.findByCriteria(criteria, pageable)
         // println("Results: ${page.totalElements}")
+
+        // Calentamos el cache por-libro con los resultados de la búsqueda (los 6 de la página).
+        // Así, navegando el catálogo, los libros quedan cacheados para futuras lecturas.
+        bookCacheService.cacheBooks(page.content)
 
         val booksWithBibliokarmasDTO : List<BookDTO> = getBooksBibliokarmasDTO(page.content, searchCriteria)
         return PageResponse(

@@ -9,78 +9,79 @@ import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.MongoBookRepository
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.data.domain.Pageable
 import org.springframework.data.redis.core.StringRedisTemplate
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.time.Duration
 import kotlin.math.ceil
 
+/**
+ * Arma la primera página del Home (los más populares por clicks) leyendo de Redis:
+ *   1. ranking de ids desde el ZSET (ClickRankingService)
+ *   2. datos de cada libro desde el cache por-libro (BookCacheService)
+ *   3. si faltan, los trae del Top10PorClicks de Mongo y los cachea
+ * Sobre los 6 primeros calcula los bibliokarmas del usuario+fechas.
+ */
 @Service
 class PopularBooksService(
     val bookRepository: MongoBookRepository,
     val userRepository: CrudUserRepository,
+    val clickRankingService: ClickRankingService,
+    val bookCacheService: BookCacheService,
     val redisTemplate: StringRedisTemplate,
-    val objectMapper: ObjectMapper,
 ) {
     companion object {
-        const val BOOKS_KEY = "home:popular-books"   // JSON con los 12 libros del Top
-        const val TOTAL_KEY = "home:popular-total"   // total del ranking populares (para paginar)
-        const val CACHED_SIZE = 12                   // "Top 10" del equipo, 12 reales (2 páginas de 6)
-        const val REFRESH_RATE_MS = 5 * 60 * 1000L   // 5 minutos
+        const val POPULAR_TOTAL_KEY = "home:popular-total"
+        const val HOME_PAGE_SIZE = 6                     // lo que muestra el Home
+        const val RANKING_FETCH = 10L                    // top 10 del ZSET (colchón); usamos 6
+        val TOTAL_TTL: Duration = Duration.ofMinutes(10)
     }
 
-    // Refresca el Top cada 5 min. Es el ÚNICO punto que paga el costo en Mongo
-    // (sort + count sobre los 500k); el Home nunca dispara esas queries.
-    // fixedRate => corre al arrancar y luego cada 5 min.
-    @Scheduled(fixedRate = REFRESH_RATE_MS)
-    fun refreshPopularBooks() {
-        val topBooks = bookRepository.findTop10ByOrderByBookClicksDesc().content
-        redisTemplate.opsForValue().set(BOOKS_KEY, objectMapper.writeValueAsString(topBooks))
-        redisTemplate.opsForValue().set(TOTAL_KEY, bookRepository.countPopularBooks().toString())
-    }
-
-    // Sirve una página del ranking populares del Home:
-    //   - si la página entra en el Top cacheado (primeras 2 con pageSize 6) → Redis
-    //   - si no (3ª en adelante, o aún sin caché) → Mongo, con la MISMA query global del caché
-    // Como ambos ordenan igual (clicks DESC, mismo criterio), la paginación no salta en el borde.
-    // Sobre los libros resultantes recalcula los bibliokarmas del usuario+fechas (barato).
-    fun getPopularPage(criteria: BookSearchCriteria, pageable: Pageable): PageResponse<BookDTO> {
-        val books = booksForPage(pageable)
-        val total = readTotalFromCache() ?: bookRepository.countPopularBooks()
+    // Página 0 del Home: populares por clicks, desde Redis.
+    fun getPopularFirstPage(criteria: BookSearchCriteria): PageResponse<BookDTO> {
+        val books = topPopularBooks()
+        val total = popularTotal()
         return PageResponse(
             content = withBibliokarmas(books, criteria),
-            page = pageable.pageNumber,
-            pageSize = pageable.pageSize,
+            page = 0,
+            pageSize = HOME_PAGE_SIZE,
             totalElements = total.toInt(),
-            totalPages = ceil(total.toDouble() / pageable.pageSize).toInt(),
+            totalPages = ceil(total.toDouble() / HOME_PAGE_SIZE).toInt(),
         )
     }
 
-    private fun booksForPage(pageable: Pageable): List<Book> {
-        // ¿la página entra completa en [0, CACHED_SIZE)? Ej (pageSize 6): page0=[0,6) ✓ page1=[6,12) ✓ page2 ✗
-        val fitsInCache = pageable.offset + pageable.pageSize <= CACHED_SIZE
-        if (fitsInCache) {
-            val cached = readBooksFromCache()
-            val from = pageable.offset.toInt()
-            if (cached != null && from < cached.size) {
-                return cached.subList(from, minOf(from + pageable.pageSize, cached.size))
-            }
+    // Devuelve hasta 6 Books en orden de ranking, resolviendo el cache por-libro
+    // y cayendo a Mongo (Top10PorClicks) solo si falta alguno.
+    private fun topPopularBooks(): List<Book> {
+        val ids = clickRankingService.topBookIds(RANKING_FETCH)
+        if (ids.isEmpty()) return refillFromMongo().take(HOME_PAGE_SIZE) // ZSET vacío → Mongo
+
+        val cached = bookCacheService.readBooks(ids)
+        val resolved = if (ids.any { cached[it] == null }) {
+            // Falta alguno en cache → traigo el Top 10 de Mongo y lo cacheo, después resuelvo.
+            val refilled = refillFromMongo().associateBy { it.bookId }
+            ids.mapNotNull { cached[it] ?: refilled[it] }
+        } else {
+            ids.mapNotNull { cached[it] }
         }
-        // fuera del caché (o caché vacío en el primer arranque): Mongo, misma query global.
-        return bookRepository.findPopularBooks(pageable)
+        return resolved.take(HOME_PAGE_SIZE)
     }
 
-    private fun readBooksFromCache(): List<Book>? {
-        val cached = redisTemplate.opsForValue().get(BOOKS_KEY) ?: return null
-        val listType = objectMapper.typeFactory.constructCollectionType(List::class.java, Book::class.java)
-        return objectMapper.readValue(cached, listType)
+    // Top 10 por clicks de Mongo + lo deja cacheado por-libro (con TTL).
+    private fun refillFromMongo(): List<Book> {
+        val books = bookRepository.findTop10ByOrderByBookClicksDesc()
+        bookCacheService.cacheBooks(books)
+        return books
     }
 
-    private fun readTotalFromCache(): Long? = redisTemplate.opsForValue().get(TOTAL_KEY)?.toLongOrNull()
+    // Total del catálogo de populares, para la paginación. Cacheado con TTL para no contar
+    // en Mongo en cada page 0; el front lo usa para pasar a las páginas siguientes (Mongo).
+    private fun popularTotal(): Long {
+        redisTemplate.opsForValue().get(POPULAR_TOTAL_KEY)?.toLongOrNull()?.let { return it }
+        val total = bookRepository.countPopularBooks()
+        redisTemplate.opsForValue().set(POPULAR_TOTAL_KEY, total.toString(), TOTAL_TTL)
+        return total
+    }
 
-    // Sobre los libros recalcula los bibliokarmas del usuario + fechas del criteria.
-    // Barato: 1 lookup de user + un cálculo por libro de la página.
     private fun withBibliokarmas(books: List<Book>, criteria: BookSearchCriteria): List<BookDTO> {
         val user = userRepository.findById(criteria.userId!!)
             .orElseThrow { NotFoundException("No existe user con id: ${criteria.userId}") }

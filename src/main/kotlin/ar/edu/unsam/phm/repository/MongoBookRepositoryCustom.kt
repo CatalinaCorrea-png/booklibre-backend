@@ -21,13 +21,10 @@ interface MongoBookRepositoryCustom {
         bookId: String
     ): Unit
 
-    // Feeder del caché: el Top global (12) por clicks. Lo usa el job @Scheduled.
-    fun findTop10ByOrderByBookClicksDesc(): Page<Book>
+    // Top 10 por clicks desde Mongo (criterio populares: no eliminados, dueño no READER).
+    // Es el fallback cuando el cache por-libro no tiene los ids del ranking del ZSET.
+    fun findTop10ByOrderByBookClicksDesc(): List<Book>
 
-    // Fallback paginado del ranking populares (mismo criterio/orden que el caché),
-    // para las páginas que ya no entran en Redis.
-    fun findPopularBooks(pageable: Pageable): List<Book>
-
-    // Total del ranking populares (para la paginación).
+    // Total del catálogo de populares (para la paginación de la página 0 del Home).
     fun countPopularBooks(): Long
 }

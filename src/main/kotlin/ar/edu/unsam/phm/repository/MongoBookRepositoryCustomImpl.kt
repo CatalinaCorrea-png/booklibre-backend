@@ -58,22 +58,14 @@ class MongoBookRepositoryCustomImpl(
         Criteria.where("deleted").`is`(false)
             .and("owner.userType").ne(UserTypes.READER.name)
 
-    override fun findTop10ByOrderByBookClicksDesc(): Page<Book> {
-        // "Top 10" por convención del equipo, pero traemos 12 (múltiplo de 6, el pageSize del Home).
-        // Solo lo llama el job @Scheduled que refresca el caché; el Home nunca dispara esta query.
-        val pageable = PageRequest.of(0, 12, Sort.by(Sort.Direction.DESC, "bookClicks"))
-        val books = mongoTemplate.find(Query(popularCriteria()).with(pageable), Book::class.java)
-        return PageImpl(books, pageable, books.size.toLong())
+    override fun findTop10ByOrderByBookClicksDesc(): List<Book> {
+        // Top 10 por clicks (criterio populares). Fallback del cache por-libro: trae 10 de
+        // colchón aunque el Home use 6 (por si algunos se vencieron del cache por su TTL).
+        val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "bookClicks"))
+        return mongoTemplate.find(Query(popularCriteria()).with(pageable), Book::class.java)
     }
 
-    // Fallback paginado: páginas que ya no entran en el caché (de la 3ª en adelante).
-    // Usa EXACTAMENTE el mismo criterio y orden que el caché, así la paginación
-    // Redis→Mongo no salta en el borde.
-    override fun findPopularBooks(pageable: Pageable): List<Book> =
-        mongoTemplate.find(Query(popularCriteria()).with(pageable), Book::class.java)
-
-    // Total del ranking populares, para reportar la paginación. Lo calcula el job 1 vez
-    // cada 5 min y se guarda en Redis; el Home no lo recalcula.
+    // Total del catálogo de populares (no eliminados, dueño no READER) para la paginación.
     override fun countPopularBooks(): Long =
         mongoTemplate.count(Query(popularCriteria()), Book::class.java)
 }
