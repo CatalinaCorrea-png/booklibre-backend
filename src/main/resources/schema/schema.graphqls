@@ -1,0 +1,15 @@
+# Esquema GraphQL del proyecto. Convive con la API REST, no la reemplaza.
+# Tablero de KPIs para administración.
+type Query {
+    # Tasa de conversión: Top 5 de libros más clickeados (Redis) cruzado con las
+    # reservas (Postgres). Por libro: clicks, reservas y tasa = reservas / clicks.
+    conversionRate: [BookConversion!]!
+}
+
+type BookConversion {
+    bookId: ID!
+    title: String!
+    clicks: Int!
+    reservations: Int!
+    conversionRate: Float!   # fracción reservas/clicks (en el front: * 100 para el %)
+}
