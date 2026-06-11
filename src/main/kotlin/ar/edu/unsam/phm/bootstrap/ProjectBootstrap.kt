@@ -247,6 +247,7 @@ class ProjectBootstrap : InitializingBean {
         val bookEnRepo = repoBooks.findFirstByTitle(book.title)
         if (bookEnRepo.isPresent) {
             book.id = bookEnRepo.get().id
+            book.bookId = bookEnRepo.get().bookId
         } else {
             repoBooks.save(book)
             println("Book ${book.title} creado")
@@ -265,6 +266,7 @@ class ProjectBootstrap : InitializingBean {
             val user = reservation.user
 
             // Denormalización
+            reservation.bookId = book.bookId
             reservation.bookTitle = book.title
             reservation.bookAuthorName = book.author?.name ?: ""
             reservation.bookImageSrc = book.imageSrc
