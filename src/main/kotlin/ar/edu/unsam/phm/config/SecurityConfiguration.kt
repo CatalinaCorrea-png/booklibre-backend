@@ -51,7 +51,7 @@ class SecurityConfiguration(
                     .requestMatchers("/assets/**").permitAll() // para que no rompan las imagenes de perfil
                     // GraphQL: endpoint del tablero de KPIs. Abierto para la demo del TP.
                     // (Es para un admin: en producción convendría restringirlo a un rol.)
-                    .requestMatchers("/graphql", "/graphiql", "/graphiql/**").hasAnyAuthority(UserTypes.ADMIN.name)
+                    .requestMatchers("/graphql", "/graphiql", "/graphiql/**").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS)
                     .permitAll() // esto es para react pregunta antes de hacer la request real
                     .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
