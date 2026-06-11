@@ -4,6 +4,10 @@ type Query {
     # Tasa de conversión: Top 5 de libros más clickeados (Redis) cruzado con las
     # reservas (Postgres). Por libro: clicks, reservas y tasa = reservas / clicks.
     conversionRate: [BookConversion!]!
+
+    # Promedio de calificación por tipo de libro (Común, Con dedicatoria, Coleccionable).
+    # Libros sin reseñas (ratingAvg == 0) quedan excluidos del cálculo.
+    calificactionAnalisis: [BookCalification!]!
 }
 
 type BookConversion {
@@ -12,4 +16,9 @@ type BookConversion {
     clicks: Int!
     reservations: Int!
     conversionRate: Float!   # fracción reservas/clicks (en el front: * 100 para el %)
+}
+
+type BookCalification {
+    bookType: String!
+    avgRating: Float!
 }
