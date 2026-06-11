@@ -5,7 +5,8 @@ import ar.edu.unsam.phm.errors.ConflictException
 enum class UserTypes(val value: String) {
     PUBLISHER("Publicador"),
     READER("Lector"),
-    COMBINED("Lector / Publicador");
+    COMBINED("Lector / Publicador"),
+    ADMIN("Admin");
 
     companion object {
         fun fromValue(value: String): UserTypes {

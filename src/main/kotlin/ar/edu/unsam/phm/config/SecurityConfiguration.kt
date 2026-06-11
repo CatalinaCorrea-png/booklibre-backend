@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -49,7 +51,7 @@ class SecurityConfiguration(
                     .requestMatchers("/assets/**").permitAll() // para que no rompan las imagenes de perfil
                     // GraphQL: endpoint del tablero de KPIs. Abierto para la demo del TP.
                     // (Es para un admin: en producción convendría restringirlo a un rol.)
-                    .requestMatchers("/graphql", "/graphiql", "/graphiql/**").permitAll()
+                    .requestMatchers("/graphql", "/graphiql", "/graphiql/**").hasAnyAuthority(UserTypes.ADMIN.name)
                     .requestMatchers(HttpMethod.OPTIONS)
                     .permitAll() // esto es para react pregunta antes de hacer la request real
                     .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
@@ -71,7 +73,6 @@ class SecurityConfiguration(
                     .hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
                     .requestMatchers(HttpMethod.GET, "/userOwnBooks/**")
                     .hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
-
                     .anyRequest().fullyAuthenticated() // el resto esta bloqueado si no se autentica
             }
 
@@ -97,5 +98,15 @@ class SecurityConfiguration(
             registerCorsConfiguration("/**", config)
         }
     }
+
+    @Bean
+    fun roleHierarchy(): RoleHierarchy =          // ← Spring lo engancha solo
+        RoleHierarchyImpl.fromHierarchy(
+            """
+              ${UserTypes.ADMIN.name} > ${UserTypes.PUBLISHER.name}
+              ${UserTypes.ADMIN.name} > ${UserTypes.COMBINED.name}
+              ${UserTypes.ADMIN.name} > ${UserTypes.READER.name}
+              """.trimIndent()
+        )
 
 }
