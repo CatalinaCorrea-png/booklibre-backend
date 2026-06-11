@@ -94,6 +94,7 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var lucianoVega: User
     private lateinit var valentinaSosa: User
     private lateinit var mateoLopez: User
+    private lateinit var admin: User
 
     // ─── Reseñas ─────────────────────────────────────────────────────────────
 
@@ -246,8 +247,14 @@ class ProjectBootstrap : InitializingBean {
         // reutilizamos cualquiera con ese título.
         val bookEnRepo = repoBooks.findFirstByTitle(book.title)
         if (bookEnRepo.isPresent) {
-            book.id = bookEnRepo.get().id
-            book.bookId = bookEnRepo.get().bookId
+            val existing = bookEnRepo.get()
+            book.id = existing.id
+            book.bookId = existing.bookId
+            // El bootstrap es la fuente del seed de popularidad: persistimos el bookClicks
+            // aunque el libro ya exista. Antes se salteaba y quedaba en 0, por eso el ranking
+            // del Home no tenía datos y refillFromMongo traía un top arbitrario.
+            existing.bookClicks = book.bookClicks
+            repoBooks.save(existing)
         } else {
             repoBooks.save(book)
             println("Book ${book.title} creado")
@@ -387,7 +394,21 @@ class ProjectBootstrap : InitializingBean {
             img = "/assets/mateo_lopez_avatar.png"
         )
 
-        listOf(emiliaRomero, lucianoVega, valentinaSosa, mateoLopez)
+        admin = User(
+            name = "Admin",
+            description = "un genio",
+            email = "admin@example.com",
+            cel = "1167676767",
+            location = "Islas Malvinas, AR",
+            userType = UserTypes.ADMIN,
+            bibliokarmas = 0,
+            password = encoder.encode("123456"),
+            timestamp = "01/02/2024",
+            img = "/assets/author_default.jpg"
+        )
+
+        listOf(emiliaRomero, lucianoVega, valentinaSosa, mateoLopez, admin
+        )
             .forEach { createUser(it) }
     }
 
@@ -422,7 +443,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz9gIAgf5hTagXaQZl8ayY6FF26n2qirXQMg&s"
             timestamp = LocalDate.of(2026, 1, 21)
-            bookClicks = 1243
+            bookClicks = 98
         }
 
         elProceso = Common().apply {
@@ -447,7 +468,7 @@ class ProjectBootstrap : InitializingBean {
             imageSrc =
                 "https://quelibroleo.com/images/libros/9788493621360.jpg"
             timestamp = LocalDate.of(2024, 3, 1)
-            bookClicks = 12374828
+            bookClicks = 200
         }
 
         crimen = Common().apply {
@@ -472,7 +493,7 @@ class ProjectBootstrap : InitializingBean {
             imageSrc =
                 "https://acdn-us.mitiendanube.com/stores/004/008/965/products/img_8468-dfbcfc91acd4498ad217537263442873-480-0.webp"
             timestamp = LocalDate.of(2021, 2, 9)
-            bookClicks = 12
+            bookClicks = 68
         }
 
         orgullo = Common().apply {
@@ -496,7 +517,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://images.cdn2.buscalibre.com/fit-in/360x360/5f/b0/5fb0cb647320eede167a469ee4b648bf.jpg"
             timestamp = LocalDate.of(2019, 6, 1)
-            bookClicks = 85995
+            bookClicks = 146
         }
 
         guerraPaz = Common().apply {
@@ -520,7 +541,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://http2.mlstatic.com/D_NQ_NP_689496-MLA78230208406_082024-O.webp"
             timestamp = LocalDate.of(2024, 12, 1)
-            bookClicks = 1004552
+            bookClicks = 182
         }
 
         losMiserables = Common().apply {
@@ -544,7 +565,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://http2.mlstatic.com/D_NQ_NP_762363-MLM49917565139_052022-O.webp"
             timestamp = LocalDate.of(2025, 10, 21)
-            bookClicks = 1232
+            bookClicks = 92
         }
 
         alquimista = Common().apply {
@@ -568,6 +589,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://tienda.planetadelibros.com.ar/cdn/shop/files/ElalquimistaBK_Fte.jpg?v=1730985825"
             timestamp = LocalDate.of(2016, 6, 6)
+            bookClicks = 62
         }
 
         extranjero = Common().apply {
@@ -591,7 +613,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://m.media-amazon.com/images/I/71mLWMj0sQL._AC_UF1000,1000_QL80_.jpg"
             timestamp = LocalDate.of(2025, 7, 8)
-            bookClicks = 986
+            bookClicks = 86
         }
 
         // ─── Libros Con Dedicatoria (8) ───────────────────────────────────────
@@ -617,7 +639,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://http2.mlstatic.com/D_NQ_NP_980687-MLU78007366453_072024-O.webp"
             timestamp = LocalDate.of(2026, 3, 17)
-            bookClicks = 9400231
+            bookClicks = 188
         }
 
         adiosArmas = WithADedication().apply {
@@ -641,7 +663,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://www.penguinlibros.com/ar/1595223/adios-a-las-armas.jpg"
             timestamp = LocalDate.of(2024, 10, 9)
-            bookClicks = 7554
+            bookClicks = 110
         }
 
         monteCristo = WithADedication().apply {
@@ -664,7 +686,7 @@ class ProjectBootstrap : InitializingBean {
                 img = valentinaSosa.img,
             )
             imageSrc = "https://imagessl0.casadellibro.com/a/l/s5/00/9788497945400.webp"
-            bookClicks = 12333
+            bookClicks = 128
         }
 
         vueltaMundo = WithADedication().apply {
@@ -688,7 +710,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://images.cdn2.buscalibre.com/fit-in/360x360/1f/cb/1fcbcd4165d3c7eababb3e92dff6972c.jpg"
             timestamp = LocalDate.of(2022, 1, 1)
-            bookClicks = 95
+            bookClicks = 74
         }
 
         senoraDalloway = WithADedication().apply {
@@ -712,7 +734,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnPl2enENU9OdvIh58PC0QuIJ_g0-wYbc3XQ&s"
             timestamp = LocalDate.of(2018, 2, 12)
-            bookClicks = 4423
+            bookClicks = 104
         }
 
         cuentosMisterio = WithADedication().apply {
@@ -737,7 +759,7 @@ class ProjectBootstrap : InitializingBean {
             imageSrc =
                 "https://panamericana.vtexassets.com/arquivos/ids/525902/cuentos-de-misterio-e-imaginacion-2-9788418211997.jpg?v=638407572538400000"
             timestamp = LocalDate.of(2025, 5, 14)
-            bookClicks = 12321
+            bookClicks = 122
         }
 
         fundacion = WithADedication().apply {
@@ -761,7 +783,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1170429948i/53687.jpg"
             timestamp = LocalDate.of(2023, 7, 25)
-            bookClicks = 123
+            bookClicks = 80
         }
 
         cienAnios = WithADedication().apply {
@@ -786,7 +808,7 @@ class ProjectBootstrap : InitializingBean {
             imageSrc =
                 "https://assets.lectulandia.co/b/ab/Gabriel%20Garcia%20Marquez/Cien%20anos%20de%20soledad%20Edicion%20conmemorativa%20(1)/big.jpg"
             timestamp = LocalDate.of(2025, 10, 3)
-            bookClicks = 1000000
+            bookClicks = 176
         }
 
         // ─── Libros Coleccionables (8) ────────────────────────────────────────
@@ -812,7 +834,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://www.edicontinente.com.ar/image/titulos/9788426141057.jpg"
             timestamp = LocalDate.of(2025, 3, 30)
-            bookClicks = 95553
+            bookClicks = 152
         }
 
         ficciones = Collectable().apply {
@@ -836,7 +858,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm6k93G1ce4FkEE8FYXOsApKJfGO-_xD5-tQ&s"
             timestamp = LocalDate.of(2025, 2, 3)
-            bookClicks = 123332
+            bookClicks = 164
         }
 
         rayuela = Collectable().apply {
@@ -860,7 +882,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://images.cdn3.buscalibre.com/fit-in/360x360/90/53/905322d10841b36aa311dbd5c90d92ed.jpg"
             timestamp = LocalDate.of(2025, 5, 29)
-            bookClicks = 55343
+            bookClicks = 140
         }
 
         ensayoCeguera = Collectable().apply {
@@ -884,7 +906,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://www.penguinlibros.com/ar/3537745-large_default/ensayo-sobre-la-ceguera.webp"
             timestamp = LocalDate.of(2023, 1, 12)
-            bookClicks = 9593
+            bookClicks = 116
         }
 
         montagnaMagica = Collectable().apply {
@@ -908,7 +930,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://images.cdn3.buscalibre.com/fit-in/360x360/75/56/7556ee308c4a24d1a4ea1be13b9ee928.jpg"
             timestamp = LocalDate.of(2023, 2, 1)
-            bookClicks = 123443
+            bookClicks = 170
         }
 
         caminoSwann = Collectable().apply {
@@ -933,7 +955,7 @@ class ProjectBootstrap : InitializingBean {
             imageSrc =
                 "https://upload.wikimedia.org/wikipedia/commons/e/ee/Por_el_camino_de_Swann-Espasa-Calpe1920-01.jpg"
             timestamp = LocalDate.of(2023, 5, 21)
-            bookClicks = 99432
+            bookClicks = 158
         }
 
         jardinCerezos = Collectable().apply {
@@ -957,7 +979,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://images.cdn2.buscalibre.com/fit-in/360x360/4b/33/4b3304f77876c25cd3e8babde159401d.jpg"
             timestamp = LocalDate.of(2024, 1, 10)
-            bookClicks = 23432
+            bookClicks = 134
         }
 
         harryPotter = Collectable().apply {
@@ -981,7 +1003,7 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc = "https://images.cdn2.buscalibre.com/fit-in/360x360/e6/5f/e65f54742ad7bbc41903d17f75b77d78.jpg"
             timestamp = LocalDate.of(2026, 1, 10)
-            bookClicks = 9995484
+            bookClicks = 194
         }
 
         listOf(
@@ -1520,9 +1542,10 @@ class ProjectBootstrap : InitializingBean {
 
     fun initClicksRanking() {
         // ── Sembrar el ZSET de ranking de clicks en Redis ───────────────────
-        // Si el sorted set está vacío (Redis recién levantado), lo puebla con los
-        // bookClicks que ya hay en Mongo. La lógica vive en ClickRankingService.
-        clickRankingService.seedFromMongoIfEmpty()
+        // Reconstruye el sorted set desde los bookClicks que el bootstrap acaba de
+        // persistir en Mongo. Hace reset+seed (no "if empty") para descartar un ZSET
+        // stale con bookIds de un dataset previo, que dejaría el ranking desincronizado.
+        clickRankingService.reseedFromMongo()
     }
 
     // ═════════════════════════════════════════════════════════════════════════

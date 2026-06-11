@@ -1,6 +1,7 @@
 # Esquema GraphQL del proyecto. Convive con la API REST, no la reemplaza.
 # Tablero de KPIs para administración.
 type Query {
+    book(isbn: String!): BookGql
     # Tasa de conversión: Top 5 de libros más clickeados (Redis) cruzado con las
     # reservas (Postgres). Por libro: clicks, reservas y tasa = reservas / clicks.
     conversionRate: [BookConversion!]!
@@ -8,6 +9,20 @@ type Query {
     # Promedio de calificación por tipo de libro (Común, Con dedicatoria, Coleccionable).
     # Libros sin reseñas (ratingAvg == 0) quedan excluidos del cálculo.
     calificactionAnalisis: [BookCalification!]!
+}
+
+type BookGql {
+    bookId: ID!
+    title: String!
+    isbn: String!
+    imageSrc: String!   # portada en mongo
+    externalMetadata: ExternalMetadata  # se resuelve aparte, lazy
+}
+type ExternalMetadata {
+    title: String
+    cover: String     # cover de OpenLibrary (o fallback a imageSrc)
+    pageCount: Int
+    publishDate: String
 }
 
 type BookConversion {

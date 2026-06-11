@@ -54,4 +54,13 @@ class ClickRankingService(
         redisTemplate.opsForZSet().add(CLICKS_ZSET_KEY, tuples) // ZADD masivo
         println("ZSET '$CLICKS_ZSET_KEY' sembrado con ${tuples.size} libros desde Mongo")
     }
+
+    // Reconstruye el ZSET de cero desde Mongo: borra el set actual (puede tener bookIds
+    // de un dataset anterior, que ya no existen en Mongo y dejan el ranking desincronizado)
+    // y lo re-siembra con los bookClicks vigentes. Lo invoca el bootstrap, que es la fuente
+    // autoritativa del baseline de popularidad.
+    fun reseedFromMongo() {
+        redisTemplate.delete(CLICKS_ZSET_KEY)
+        seedFromMongoIfEmpty()
+    }
 }
