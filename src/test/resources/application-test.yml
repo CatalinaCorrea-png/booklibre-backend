@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/booklibre_test
+      uri: mongodb://admin:admin@localhost:27019/booklibre_test?authSource=admin
   datasource:
     url: jdbc:h2:mem:booklibre_test;DATABASE_TO_LOWER=TRUE
     username: sa

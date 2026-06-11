@@ -2,6 +2,7 @@ import ar.edu.unsam.phm.domain.*
 import ar.edu.unsam.phm.dto.*
 import ar.edu.unsam.phm.repository.*
 import ar.edu.unsam.phm.services.BookService
+import ar.edu.unsam.phm.services.BookCacheService
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -22,7 +23,8 @@ class ProfileSpec : DescribeSpec({
     val userRepository = mockk<CrudUserRepository>()
     val authorRepository = mockk<CrudAuthorRepository>()
     val reviewRepository = mockk<CrudReviewRepository>(relaxed = true)
-    val bookService = BookService(bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository)
+    val bookCacheService = mockk<BookCacheService>(relaxed = true)
+    val bookService = BookService(bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository, bookCacheService)
 
     val userId = "user-id-1"
 

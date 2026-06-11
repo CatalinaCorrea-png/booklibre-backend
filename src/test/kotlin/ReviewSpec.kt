@@ -23,9 +23,10 @@ class ReviewSpec : DescribeSpec({
     val userRepository             = mockk<CrudUserRepository>(relaxed = true)
     val authorRepository           = mockk<CrudAuthorRepository>(relaxed = true)
     val reviewRepository           = mockk<CrudReviewRepository>()
+    val bookCacheService           = mockk<BookCacheService>(relaxed = true)
 
     val bookService = BookService(
-        bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository
+        bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository, bookCacheService
     )
     val reservationService = ReservationService(
         reservationRepository, bookRepository, userRepository, reviewRepository
