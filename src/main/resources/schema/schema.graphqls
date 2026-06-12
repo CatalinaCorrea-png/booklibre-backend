@@ -10,8 +10,7 @@ type Query {
     # Libros sin reseñas (ratingAvg == 0) quedan excluidos del cálculo.
     calificactionAnalisis: [BookCalification!]!
 
-    # Estado de salud del catálogo: clasifica cada libro en buckets disjuntos que
-    # suman el total. Cruza el catálogo (Mongo) con las reservas (Postgres).
+    # Estado de salud del catalogo, clasifica cada libro en buckets disjuntos segun estado de las reservas
     catalogHealth: CatalogHealth!
 }
 
