@@ -42,7 +42,7 @@ class RecentActivityDataFetcher(
 
         val reservationEvents = reservationRepository.findTop5ByOrderByCreatedAtDesc()
             .map { res ->
-                val date = res.createdAt ?: LocalDateTime.MIN  // null-safe para filas legacy
+                val date = res.createdAt // null-safe para filas legacy
                 date to NewReservationEvent(
                     date = date.toIsoWithOffset(),
                     user = res.user.name,     // lector que reservó

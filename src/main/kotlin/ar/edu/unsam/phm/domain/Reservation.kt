@@ -77,8 +77,14 @@ data class Reservation(
         TODO("Not yet implemented")
     }
 
+    private fun userIsNotOwner(): Boolean {
+        return if (this.book?.owner?.id != this.ownerId) {
+            throw BusinessException("No podes reservar un libro si sos el dueño.")
+        } else true
+    }
+
     override fun validate() {
-        isPickUpBeforeDropOff() && isPickUpNotBeforeToday() && ownerIsReader() && userIsPublisher()
+        isPickUpBeforeDropOff() && isPickUpNotBeforeToday() && ownerIsReader() && userIsPublisher() && userIsNotOwner()
     }
 
 }
