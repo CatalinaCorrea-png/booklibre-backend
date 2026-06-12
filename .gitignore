@@ -49,3 +49,8 @@ uploads
 .claude/
 node_modules/
 /node_modules/
+
+### Secrets / env ###
+.env
+.env.local
+!.env.example
