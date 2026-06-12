@@ -255,6 +255,7 @@ class ProjectBootstrap : InitializingBean {
             // del Home no tenía datos y refillFromMongo traía un top arbitrario.
             existing.bookClicks = book.bookClicks
             existing.owner = book.owner
+            existing.deleted = false
             repoBooks.save(existing)
         } else {
             repoBooks.save(book)
