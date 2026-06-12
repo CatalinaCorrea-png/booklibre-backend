@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class BookService(
@@ -48,6 +49,13 @@ class BookService(
 
         val newBook = bookCreateDTO.createFromDTO(owner)
         newBook.author = author
+        // El alta es una decisión del servidor, no del cliente: estampamos la fecha acá
+        // para que el feed de actividad reciente la ordene bien (y no dependa del default
+        // de deserialización del payload). createdAt = fecha (perfil/Home); registeredAt =
+        // momento exacto, que es lo que usa el feed.
+        val now = LocalDateTime.now()
+        newBook.createdAt = now.toLocalDate()
+        newBook.registeredAt = now
         //println("author name del DTO: ${bookCreateDTO.book.author.name}")
         newBook.validate()
         bookRepository.save(newBook)

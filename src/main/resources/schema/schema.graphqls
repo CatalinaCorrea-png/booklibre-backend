@@ -12,6 +12,37 @@ type Query {
 
     # Estado de salud del catalogo, clasifica cada libro en buckets disjuntos segun estado de las reservas
     catalogHealth: CatalogHealth!
+    # Feed de actividad reciente: unifica los últimos libros dados de alta (Mongo,
+    # Book.createdAt) y las últimas reservas confirmadas (Postgres, Reservation.createdAt)
+    # en una lista heterogénea, orden cronológico descendente, top 5.
+    recentActivity: [ActivityEvent!]!
+}
+
+enum ActivityEventType { BOOK_REGISTERED, RESERVATION }
+
+# Interface heterogénea: cada evento del feed comparte estos campos. El cliente puede
+# pedir __typename para distinguir entre alta de libro y reserva.
+interface ActivityEvent {
+    date: String!                  # ISO-8601; el front calcula el "hace X"
+    typeEvent: ActivityEventType!
+    user: String!                  # quién originó el evento
+    bookTitle: String!
+}
+
+# Alta de un libro nuevo en la plataforma. user = owner que lo publicó.
+type NewBookEvent implements ActivityEvent {
+    date: String!
+    typeEvent: ActivityEventType!
+    user: String!
+    bookTitle: String!
+}
+
+# Reserva confirmada. user = lector que reservó.
+type NewReservationEvent implements ActivityEvent {
+    date: String!
+    typeEvent: ActivityEventType!
+    user: String!
+    bookTitle: String!
 }
 
 type BookGql {
