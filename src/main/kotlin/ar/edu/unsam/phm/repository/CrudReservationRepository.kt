@@ -109,4 +109,9 @@ interface CrudReservationRepository : CrudRepository<Reservation, String> {
     @Query("UPDATE Reservation r SET r.bookDeleted = true WHERE r.bookId = :bookId")
     fun markBookAsDeletedInReservations(@Param("bookId") bookId: String)
     fun findByOwnerId(ownerId: String): MutableList<Reservation>
+
+    // Top 5 reservas confirmadas más recientes. @EntityGraph trae al user en la misma
+    // query: es LAZY y el resolver lee user.name (sin esto: LazyInitializationException).
+    @EntityGraph(attributePaths = ["user"])
+    fun findTop5ByOrderByCreatedAtDesc(): List<Reservation>
 }

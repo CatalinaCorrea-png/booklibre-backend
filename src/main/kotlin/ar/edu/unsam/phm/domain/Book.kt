@@ -13,6 +13,7 @@ import jakarta.persistence.*
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 //@Entity
@@ -40,7 +41,16 @@ abstract class Book(
     var condition: BookCondition = BookCondition.EXCELLENT,
     var owner: OwnerDTO = OwnerDTO(),
     var imageSrc: String = "",
-    var timestamp: LocalDate = LocalDate.now(),
+    // Fecha de ALTA del libro en el sistema (cuándo se publicó en la plataforma),
+    // distinta de publishDate (fecha de edición/publicación real del libro).
+    // La usan Home (caché), perfil y el ordenamiento de "Mis libros".
+    var createdAt: LocalDate = LocalDate.now(),
+    // Timestamp con hora del alta, EXCLUSIVO del feed de actividad reciente. Necesita
+    // hora (no solo fecha) para mostrar "recién" y ordenar altas del mismo día por el
+    // momento real. Es additivo: no afecta a createdAt ni a las otras páginas.
+    // NULLABLE a propósito: un libro viejo que no tiene el campo queda en null (no en
+    // now()), así no aparece como "recién" en el feed; los null ordenan al final.
+    var registeredAt: LocalDateTime? = null,
     var bookType: String,
     var deleted: Boolean = false,
     var ratingAvg: Double = 0.0,

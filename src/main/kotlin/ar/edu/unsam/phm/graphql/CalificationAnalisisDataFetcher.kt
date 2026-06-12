@@ -11,13 +11,10 @@ class CalificationAnalisisDataFetcher(
 
     @DgsQuery
     fun calificactionAnalisis(): List<BookCalification> =
-        bookRepository.findAll()
-            .filter { !it.deleted && it.ratingAvg > 0.0 }
-            .groupBy { it.bookType }
-            .map { (bookType, books) ->
-                BookCalification(
-                    bookType = bookType,
-                    avgRating = Math.round(books.map { it.ratingAvg }.average() * 100) / 100.0,
-                )
-            }
+        bookRepository.avgRatingByBookType().map {
+            BookCalification(
+                bookType = it.id,
+                avgRating = Math.round(it.avgRating * 100) / 100.0,
+            )
+        }
 }
