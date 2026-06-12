@@ -1,6 +1,7 @@
 package ar.edu.unsam.phm.config
 
 import ar.edu.unsam.phm.domain.UserTypes
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -86,9 +87,13 @@ class SecurityConfiguration(
             .build()
 
     @Bean // Spring Security (antes de los filtros de seguridad)
-    fun corsConfigurationSource(): CorsConfigurationSource {
+    fun corsConfigurationSource(
+        // Orígenes permitidos por CORS, separados por coma. Local: Vite dev (5173).
+        // En la nube se agrega la URL del front con la env var CORS_ALLOWED_ORIGINS.
+        @Value("\${cors.allowed-origins:http://localhost:5173}") allowedOriginsCsv: String
+    ): CorsConfigurationSource {
         val config = CorsConfiguration().apply {
-            allowedOrigins = listOf("http://localhost:5173")
+            allowedOrigins = allowedOriginsCsv.split(",").map { it.trim() }
             allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             allowedHeaders = listOf("*")
             exposedHeaders = listOf("WWW-Authenticate")
