@@ -78,7 +78,7 @@ data class Reservation(
     }
 
     private fun userIsNotOwner(): Boolean {
-        return if (this.book?.owner?.id != this.ownerId) {
+        return if (this.book?.owner?.id == this.user.id) {
             throw BusinessException("No podes reservar un libro si sos el dueño.")
         } else true
     }
