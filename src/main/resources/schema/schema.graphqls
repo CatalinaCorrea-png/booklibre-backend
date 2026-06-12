@@ -41,7 +41,7 @@ type BookCalification {
     avgRating: Float!
 }
 
-# Buckets disjuntos del catálogo. Se cumple siempre:
+# Buckets disjuntos del catalogo. Se cumple siempre:
 # prestados + disponiblesNuncaReservados + disponiblesReservadosAFuturo + disponiblesDevueltos = total
 type CatalogHealth {
     total: Int!

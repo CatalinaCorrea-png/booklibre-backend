@@ -14,7 +14,7 @@ class CatalogHealthDataFetcher(
     fun catalogHealth(): CatalogHealth {
         val today = LocalDate.now()
 
-        val books = bookRepository.findAll().filter { !it.deleted }
+        val books = bookRepository.findByDeletedFalse()
 
         var prestados = 0
         var nuncaReservados = 0
@@ -39,4 +39,10 @@ class CatalogHealthDataFetcher(
             disponiblesDevueltos = devueltos,
         )
     }
+
+//    @DgsQuery
+//    fun catalogHealth(): CatalogHealth =
+//        bookRepository.catalogHealth(LocalDate.now())
+//            ?: CatalogHealth(0, 0, 0, 0, 0)
+//
 }
