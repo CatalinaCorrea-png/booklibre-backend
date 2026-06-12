@@ -9,6 +9,10 @@ type Query {
     # Promedio de calificación por tipo de libro (Común, Con dedicatoria, Coleccionable).
     # Libros sin reseñas (ratingAvg == 0) quedan excluidos del cálculo.
     calificactionAnalisis: [BookCalification!]!
+
+    # Estado de salud del catálogo: clasifica cada libro en buckets disjuntos que
+    # suman el total. Cruza el catálogo (Mongo) con las reservas (Postgres).
+    catalogHealth: CatalogHealth!
 }
 
 type BookGql {
@@ -36,4 +40,14 @@ type BookConversion {
 type BookCalification {
     bookType: String!
     avgRating: Float!
+}
+
+# Buckets disjuntos del catálogo. Se cumple siempre:
+# prestados + disponiblesNuncaReservados + disponiblesReservadosAFuturo + disponiblesDevueltos = total
+type CatalogHealth {
+    total: Int!
+    prestados: Int!                       # con reserva vigente hoy
+    disponiblesNuncaReservados: Int!      # sin ninguna reserva
+    disponiblesReservadosAFuturo: Int!    # sin reserva vigente, alguna futura y ninguna finalizada
+    disponiblesDevueltos: Int!            # sin reserva vigente, al menos una finalizada
 }
