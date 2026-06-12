@@ -8,6 +8,7 @@ import java.util.Optional
 interface MongoBookRepository : MongoRepository<Book, String>, MongoBookRepositoryCustom {
     fun findByTitle(title: String): Optional<Book>
     fun findFirstByTitle(title: String): Optional<Book>
+    fun findAllByTitle(title: String): List<Book>
     fun findByIsbn(isbn: String): MutableList<Book>
     fun findByBookId(bookId: String): Optional<Book>
     fun findAllByBookIdIn(bookIds: List<String>): List<Book>
@@ -24,3 +25,8 @@ interface MongoBookRepository : MongoRepository<Book, String>, MongoBookReposito
 }
 
 data class BookTypeAvgResult(val id: String, val avgRating: Double)
+    // Top 5 de libros dados de alta más recientemente (no eliminados). Feed de actividad:
+    // ordena por registeredAt (con hora) para precisión intra-día.
+    fun findTop5ByDeletedFalseOrderByRegisteredAtDesc(): List<Book>
+
+}
