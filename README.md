@@ -285,7 +285,7 @@ La primera página del Home (page 0, sin filtros) se sirve desde Redis:
 1. **ZSET `books-ranking:clicks`** → top 10 `bookId` por clicks (`ZREVRANGE`). Se siembra desde `Book.bookClicks` en el bootstrap y sube `+1` con cada click.
 2. **Cache por-libro `cached-books:<bookId>`** (TTL 10 min) → trae el JSON de esos libros en un solo `MGET`.
 3. Si falta alguno en cache → fallback a Mongo (`findTop10ByOrderByBookClicksDesc`) y se re-cachea.
-4. Se quedan los primeros 6 (`HOME_PAGE_SIZE`), se les calcula bibliokarmas y se devuelve. El total se cachea en `home:popular-total`.
+4. Se quedan los primeros 6 (`HOME_PAGE_SIZE`), se les calcula bibliokarmas y se devuelve. El total se cuenta en Mongo con el **mismo criterio per-usuario** que `searchBooks` (`countByCriteria(byCriteriaMongo)`), para que la cantidad de páginas sea consistente entre la página 0 y las siguientes.
 
 El resto (page 1+ o búsquedas con filtros) va directo a Mongo (`searchBooks`).
 

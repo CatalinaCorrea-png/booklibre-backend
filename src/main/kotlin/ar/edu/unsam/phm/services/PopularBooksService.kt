@@ -9,9 +9,8 @@ import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.errors.NotFoundException
 import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.MongoBookRepository
-import org.springframework.data.redis.core.StringRedisTemplate
+import ar.edu.unsam.phm.specification.BookSpecifications
 import org.springframework.stereotype.Service
-import java.time.Duration
 import kotlin.math.ceil
 
 /**
@@ -27,19 +26,19 @@ class PopularBooksService(
     val userRepository: CrudUserRepository,
     val clickRankingService: ClickRankingService,
     val bookCacheService: BookCacheService,
-    val redisTemplate: StringRedisTemplate,
 ) {
     companion object {
-        const val POPULAR_TOTAL_KEY = "home:popular-total"
         const val HOME_PAGE_SIZE = 6                     // lo que muestra el Home
         const val RANKING_FETCH = 10L                    // top 10 del ZSET (colchón); usamos 6
-        val TOTAL_TTL: Duration = Duration.ofMinutes(10)
     }
 
     // Página 0 del Home: populares por clicks, desde Redis.
     fun getPopularFirstPage(criteria: BookSearchCriteria): PageResponse<BookDTO> {
         val books = topPopularBooks()
-        val total = popularTotal()
+        // El total se cuenta con EL MISMO criterio per-usuario que usan las páginas 1+
+        // (searchBooks → byCriteriaMongo): excluye los libros propios y los reservados en
+        // esas fechas. Así la cantidad de páginas es consistente entre la página 0 y el resto.
+        val total = bookRepository.countByCriteria(BookSpecifications.byCriteriaMongo(criteria))
         return PageResponse(
             content = withBibliokarmas(books, criteria),
             page = 0,
@@ -71,15 +70,6 @@ class PopularBooksService(
         val books = bookRepository.findTop10ByOrderByBookClicksDesc()
         bookCacheService.cacheBooks(books)
         return books
-    }
-
-    // Total del catálogo de populares, para la paginación. Cacheado con TTL para no contar
-    // en Mongo en cada page 0; el front lo usa para pasar a las páginas siguientes (Mongo).
-    private fun popularTotal(): Long {
-        redisTemplate.opsForValue().get(POPULAR_TOTAL_KEY)?.toLongOrNull()?.let { return it }
-        val total = bookRepository.countPopularBooks()
-        redisTemplate.opsForValue().set(POPULAR_TOTAL_KEY, total.toString(), TOTAL_TTL)
-        return total
     }
 
     private fun withBibliokarmas(books: List<Book>, criteria: BookSearchCriteria): List<BookDTO> {

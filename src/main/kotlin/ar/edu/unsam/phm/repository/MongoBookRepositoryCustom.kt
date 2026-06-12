@@ -25,6 +25,7 @@ interface MongoBookRepositoryCustom {
     // Es el fallback cuando el cache por-libro no tiene los ids del ranking del ZSET.
     fun findTop10ByOrderByBookClicksDesc(): List<Book>
 
-    // Total del catálogo de populares (para la paginación de la página 0 del Home).
-    fun countPopularBooks(): Long
+    // Cuenta los libros que matchean un criterio. La página 0 del Home la usa para que su total
+    // sea consistente con el de findByCriteria (mismo criterio per-usuario).
+    fun countByCriteria(criteria: Criteria): Long
 }

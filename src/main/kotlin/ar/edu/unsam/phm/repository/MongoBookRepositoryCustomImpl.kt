@@ -65,7 +65,9 @@ class MongoBookRepositoryCustomImpl(
         return mongoTemplate.find(Query(popularCriteria()).with(pageable), Book::class.java)
     }
 
-    // Total del catálogo de populares (no eliminados, dueño no READER) para la paginación.
-    override fun countPopularBooks(): Long =
-        mongoTemplate.count(Query(popularCriteria()), Book::class.java)
+    // Cuenta los libros que matchean un criterio. La usa la página 0 del Home para que su total
+    // sea consistente con findByCriteria (mismo criterio per-usuario), evitando el desfasaje de
+    // páginas entre la página 0 (antes contaba el catálogo global) y las siguientes.
+    override fun countByCriteria(criteria: Criteria): Long =
+        mongoTemplate.count(Query(criteria), Book::class.java)
 }
