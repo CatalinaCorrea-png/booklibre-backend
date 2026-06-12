@@ -17,7 +17,6 @@ class User(
     val cel: String = "",
     @Column(length = 50)
     val location: String = "",
-    @Enumerated(EnumType.STRING)
     var userType: UserTypes = UserTypes.COMBINED,
     val timestamp: String = "",
     @Column(nullable = false)
