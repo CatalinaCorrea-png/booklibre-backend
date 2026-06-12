@@ -14,6 +14,7 @@ import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.domain.WithADedication
 import ar.edu.unsam.phm.domain.toDoc
 import ar.edu.unsam.phm.dto.OwnerDTO
+import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.dto.toReservationDate
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.CrudAuthorRepository
@@ -1531,17 +1532,22 @@ class ProjectBootstrap : InitializingBean {
     }
 
     fun initBookRatingAvg() {
-        // ── Agregar Rating AVG a los libros ──────────────────────────
-        // Recalcular ratingAvg en MongoDB
-        val allReviews = repoReviews.findAll().toList()
-        val avgByBookId = allReviews.groupBy { it.bookId }.mapValues { (_, reviews) ->
-            reviews.map { it.rating }.average()
-        }
-        avgByBookId.forEach { (bookId, avg) ->
-            val book = repoBooks.findByBookId(bookId)
-            if (book.isPresent) {
-                book.get().ratingAvg = avg
-                repoBooks.save(book.get())
+        // ── Agregados de reseñas en cada libro (Mongo), reconstruidos desde Postgres ──
+        // Reconstruye ratingAvg Y lastTwoReviews (las 2 más recientes por timestamp, igual que
+        // el runtime al calificar en ReservationService). Se hace en una sola pasada y se PISA
+        // el valor (no se acumula), así es idempotente y refleja también las reviews de runtime.
+        val reviewsByBookId = repoReviews.findAll().groupBy { it.bookId }
+        reviewsByBookId.forEach { (bookId, reviews) ->
+            val bookOpt = repoBooks.findByBookId(bookId)
+            if (bookOpt.isPresent) {
+                val book = bookOpt.get()
+                book.ratingAvg = reviews.map { it.rating }.average()
+                book.lastTwoReviews = reviews
+                    .sortedByDescending { it.timestamp }
+                    .take(2)
+                    .map { it.toDTO() }
+                    .toMutableList()
+                repoBooks.save(book)
             }
         }
     }
@@ -1582,17 +1588,30 @@ class ProjectBootstrap : InitializingBean {
         println("************************************************************************")
         println("Running initialization")
         println("************************************************************************")
-        // Los libros creados por el usuario PERSISTEN (no se borran). El bootstrap solo
-        // mantiene el seed: deduplica copias repetidas de libros del seed y resetea las
-        // reservas embebidas para que reflejen Postgres (ver createBook).
+        // createUser/Author/Book son idempotentes (find-by-key), así que conviven con el
+        // dataset de libros ya cargado.
         this.initUsers()
         this.initAuthors()
-        this.initBooks()          // libros sin reviews (dedup seed + resetea reservas embebidas)
-        this.initReservations()   // reservaciones ya con users y books
-        this.initReviews()        // reviews con reservaciones → se agregan a libros → save
+        this.initBooks()          // libros sin reviews (createBook LIMPIA el array de reservas embebido)
+
+        // RESERVAS y REVIEWS en POSTGRES (fuente canónica): seed-once. NO son idempotentes
+        // (id autogenerado + fechas relativas a hoy), así que re-sembrarlas en cada arranque
+        // con ddl-auto=update las DUPLICA e infla los bibliokarmas. initReviews depende de los
+        // objetos Reservation de initReservations, por eso se saltean en bloque.
+        if (repoReservations.count() == 0L) {
+            this.initReservations()
+            this.initReviews()
+        } else {
+            println("Reservas ya existen (${repoReservations.count()}): se saltea el seed de reservas/reviews para no duplicar.")
+        }
+
+        // AGREGADOS embebidos en Mongo (ratingAvg, reservationCount + array de reservas): se
+        // reconstruyen SIEMPRE desde Postgres. createBook limpió el array en cada arranque, así
+        // que initBookReservationCount lo vuelve a armar con las reservas vigentes (seed + las
+        // que creó el usuario). Son idempotentes: leen de los repos y pisan el valor en Mongo.
         this.initBookRatingAvg()
-        this.initBookReservationCount()  // reconstruye reservas embebidas desde Postgres
-        this.initClicksRanking()  // siembra el ZSET de ranking de clicks en Redis
+        this.initBookReservationCount()
+        this.initClicksRanking()  // siembra el ZSET de ranking de clicks en Redis (idempotente)
         println("------------------------------------------------------------------------")
     }
 }
