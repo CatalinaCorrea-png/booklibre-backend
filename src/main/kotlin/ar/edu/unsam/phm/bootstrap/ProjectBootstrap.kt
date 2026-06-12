@@ -261,6 +261,7 @@ class ProjectBootstrap : InitializingBean {
             // del Home no tenía datos y refillFromMongo traía un top arbitrario.
             existing.bookClicks = book.bookClicks
             existing.owner = book.owner
+            existing.deleted = false
             existing.createdAt = book.createdAt
             existing.registeredAt = book.registeredAt
             // Reset de las reservas embebidas: en cada arranque las reconstruye
