@@ -4,7 +4,6 @@ import ar.edu.unsam.phm.domain.Book
 import org.springframework.data.mongodb.repository.Aggregation
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.Optional
-import org.springframework.data.mongodb.repository.Aggregation
 import ar.edu.unsam.phm.graphql.CatalogHealth
 import java.time.LocalDate
 
