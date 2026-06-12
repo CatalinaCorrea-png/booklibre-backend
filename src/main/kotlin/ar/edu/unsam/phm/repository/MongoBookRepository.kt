@@ -22,7 +22,7 @@ interface MongoBookRepository : MongoRepository<Book, String>, MongoBookReposito
         "{ \$group: { _id: '\$bookType', avgRating: { \$avg: '\$ratingAvg' } } }"
     ])
     fun avgRatingByBookType(): List<BookTypeAvgResult>
-}
+
 
 data class BookTypeAvgResult(val id: String, val avgRating: Double)
     // Top 5 de libros dados de alta más recientemente (no eliminados). Feed de actividad:
