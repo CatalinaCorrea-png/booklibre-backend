@@ -35,7 +35,7 @@ class ProfileSpec : DescribeSpec({
         title = "1984"
         this.author = Author("George Orwell", "avatar.jpg")
         gender = Gender.DRAMA
-        timestamp = LocalDate.of(2024, 1, 1)
+        createdAt = LocalDate.of(2024, 1, 1)
         imageSrc = ""
         this.owner = owner.toOwnerDTO()
         desc = "Descripcion"
@@ -55,7 +55,7 @@ class ProfileSpec : DescribeSpec({
         title = "Rayuela"
         this.author = Author("Julio Cortázar", "avatar.jpg")
         gender = Gender.DRAMA
-        timestamp = LocalDate.of(2024, 2, 1)
+        createdAt = LocalDate.of(2024, 2, 1)
         imageSrc = ""
         this.owner = owner.toOwnerDTO()
         desc = "Descripcion"
@@ -69,7 +69,7 @@ class ProfileSpec : DescribeSpec({
         title = "El Aleph"
         this.author = Author("Jorge Luis Borges", "avatar.jpg")
         gender = Gender.DRAMA
-        timestamp = LocalDate.of(2024, 3, 1)
+        createdAt = LocalDate.of(2024, 3, 1)
         imageSrc = ""
         this.owner = owner.toOwnerDTO()
         desc = "Descripcion"
@@ -81,7 +81,7 @@ class ProfileSpec : DescribeSpec({
     describe("getAllUserBooks devuelve todos los libros del usuario") {
 
         it("Cada libro aparece exactamente una vez con su estado actual") {
-            val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "timestamp"))
+            val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
             every {
                 bookRepository.findUserBooks(userId, any(), any())
             } returns PageImpl(listOf(bookA, bookB, bookC), pageable, 3)
@@ -96,7 +96,7 @@ class ProfileSpec : DescribeSpec({
         }
 
         it("Un libro con reserva activa aparece como PRESTADO") {
-            val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "timestamp"))
+            val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
             every {
                 bookRepository.findUserBooks(userId, any(), any())
             } returns PageImpl(listOf(bookA), pageable, 1)
@@ -113,7 +113,7 @@ class ProfileSpec : DescribeSpec({
     describe("El filtro de perfil clasifica correctamente DISPONIBLE vs PRESTADO") {
 
         it("BORROWED muestra solo libros actualmente prestados, AVAILABLE los disponibles, ALL todos") {
-            val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "timestamp"))
+            val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
 
             every {
                 bookRepository.findUserBooks(userId, any(), any())

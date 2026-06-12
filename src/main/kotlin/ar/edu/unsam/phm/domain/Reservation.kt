@@ -4,6 +4,7 @@ import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.RepositoryElement
 import jakarta.persistence.*
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 @Entity
@@ -24,6 +25,9 @@ data class Reservation(
     var ownerId: String = "",
     var bookDeleted: Boolean = false,
     var bibliokarmas: Long = 0,
+    // Fecha en que se confirmó la reserva (distinta de pickUpDate, que es cuándo se retira
+    // el libro). Es la "fecha de la reserva" que usa el feed de actividad reciente.
+    var createdAt: LocalDateTime = LocalDateTime.now(),
 ) : RepositoryElement {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
