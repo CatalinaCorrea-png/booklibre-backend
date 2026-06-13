@@ -21,7 +21,9 @@ fun Book.toProfileBookDTO(today: LocalDate) = ProfileBookDTO(
     title = title,
     author = author.name,
     gender = gender,
-    timestamp = timestamp,
+    // El DTO mantiene 'timestamp' como nombre de campo (contrato REST del perfil),
+    // pero ahora lee del renombrado Book.createdAt.
+    timestamp = createdAt,
     imageSrc = imageSrc,
     state = BookAvailability.of(
         reservations.any {it.pickUpDate <= today && it.dropOffDate >= today}

@@ -1,11 +1,14 @@
 package ar.edu.unsam.phm.config
 
 import ar.edu.unsam.phm.domain.UserTypes
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -47,6 +50,9 @@ class SecurityConfiguration(
                     // Endpoints publicos
                     .requestMatchers("/api/auth", "/api/auth/refresh", "/error", "/books/**", "/book-titulo/**").permitAll()
                     .requestMatchers("/assets/**").permitAll() // para que no rompan las imagenes de perfil
+                    // (Es para un admin: en producción convendría restringirlo a un rol.)
+                    .requestMatchers("/graphql", "/graphiql", "/graphiql/**").permitAll()
+                    .requestMatchers("/actuator/health").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS)
                     .permitAll() // esto es para react pregunta antes de hacer la request real
                     .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
@@ -68,7 +74,6 @@ class SecurityConfiguration(
                     .hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
                     .requestMatchers(HttpMethod.GET, "/userOwnBooks/**")
                     .hasAnyAuthority(UserTypes.PUBLISHER.name, UserTypes.COMBINED.name)
-
                     .anyRequest().fullyAuthenticated() // el resto esta bloqueado si no se autentica
             }
 
@@ -81,9 +86,13 @@ class SecurityConfiguration(
             .build()
 
     @Bean // Spring Security (antes de los filtros de seguridad)
-    fun corsConfigurationSource(): CorsConfigurationSource {
+    fun corsConfigurationSource(
+        // Orígenes permitidos por CORS, separados por coma. Local: Vite dev (5173).
+        // En la nube se agrega la URL del front con la env var CORS_ALLOWED_ORIGINS.
+        @Value("\${cors.allowed-origins:http://localhost:5173}") allowedOriginsCsv: String
+    ): CorsConfigurationSource {
         val config = CorsConfiguration().apply {
-            allowedOrigins = listOf("http://localhost:5173")
+            allowedOrigins = allowedOriginsCsv.split(",").map { it.trim() }
             allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             allowedHeaders = listOf("*")
             exposedHeaders = listOf("WWW-Authenticate")
@@ -94,5 +103,15 @@ class SecurityConfiguration(
             registerCorsConfiguration("/**", config)
         }
     }
+
+    @Bean
+    fun roleHierarchy(): RoleHierarchy =          // ← Spring lo engancha solo
+        RoleHierarchyImpl.fromHierarchy(
+            """
+              ${UserTypes.ADMIN.name} > ${UserTypes.PUBLISHER.name}
+              ${UserTypes.ADMIN.name} > ${UserTypes.COMBINED.name}
+              ${UserTypes.ADMIN.name} > ${UserTypes.READER.name}
+              """.trimIndent()
+        )
 
 }

@@ -276,6 +276,94 @@ db["books"].find({
   }
 })
 ```
+---
+
+## Redis — Home Top 10 más clickeados (Redis)
+
+La primera página del Home (page 0, sin filtros) se sirve desde Redis:
+
+1. **ZSET `books-ranking:clicks`** → top 10 `bookId` por clicks (`ZREVRANGE`). Se siembra desde `Book.bookClicks` en el bootstrap y sube `+1` con cada click.
+2. **Cache por-libro `cached-books:<bookId>`** (TTL 10 min) → trae el JSON de esos libros en un solo `MGET`.
+3. Si falta alguno en cache → fallback a Mongo (`findTop10ByOrderByBookClicksDesc`) y se re-cachea.
+4. Se quedan los primeros 6 (`HOME_PAGE_SIZE`), se les calcula bibliokarmas y se devuelve. El total se cuenta en Mongo con el **mismo criterio per-usuario** que `searchBooks` (`countByCriteria(byCriteriaMongo)`), para que la cantidad de páginas sea consistente entre la página 0 y las siguientes.
+
+El resto (page 1+ o búsquedas con filtros) va directo a Mongo (`searchBooks`).
+
+---
+
+## GraphQL — Schema stitching (OpenLibrary)
+
+El tipo `BookGql` se compone de dos fuentes: **MongoDB** para los campos base y **OpenLibrary** (por ISBN) para el campo `externalMetadata`. Ese campo se resuelve de forma **lazy**: la API externa se consulta solo si el cliente pide ese campo. Si OpenLibrary falla o no tiene el ISBN, `cover` cae al `imageSrc` guardado en Mongo. El panel de KPIs es conceptualmente solo para administradores (el front bloquea la ruta); el endpoint `/graphql` queda abierto en el back (`permitAll`) como simplificación del TP.
+
+**Query sin `externalMetadata`** → no hay llamada a OpenLibrary:
+```graphql
+query {
+  book(isbn: "978-0-452-28423-4") {
+    title
+    imageSrc
+  }
+}
+```
+```json
+{
+  "data": {
+    "book": {
+      "title": "1984",
+      "imageSrc": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz9gIAgf5hTagXaQZl8ayY6FF26n2qirXQMg&s"
+    }
+  }
+}
+```
+
+**Query con `externalMetadata`** → se consulta OpenLibrary por ISBN:
+```graphql
+query {
+  book(isbn: "978-0-452-28423-4") {
+    title
+    externalMetadata {
+      title
+      cover
+      pageCount
+      publishDate
+    }
+  }
+}
+```
+```json
+{
+  "data": {
+    "book": {
+      "title": "1984",
+      "externalMetadata": {
+        "title": "Nineteen eighty-four",
+        "cover": "https://covers.openlibrary.org/b/id/7898938-L.jpg",
+        "pageCount": 339,
+        "publishDate": "2003"
+      }
+    }
+  }
+}
+```
+
+---
+
+## Seguridad — Jerarquía de roles (`RoleHierarchy`)
+
+Un `@Bean RoleHierarchy` define que `ADMIN` está por encima del resto de los roles, de modo que un admin **hereda** las authorities `READER`, `PUBLISHER` y `COMBINED`. Así el admin pasa todos los `requestMatcher` protegidos por rol sin tener que listar `ADMIN` en cada uno.
+
+```kotlin
+@Bean
+fun roleHierarchy(): RoleHierarchy =
+    RoleHierarchyImpl.fromHierarchy(
+        """
+        ADMIN > PUBLISHER
+        ADMIN > COMBINED
+        ADMIN > READER
+        """.trimIndent()
+    )
+```
+
+Por qué hace falta: la autorización es **first-match-wins** por orden de los matchers (no "gana la más permisiva"). Sin la jerarquía, un admin que pega a un endpoint listado con otro rol (ej. `/filtered-books` → `READER`/`COMBINED`) sería rechazado antes de llegar a cualquier regla general. En Spring Boot 3.3 el bean se aplica automáticamente, sin cablearlo dentro de `authorizeHttpRequests`.
 
 ---
 

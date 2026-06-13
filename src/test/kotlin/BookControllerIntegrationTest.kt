@@ -94,18 +94,26 @@ class BookControllerIntegrationTest {
         })
     }
 
+    // NOTA sobre el diseño Redis:
+    // La página 0 del Home con sort por defecto (title, ascending) y sin filtros de texto
+    // (isFirstHomeView) NO va a Mongo: se sirve del ranking "populares" cacheado en Redis,
+    // que ignora a propósito el filtrado por dueño/páginas/fechas. Para ejercitar el filtrado
+    // real de Mongo (BookService.searchBooks) estos tests fuerzan el camino normal usando
+    // `ascending=false` (orden invertido) o un filtro de texto, que descalifican isFirstHomeView.
     @Test
     fun `devuelve solo libros que no son del usuario consultante`() {
         mockMvc.perform(
             get("/filtered-books")
                 .param("userId", otherUser.id.toString())
+                .param("ascending", "false") // fuerza el camino Mongo (no Home/populares)
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.content").isArray)
             .andExpect(jsonPath("$.content.length()").value(2))
-            .andExpect(jsonPath("$.content[0].title").value("Cien años de soledad"))
-            .andExpect(jsonPath("$.content[1].title").value("El amor en los tiempos del cólera"))
+            // title DESC por ascending=false
+            .andExpect(jsonPath("$.content[0].title").value("El amor en los tiempos del cólera"))
+            .andExpect(jsonPath("$.content[1].title").value("Cien años de soledad"))
     }
 
     @Test
@@ -122,6 +130,7 @@ class BookControllerIntegrationTest {
     fun `filtra por rango de páginas`() {
         mockMvc.perform(get("/filtered-books")
             .param("userId", otherUser.id.toString())
+            .param("ascending", "false") // fuerza el camino Mongo (no Home/populares)
             .param("pagesRangeMin", "300")
             .param("pagesRangeMax", "500"))
             .andExpect(status().isOk)
@@ -168,6 +177,7 @@ class BookControllerIntegrationTest {
 
         mockMvc.perform(get("/filtered-books")
             .param("userId", otherUser.id.toString())
+            .param("ascending", "false") // fuerza el camino Mongo (no Home/populares)
             .param("pickUpDate", "2026-05-15")
             .param("dropOffDate", "2026-05-18"))
             .andExpect(status().isOk)
@@ -186,6 +196,7 @@ class BookControllerIntegrationTest {
 
         mockMvc.perform(get("/filtered-books")
             .param("userId", otherUser.id.toString())
+            .param("ascending", "false") // fuerza el camino Mongo (no Home/populares)
             .param("pickUpDate", "2026-06-01")
             .param("dropOffDate", "2026-06-05"))
             .andExpect(status().isOk)
@@ -197,7 +208,9 @@ class BookControllerIntegrationTest {
         book1.logicDelete()
         bookRepository.save(book1)
 
-        mockMvc.perform(get("/filtered-books").param("userId", otherUser.id.toString()))
+        mockMvc.perform(get("/filtered-books")
+            .param("userId", otherUser.id.toString())
+            .param("ascending", "false")) // fuerza el camino Mongo (no Home/populares)
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.content.length()").value(1))
     }
@@ -206,6 +219,7 @@ class BookControllerIntegrationTest {
     fun `pagina correctamente`() {
         mockMvc.perform(get("/filtered-books")
             .param("userId", otherUser.id.toString())
+            .param("ascending", "false") // fuerza el camino Mongo (no Home/populares)
             .param("page", "0")
             .param("pageSize", "1"))
             .andExpect(status().isOk)
@@ -216,7 +230,11 @@ class BookControllerIntegrationTest {
 
     @Test
     fun `ordena por título ascendente por default`() {
-        mockMvc.perform(get("/filtered-books").param("userId", otherUser.id.toString()))
+        // Filtro de texto (ownersName) para ir al camino Mongo manteniendo el sort ascendente
+        // por defecto; ambos libros de "Juan Pérez" deben salir en orden alfabético de título.
+        mockMvc.perform(get("/filtered-books")
+            .param("userId", otherUser.id.toString())
+            .param("ownersName", "juan"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.content[0].title").value("Cien años de soledad"))
             .andExpect(jsonPath("$.content[1].title").value("El amor en los tiempos del cólera"))
@@ -235,6 +253,7 @@ class BookControllerIntegrationTest {
     fun `calcula bibliokarmas correctamente en el DTO`() {
         mockMvc.perform(get("/filtered-books")
             .param("userId", otherUser.id.toString())
+            .param("ascending", "false") // fuerza el camino Mongo (no Home/populares)
             .param("pickUpDate", "2026-05-10")
             .param("dropOffDate", "2026-05-15"))
             .andExpect(status().isOk)

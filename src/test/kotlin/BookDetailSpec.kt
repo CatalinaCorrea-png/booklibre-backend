@@ -21,9 +21,10 @@ class BookDetailSpec : DescribeSpec({
     val userRepository            = mockk<CrudUserRepository>(relaxed = true)
     val authorRepository          = mockk<CrudAuthorRepository>(relaxed = true)
     val reviewRepository          = mockk<CrudReviewRepository>(relaxed = true)
+    val bookCacheService          = mockk<BookCacheService>(relaxed = true)
 
     val bookService = BookService(
-        bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository
+        bookRepository, reservationRepository, userRepository, authorRepository, reviewRepository, bookCacheService
     )
 
     val owner = User(name = "Tolkien", userType = UserTypes.PUBLISHER).apply { id = "user-id-1" }

@@ -1,0 +1,12 @@
+# Artefactos locales y cosas que no van en la imagen (más rápido y sin filtrar secrets)
+.git
+.gradle
+build/
+node_modules/
+.idea/
+*.iml
+uploads/
+
+# Secrets locales: NUNCA al contexto del build
+.env
+.env.local

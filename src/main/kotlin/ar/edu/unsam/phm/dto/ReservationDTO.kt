@@ -41,7 +41,7 @@ fun Reservation.toDTO(hasReview: Boolean): ReservationDTO =
         user = this.user.toUserDTO(),
         review = 0,
         pickUpDate = this.pickUpDate,
-        dropOffDate = this.dropOffDate,
+        dropOffDate = this.dropOffDate, 
         state = this.state,
         canRate = !hasReview && this.state == State.RETURNED,
         bibliokarmas = this.bibliokarmas,

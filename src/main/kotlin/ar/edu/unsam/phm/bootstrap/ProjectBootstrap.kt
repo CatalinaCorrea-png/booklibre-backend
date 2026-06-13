@@ -14,6 +14,7 @@ import ar.edu.unsam.phm.domain.UserTypes
 import ar.edu.unsam.phm.domain.WithADedication
 import ar.edu.unsam.phm.domain.toDoc
 import ar.edu.unsam.phm.dto.OwnerDTO
+import ar.edu.unsam.phm.dto.toDTO
 import ar.edu.unsam.phm.dto.toReservationDate
 import ar.edu.unsam.phm.errors.BusinessException
 import ar.edu.unsam.phm.repository.CrudAuthorRepository
@@ -22,6 +23,7 @@ import ar.edu.unsam.phm.repository.CrudUserRepository
 import ar.edu.unsam.phm.repository.BookClickRepository
 import ar.edu.unsam.phm.repository.CrudReviewRepository
 import ar.edu.unsam.phm.repository.MongoBookRepository
+import ar.edu.unsam.phm.services.ClickRankingService
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
@@ -53,6 +55,9 @@ class ProjectBootstrap : InitializingBean {
 
     @Autowired
     private lateinit var repoBookClicks: BookClickRepository
+
+    @Autowired
+    private lateinit var clickRankingService: ClickRankingService
 
     @Autowired
     private lateinit var encoder: PasswordEncoder
@@ -90,6 +95,7 @@ class ProjectBootstrap : InitializingBean {
     private lateinit var lucianoVega: User
     private lateinit var valentinaSosa: User
     private lateinit var mateoLopez: User
+    private lateinit var admin: User
 
     // ─── Reseñas ─────────────────────────────────────────────────────────────
 
@@ -237,10 +243,35 @@ class ProjectBootstrap : InitializingBean {
     }
 
     fun createBook(book: Book) {
-        val bookEnRepo = repoBooks.findByTitle(book.title)
-        if (bookEnRepo.isPresent) {
-            book.id = bookEnRepo.get().id
+        // El feed ordena por registeredAt (con hora). Para los libros sembrados lo
+        // derivamos de su fecha de alta histórica (medianoche de createdAt), así
+        // conservan una distribución temporal realista y distinta.
+        book.registeredAt = book.createdAt.atStartOfDay()
+        // Todas las copias con este título. Normalmente una; si hay duplicados acumulados
+        // de un libro del seed (mismo título, otro bookId), nos quedamos con la primera
+        // y borramos el resto → arregla los libros repetidos del Home sin tocar los
+        // libros creados por el usuario (que tienen otro título).
+        val matches = repoBooks.findAllByTitle(book.title)
+        if (matches.isNotEmpty()) {
+            val existing = matches.first()
+            if (matches.size > 1) repoBooks.deleteAll(matches.drop(1))
+            book.id = existing.id
+            book.bookId = existing.bookId
+            // El bootstrap es la fuente del seed de popularidad: persistimos el bookClicks
+            // aunque el libro ya exista. Antes se salteaba y quedaba en 0, por eso el ranking
+            // del Home no tenía datos y refillFromMongo traía un top arbitrario.
+            existing.bookClicks = book.bookClicks
+            existing.owner = book.owner
+            existing.deleted = false
+            existing.createdAt = book.createdAt
+            existing.registeredAt = book.registeredAt
+            // Reset de las reservas embebidas: en cada arranque las reconstruye
+            // initBookReservationCount desde Postgres. Sin esto se acumulan (incluidas las
+            // que reservó el usuario en la sesión), y el libro nunca vuelve a "disponible".
+            existing.reservations.clear()
+            repoBooks.save(existing)
         } else {
+            book.reservations.clear()
             repoBooks.save(book)
             println("Book ${book.title} creado")
         }
@@ -258,6 +289,7 @@ class ProjectBootstrap : InitializingBean {
             val user = reservation.user
 
             // Denormalización
+            reservation.bookId = book.bookId
             reservation.bookTitle = book.title
             reservation.bookAuthorName = book.author?.name ?: ""
             reservation.bookImageSrc = book.imageSrc
@@ -270,6 +302,17 @@ class ProjectBootstrap : InitializingBean {
             reservation.bibliokarmas = bibliokarmasValue
             user.addBibliokarmas(bibliokarmasValue)
             userRepository.save(user)
+
+            // Fecha de confirmación del seed: las reservas pasadas se confirman el día de
+            // retiro; las de pickUp futuro se mapean a una fecha PASADA y DISTINTA (espejada
+            // contra hoy) para no empatar entre sí y para que cualquier reserva nueva real
+            // (now(), con hora actual) quede siempre por encima en el feed.
+            val today = LocalDate.now()
+            val pickUp = reservation.pickUpDate
+            val confirmedDate =
+                if (!pickUp.isAfter(today)) pickUp
+                else today.minusDays(pickUp.toEpochDay() - today.toEpochDay())
+            reservation.createdAt = confirmedDate.atStartOfDay()
 
             // Primero la generamos en postgres
             val savedRes = repoReservations.save(reservation)
@@ -378,7 +421,21 @@ class ProjectBootstrap : InitializingBean {
             img = "/assets/mateo_lopez_avatar.png"
         )
 
-        listOf(emiliaRomero, lucianoVega, valentinaSosa, mateoLopez)
+        admin = User(
+            name = "Admin",
+            description = "un genio",
+            email = "admin@example.com",
+            cel = "1167676767",
+            location = "Islas Malvinas, AR",
+            userType = UserTypes.ADMIN,
+            bibliokarmas = 0,
+            password = encoder.encode("123456"),
+            timestamp = "01/02/2024",
+            img = "/assets/author_default.jpg"
+        )
+
+        listOf(emiliaRomero, lucianoVega, valentinaSosa, mateoLopez, admin
+        )
             .forEach { createUser(it) }
     }
 
@@ -412,8 +469,8 @@ class ProjectBootstrap : InitializingBean {
                 img = emiliaRomero.img,
             )
             imageSrc = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz9gIAgf5hTagXaQZl8ayY6FF26n2qirXQMg&s"
-            timestamp = LocalDate.of(2026, 1, 21)
-            bookClicks = 1243
+            createdAt = LocalDate.of(2026, 1, 21)
+            bookClicks = 98
         }
 
         elProceso = Common().apply {
@@ -437,8 +494,8 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc =
                 "https://quelibroleo.com/images/libros/9788493621360.jpg"
-            timestamp = LocalDate.of(2024, 3, 1)
-            bookClicks = 12374828
+            createdAt = LocalDate.of(2024, 3, 1)
+            bookClicks = 200
         }
 
         crimen = Common().apply {
@@ -462,8 +519,8 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc =
                 "https://acdn-us.mitiendanube.com/stores/004/008/965/products/img_8468-dfbcfc91acd4498ad217537263442873-480-0.webp"
-            timestamp = LocalDate.of(2021, 2, 9)
-            bookClicks = 12
+            createdAt = LocalDate.of(2021, 2, 9)
+            bookClicks = 68
         }
 
         orgullo = Common().apply {
@@ -486,8 +543,8 @@ class ProjectBootstrap : InitializingBean {
                 img = mateoLopez.img,
             )
             imageSrc = "https://images.cdn2.buscalibre.com/fit-in/360x360/5f/b0/5fb0cb647320eede167a469ee4b648bf.jpg"
-            timestamp = LocalDate.of(2019, 6, 1)
-            bookClicks = 85995
+            createdAt = LocalDate.of(2019, 6, 1)
+            bookClicks = 146
         }
 
         guerraPaz = Common().apply {
@@ -510,8 +567,8 @@ class ProjectBootstrap : InitializingBean {
                 img = emiliaRomero.img,
             )
             imageSrc = "https://http2.mlstatic.com/D_NQ_NP_689496-MLA78230208406_082024-O.webp"
-            timestamp = LocalDate.of(2024, 12, 1)
-            bookClicks = 1004552
+            createdAt = LocalDate.of(2024, 12, 1)
+            bookClicks = 182
         }
 
         losMiserables = Common().apply {
@@ -534,8 +591,8 @@ class ProjectBootstrap : InitializingBean {
                 img = lucianoVega.img,
             )
             imageSrc = "https://http2.mlstatic.com/D_NQ_NP_762363-MLM49917565139_052022-O.webp"
-            timestamp = LocalDate.of(2025, 10, 21)
-            bookClicks = 1232
+            createdAt = LocalDate.of(2025, 10, 21)
+            bookClicks = 92
         }
 
         alquimista = Common().apply {
@@ -558,7 +615,8 @@ class ProjectBootstrap : InitializingBean {
                 img = valentinaSosa.img,
             )
             imageSrc = "https://tienda.planetadelibros.com.ar/cdn/shop/files/ElalquimistaBK_Fte.jpg?v=1730985825"
-            timestamp = LocalDate.of(2016, 6, 6)
+            createdAt = LocalDate.of(2016, 6, 6)
+            bookClicks = 62
         }
 
         extranjero = Common().apply {
@@ -581,8 +639,8 @@ class ProjectBootstrap : InitializingBean {
                 img = mateoLopez.img,
             )
             imageSrc = "https://m.media-amazon.com/images/I/71mLWMj0sQL._AC_UF1000,1000_QL80_.jpg"
-            timestamp = LocalDate.of(2025, 7, 8)
-            bookClicks = 986
+            createdAt = LocalDate.of(2025, 7, 8)
+            bookClicks = 86
         }
 
         // ─── Libros Con Dedicatoria (8) ───────────────────────────────────────
@@ -607,8 +665,8 @@ class ProjectBootstrap : InitializingBean {
                 img = emiliaRomero.img,
             )
             imageSrc = "https://http2.mlstatic.com/D_NQ_NP_980687-MLU78007366453_072024-O.webp"
-            timestamp = LocalDate.of(2026, 3, 17)
-            bookClicks = 9400231
+            createdAt = LocalDate.of(2026, 3, 17)
+            bookClicks = 188
         }
 
         adiosArmas = WithADedication().apply {
@@ -631,8 +689,8 @@ class ProjectBootstrap : InitializingBean {
                 img = lucianoVega.img,
             )
             imageSrc = "https://www.penguinlibros.com/ar/1595223/adios-a-las-armas.jpg"
-            timestamp = LocalDate.of(2024, 10, 9)
-            bookClicks = 7554
+            createdAt = LocalDate.of(2024, 10, 9)
+            bookClicks = 110
         }
 
         monteCristo = WithADedication().apply {
@@ -655,7 +713,7 @@ class ProjectBootstrap : InitializingBean {
                 img = valentinaSosa.img,
             )
             imageSrc = "https://imagessl0.casadellibro.com/a/l/s5/00/9788497945400.webp"
-            bookClicks = 12333
+            bookClicks = 128
         }
 
         vueltaMundo = WithADedication().apply {
@@ -678,8 +736,8 @@ class ProjectBootstrap : InitializingBean {
                 img = mateoLopez.img,
             )
             imageSrc = "https://images.cdn2.buscalibre.com/fit-in/360x360/1f/cb/1fcbcd4165d3c7eababb3e92dff6972c.jpg"
-            timestamp = LocalDate.of(2022, 1, 1)
-            bookClicks = 95
+            createdAt = LocalDate.of(2022, 1, 1)
+            bookClicks = 74
         }
 
         senoraDalloway = WithADedication().apply {
@@ -702,8 +760,8 @@ class ProjectBootstrap : InitializingBean {
                 img = emiliaRomero.img,
             )
             imageSrc = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnPl2enENU9OdvIh58PC0QuIJ_g0-wYbc3XQ&s"
-            timestamp = LocalDate.of(2018, 2, 12)
-            bookClicks = 4423
+            createdAt = LocalDate.of(2018, 2, 12)
+            bookClicks = 104
         }
 
         cuentosMisterio = WithADedication().apply {
@@ -727,8 +785,8 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc =
                 "https://panamericana.vtexassets.com/arquivos/ids/525902/cuentos-de-misterio-e-imaginacion-2-9788418211997.jpg?v=638407572538400000"
-            timestamp = LocalDate.of(2025, 5, 14)
-            bookClicks = 12321
+            createdAt = LocalDate.of(2025, 5, 14)
+            bookClicks = 122
         }
 
         fundacion = WithADedication().apply {
@@ -751,8 +809,8 @@ class ProjectBootstrap : InitializingBean {
                 img = valentinaSosa.img,
             )
             imageSrc = "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1170429948i/53687.jpg"
-            timestamp = LocalDate.of(2023, 7, 25)
-            bookClicks = 123
+            createdAt = LocalDate.of(2023, 7, 25)
+            bookClicks = 80
         }
 
         cienAnios = WithADedication().apply {
@@ -776,8 +834,8 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc =
                 "https://assets.lectulandia.co/b/ab/Gabriel%20Garcia%20Marquez/Cien%20anos%20de%20soledad%20Edicion%20conmemorativa%20(1)/big.jpg"
-            timestamp = LocalDate.of(2025, 10, 3)
-            bookClicks = 1000000
+            createdAt = LocalDate.of(2025, 10, 3)
+            bookClicks = 176
         }
 
         // ─── Libros Coleccionables (8) ────────────────────────────────────────
@@ -802,8 +860,8 @@ class ProjectBootstrap : InitializingBean {
                 img = emiliaRomero.img,
             )
             imageSrc = "https://www.edicontinente.com.ar/image/titulos/9788426141057.jpg"
-            timestamp = LocalDate.of(2025, 3, 30)
-            bookClicks = 95553
+            createdAt = LocalDate.of(2025, 3, 30)
+            bookClicks = 152
         }
 
         ficciones = Collectable().apply {
@@ -826,8 +884,8 @@ class ProjectBootstrap : InitializingBean {
                 img = lucianoVega.img,
             )
             imageSrc = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm6k93G1ce4FkEE8FYXOsApKJfGO-_xD5-tQ&s"
-            timestamp = LocalDate.of(2025, 2, 3)
-            bookClicks = 123332
+            createdAt = LocalDate.of(2025, 2, 3)
+            bookClicks = 164
         }
 
         rayuela = Collectable().apply {
@@ -850,8 +908,8 @@ class ProjectBootstrap : InitializingBean {
                 img = valentinaSosa.img,
             )
             imageSrc = "https://images.cdn3.buscalibre.com/fit-in/360x360/90/53/905322d10841b36aa311dbd5c90d92ed.jpg"
-            timestamp = LocalDate.of(2025, 5, 29)
-            bookClicks = 55343
+            createdAt = LocalDate.of(2025, 5, 29)
+            bookClicks = 140
         }
 
         ensayoCeguera = Collectable().apply {
@@ -874,8 +932,8 @@ class ProjectBootstrap : InitializingBean {
                 img = mateoLopez.img,
             )
             imageSrc = "https://www.penguinlibros.com/ar/3537745-large_default/ensayo-sobre-la-ceguera.webp"
-            timestamp = LocalDate.of(2023, 1, 12)
-            bookClicks = 9593
+            createdAt = LocalDate.of(2023, 1, 12)
+            bookClicks = 116
         }
 
         montagnaMagica = Collectable().apply {
@@ -898,8 +956,8 @@ class ProjectBootstrap : InitializingBean {
                 img = emiliaRomero.img,
             )
             imageSrc = "https://images.cdn3.buscalibre.com/fit-in/360x360/75/56/7556ee308c4a24d1a4ea1be13b9ee928.jpg"
-            timestamp = LocalDate.of(2023, 2, 1)
-            bookClicks = 123443
+            createdAt = LocalDate.of(2023, 2, 1)
+            bookClicks = 170
         }
 
         caminoSwann = Collectable().apply {
@@ -923,8 +981,8 @@ class ProjectBootstrap : InitializingBean {
             )
             imageSrc =
                 "https://upload.wikimedia.org/wikipedia/commons/e/ee/Por_el_camino_de_Swann-Espasa-Calpe1920-01.jpg"
-            timestamp = LocalDate.of(2023, 5, 21)
-            bookClicks = 99432
+            createdAt = LocalDate.of(2023, 5, 21)
+            bookClicks = 158
         }
 
         jardinCerezos = Collectable().apply {
@@ -947,8 +1005,8 @@ class ProjectBootstrap : InitializingBean {
                 img = valentinaSosa.img,
             )
             imageSrc = "https://images.cdn2.buscalibre.com/fit-in/360x360/4b/33/4b3304f77876c25cd3e8babde159401d.jpg"
-            timestamp = LocalDate.of(2024, 1, 10)
-            bookClicks = 23432
+            createdAt = LocalDate.of(2024, 1, 10)
+            bookClicks = 134
         }
 
         harryPotter = Collectable().apply {
@@ -971,8 +1029,8 @@ class ProjectBootstrap : InitializingBean {
                 img = mateoLopez.img,
             )
             imageSrc = "https://images.cdn2.buscalibre.com/fit-in/360x360/e6/5f/e65f54742ad7bbc41903d17f75b77d78.jpg"
-            timestamp = LocalDate.of(2026, 1, 10)
-            bookClicks = 9995484
+            createdAt = LocalDate.of(2026, 1, 10)
+            bookClicks = 194
         }
 
         listOf(
@@ -1474,35 +1532,52 @@ class ProjectBootstrap : InitializingBean {
     }
 
     fun initBookRatingAvg() {
-        // ── Agregar Rating AVG a los libros ──────────────────────────
-        // Recalcular ratingAvg en MongoDB
-        val allReviews = repoReviews.findAll().toList()
-        val avgByBookId = allReviews.groupBy { it.bookId }.mapValues { (_, reviews) ->
-            reviews.map { it.rating }.average()
-        }
-        avgByBookId.forEach { (bookId, avg) ->
-            val book = repoBooks.findByBookId(bookId)
-            if (book.isPresent) {
-                book.get().ratingAvg = avg
-                repoBooks.save(book.get())
+        // ── Agregados de reseñas en cada libro (Mongo), reconstruidos desde Postgres ──
+        // Reconstruye ratingAvg Y lastTwoReviews (las 2 más recientes por timestamp, igual que
+        // el runtime al calificar en ReservationService). Se hace en una sola pasada y se PISA
+        // el valor (no se acumula), así es idempotente y refleja también las reviews de runtime.
+        val reviewsByBookId = repoReviews.findAll().groupBy { it.bookId }
+        reviewsByBookId.forEach { (bookId, reviews) ->
+            val bookOpt = repoBooks.findByBookId(bookId)
+            if (bookOpt.isPresent) {
+                val book = bookOpt.get()
+                book.ratingAvg = reviews.map { it.rating }.average()
+                book.lastTwoReviews = reviews
+                    .sortedByDescending { it.timestamp }
+                    .take(2)
+                    .map { it.toDTO() }
+                    .toMutableList()
+                repoBooks.save(book)
             }
         }
     }
 
     fun initBookReservationCount() {
         // ── Agregar Reservation COUNT a los libros ──────────────────────────
-        val books = repoBooks.findAll()
+        // Arrancamos desde las reservas (decenas), NO desde repoBooks.findAll()
+        // (500k+ docs en el cluster shardeado). Solo tocamos los libros que
+        // realmente tienen reservas. Mismo patrón que initBookRatingAvg().
+        val reservationsByBookId = repoReservations.findAll().groupBy { it.bookId }
 
-        books.forEach { book ->
-            val reservations = repoReservations.findByBookId(book.bookId)
-            reservations.forEach { reservation ->
-                val reservationDatesDTO = reservation.toReservationDate()
-                book.addReservation(reservationDatesDTO)
+        reservationsByBookId.forEach { (bookId, reservations) ->
+            val bookOpt = repoBooks.findByBookId(bookId)
+            if (bookOpt.isPresent) {
+                val book = bookOpt.get()
+                reservations.forEach { reservation ->
+                    book.addReservation(reservation.toReservationDate())
+                }
+                book.reservationCount(reservations.size.toLong())
+                repoBooks.save(book)
             }
-            val reservationCount = reservations.size.toLong()
-            book.reservationCount(reservationCount)
-            repoBooks.save(book)
         }
+    }
+
+    fun initClicksRanking() {
+        // ── Sembrar el ZSET de ranking de clicks en Redis ───────────────────
+        // Reconstruye el sorted set desde los bookClicks que el bootstrap acaba de
+        // persistir en Mongo. Hace reset+seed (no "if empty") para descartar un ZSET
+        // stale con bookIds de un dataset previo, que dejaría el ranking desincronizado.
+        clickRankingService.reseedFromMongo()
     }
 
     // ═════════════════════════════════════════════════════════════════════════
@@ -1513,14 +1588,34 @@ class ProjectBootstrap : InitializingBean {
         println("************************************************************************")
         println("Running initialization")
         println("************************************************************************")
-        repoBooks.deleteAll()
-        this.initUsers()
-        this.initAuthors()
-        this.initBooks()          // libros sin reviews
-        this.initReservations()   // reservaciones ya con users y books
-        this.initReviews()        // reviews con reservaciones → se agregan a libros → save
-        this.initBookRatingAvg()
-        this.initBookReservationCount()
+//        this.initUsers()
+//        this.initAuthors()
+//        this.initBooks()
+        // SEED COMPLETO solo si la base está VACÍA. Todo esto es costoso (decenas de find+save
+        // secuenciales contra Postgres/Atlas remotos) y corre ANTES de que la app abra el puerto.
+        // Repetirlo en cada arranque alarga el cold start y puede hacer fallar el deploy de Render
+        // por "port scan timeout". Con ddl-auto=update los datos PERSISTEN, así que en los boots
+        // siguientes se saltea todo y el arranque es casi instantáneo.
+        // Además: reservas/reviews NO son idempotentes (id autogenerado + fechas relativas → se
+        // duplicarían) y createBook limpia el array embebido de reservas, así que todo el bloque
+        // (incluidos los agregados de Mongo) tiene que ir junto: o se siembra entero, o nada.
+        if (repoReservations.count() == 0L) {
+            this.initUsers()
+            this.initAuthors()
+            this.initBooks()
+            this.initReservations()
+            this.initReviews()
+            this.initBookRatingAvg()
+            this.initBookReservationCount()
+        } else {
+            println("Base ya sembrada (${repoReservations.count()} reservas): se saltea el seed → arranque rápido.")
+        }
+//        this.initBookRatingAvg()
+//        this.initBookReservationCount()
+        // SIEMPRE (barato): reconstruye el ZSET de ranking desde los bookClicks de Mongo, por si
+        // el Key Value de Redis se reinició (el free tier no persiste). Es una query + un ZADD,
+        // no alarga el arranque.
+        this.initClicksRanking()
         println("------------------------------------------------------------------------")
     }
 }

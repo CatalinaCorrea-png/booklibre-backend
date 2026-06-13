@@ -20,4 +20,12 @@ interface MongoBookRepositoryCustom {
     fun incrementClicks(
         bookId: String
     ): Unit
+
+    // Top 10 por clicks desde Mongo (criterio populares: no eliminados, dueño no READER).
+    // Es el fallback cuando el cache por-libro no tiene los ids del ranking del ZSET.
+    fun findTop10ByOrderByBookClicksDesc(): List<Book>
+
+    // Cuenta los libros que matchean un criterio. La página 0 del Home la usa para que su total
+    // sea consistente con el de findByCriteria (mismo criterio per-usuario).
+    fun countByCriteria(criteria: Criteria): Long
 }

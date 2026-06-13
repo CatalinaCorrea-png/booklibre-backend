@@ -1,0 +1,83 @@
+# Esquema GraphQL del proyecto. Convive con la API REST, no la reemplaza.
+# Tablero de KPIs para administración.
+type Query {
+    book(isbn: String!): BookGql
+    # Tasa de conversión: Top 5 de libros más clickeados (Redis) cruzado con las
+    # reservas (Postgres). Por libro: clicks, reservas y tasa = reservas / clicks.
+    conversionRate: [BookConversion!]!
+
+    # Promedio de calificación por tipo de libro (Común, Con dedicatoria, Coleccionable).
+    # Libros sin reseñas (ratingAvg == 0) quedan excluidos del cálculo.
+    calificactionAnalisis: [BookCalification!]!
+
+    # Estado de salud del catalogo, clasifica cada libro en buckets disjuntos segun estado de las reservas
+    catalogHealth: CatalogHealth!
+    # Feed de actividad reciente: unifica los últimos libros dados de alta (Mongo,
+    # Book.createdAt) y las últimas reservas confirmadas (Postgres, Reservation.createdAt)
+    # en una lista heterogénea, orden cronológico descendente, top 5.
+    recentActivity: [ActivityEvent!]!
+}
+
+enum ActivityEventType { BOOK_REGISTERED, RESERVATION }
+
+# Interface heterogénea: cada evento del feed comparte estos campos. El cliente puede
+# pedir __typename para distinguir entre alta de libro y reserva.
+interface ActivityEvent {
+    date: String!                  # ISO-8601; el front calcula el "hace X"
+    typeEvent: ActivityEventType!
+    user: String!                  # quién originó el evento
+    bookTitle: String!
+}
+
+# Alta de un libro nuevo en la plataforma. user = owner que lo publicó.
+type NewBookEvent implements ActivityEvent {
+    date: String!
+    typeEvent: ActivityEventType!
+    user: String!
+    bookTitle: String!
+}
+
+# Reserva confirmada. user = lector que reservó.
+type NewReservationEvent implements ActivityEvent {
+    date: String!
+    typeEvent: ActivityEventType!
+    user: String!
+    bookTitle: String!
+}
+
+type BookGql {
+    bookId: ID!
+    title: String!
+    isbn: String!
+    imageSrc: String!   # portada en mongo
+    externalMetadata: ExternalMetadata  # se resuelve aparte, lazy
+}
+type ExternalMetadata {
+    title: String
+    cover: String     # cover de OpenLibrary (o fallback a imageSrc)
+    pageCount: Int
+    publishDate: String
+}
+
+type BookConversion {
+    bookId: ID!
+    title: String!
+    clicks: Int!
+    reservations: Int!
+    conversionRate: Float!   # fracción reservas/clicks (en el front: * 100 para el %)
+}
+
+type BookCalification {
+    bookType: String!
+    avgRating: Float!
+}
+
+# Buckets disjuntos del catalogo. Se cumple siempre:
+# prestados + disponiblesNuncaReservados + disponiblesReservadosAFuturo + disponiblesDevueltos = total
+type CatalogHealth {
+    total: Int!
+    prestados: Int!                       # con reserva vigente hoy
+    disponiblesNuncaReservados: Int!      # sin ninguna reserva
+    disponiblesReservadosAFuturo: Int!    # sin reserva vigente, alguna futura y ninguna finalizada
+    disponiblesDevueltos: Int!            # sin reserva vigente, al menos una finalizada
+}
