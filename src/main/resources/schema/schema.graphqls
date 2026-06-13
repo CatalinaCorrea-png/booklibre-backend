@@ -10,6 +10,8 @@ type Query {
     # Libros sin reseñas (ratingAvg == 0) quedan excluidos del cálculo.
     calificactionAnalisis: [BookCalification!]!
 
+    # Estado de salud del catalogo, clasifica cada libro en buckets disjuntos segun estado de las reservas
+    catalogHealth: CatalogHealth!
     # Feed de actividad reciente: unifica los últimos libros dados de alta (Mongo,
     # Book.createdAt) y las últimas reservas confirmadas (Postgres, Reservation.createdAt)
     # en una lista heterogénea, orden cronológico descendente, top 5.
@@ -68,4 +70,14 @@ type BookConversion {
 type BookCalification {
     bookType: String!
     avgRating: Float!
+}
+
+# Buckets disjuntos del catalogo. Se cumple siempre:
+# prestados + disponiblesNuncaReservados + disponiblesReservadosAFuturo + disponiblesDevueltos = total
+type CatalogHealth {
+    total: Int!
+    prestados: Int!                       # con reserva vigente hoy
+    disponiblesNuncaReservados: Int!      # sin ninguna reserva
+    disponiblesReservadosAFuturo: Int!    # sin reserva vigente, alguna futura y ninguna finalizada
+    disponiblesDevueltos: Int!            # sin reserva vigente, al menos una finalizada
 }
