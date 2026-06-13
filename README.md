@@ -349,7 +349,7 @@ query {
 
 ## Seguridad — Jerarquía de roles (`RoleHierarchy`)
 
-Un `@Bean RoleHierarchy` define que `ADMIN` está por encima del resto de los roles, de modo que un admin **hereda** las authorities `READER`, `PUBLISHER` y `COMBINED`. Así el admin pasa todos los `requestMatcher` protegidos por rol sin tener que listar `ADMIN` en cada uno.
+Un `@Bean RoleHierarchy` en `SecurityConfiguration` define que `ADMIN` está por encima del resto de los roles, de modo que un admin **hereda** las authorities `READER`, `PUBLISHER` y `COMBINED`. Así el admin pasa todos los `requestMatcher` protegidos por rol sin tener que listar `ADMIN` en cada uno.
 
 ```kotlin
 @Bean
