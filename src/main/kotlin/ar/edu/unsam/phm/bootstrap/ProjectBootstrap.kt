@@ -1588,30 +1588,34 @@ class ProjectBootstrap : InitializingBean {
         println("************************************************************************")
         println("Running initialization")
         println("************************************************************************")
-        // createUser/Author/Book son idempotentes (find-by-key), así que conviven con el
-        // dataset de libros ya cargado.
-        this.initUsers()
-        this.initAuthors()
-        this.initBooks()          // libros sin reviews (createBook LIMPIA el array de reservas embebido)
-
-        // RESERVAS y REVIEWS en POSTGRES (fuente canónica): seed-once. NO son idempotentes
-        // (id autogenerado + fechas relativas a hoy), así que re-sembrarlas en cada arranque
-        // con ddl-auto=update las DUPLICA e infla los bibliokarmas. initReviews depende de los
-        // objetos Reservation de initReservations, por eso se saltean en bloque.
+//        this.initUsers()
+//        this.initAuthors()
+//        this.initBooks()
+        // SEED COMPLETO solo si la base está VACÍA. Todo esto es costoso (decenas de find+save
+        // secuenciales contra Postgres/Atlas remotos) y corre ANTES de que la app abra el puerto.
+        // Repetirlo en cada arranque alarga el cold start y puede hacer fallar el deploy de Render
+        // por "port scan timeout". Con ddl-auto=update los datos PERSISTEN, así que en los boots
+        // siguientes se saltea todo y el arranque es casi instantáneo.
+        // Además: reservas/reviews NO son idempotentes (id autogenerado + fechas relativas → se
+        // duplicarían) y createBook limpia el array embebido de reservas, así que todo el bloque
+        // (incluidos los agregados de Mongo) tiene que ir junto: o se siembra entero, o nada.
         if (repoReservations.count() == 0L) {
+            this.initUsers()
+            this.initAuthors()
+            this.initBooks()
             this.initReservations()
             this.initReviews()
+            this.initBookRatingAvg()
+            this.initBookReservationCount()
         } else {
-            println("Reservas ya existen (${repoReservations.count()}): se saltea el seed de reservas/reviews para no duplicar.")
+            println("Base ya sembrada (${repoReservations.count()} reservas): se saltea el seed → arranque rápido.")
         }
-
-        // AGREGADOS embebidos en Mongo (ratingAvg, reservationCount + array de reservas): se
-        // reconstruyen SIEMPRE desde Postgres. createBook limpió el array en cada arranque, así
-        // que initBookReservationCount lo vuelve a armar con las reservas vigentes (seed + las
-        // que creó el usuario). Son idempotentes: leen de los repos y pisan el valor en Mongo.
-        this.initBookRatingAvg()
-        this.initBookReservationCount()
-        this.initClicksRanking()  // siembra el ZSET de ranking de clicks en Redis (idempotente)
+//        this.initBookRatingAvg()
+//        this.initBookReservationCount()
+        // SIEMPRE (barato): reconstruye el ZSET de ranking desde los bookClicks de Mongo, por si
+        // el Key Value de Redis se reinició (el free tier no persiste). Es una query + un ZADD,
+        // no alarga el arranque.
+        this.initClicksRanking()
         println("------------------------------------------------------------------------")
     }
 }
