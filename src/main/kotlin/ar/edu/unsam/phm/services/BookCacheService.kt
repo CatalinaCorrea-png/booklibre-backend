@@ -19,7 +19,7 @@ class BookCacheService(
 ) {
     companion object {
         const val BOOK_CACHE_PREFIX = "cached-books:"
-        val BOOK_TTL: Duration = Duration.ofMinutes(10)
+        val BOOK_TTL: Duration = Duration.ofMinutes(5) // TTL 5 minutos
     }
 
     fun cacheBook(book: Book) {
