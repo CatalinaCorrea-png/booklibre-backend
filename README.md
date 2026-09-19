@@ -6,19 +6,65 @@
 
 Backend de **BookLibre**, una plataforma para gestionar préstamos de libros entre usuarios. Desarrollado con **Kotlin + Spring Boot**.
 
+> Proyecto grupal de la materia PHM (UNSAM, 2026). Este repositorio es una copia del
+> original de la cátedra, con todo el historial. [Equipo](#integrantes) al final.
+
 ---
 
 ## 🛠️ Tecnologías
 
-| Tecnología | Uso |
-|---|---|
-| Kotlin | Lenguaje principal |
-| Spring Boot | Framework web |
-| Spring Data JPA | Persistencia y ORM |
-| PostgreSQL | Base de datos relacional |
-| Gradle | Gestión de dependencias |
-| Docker | Contenedor de base de datos |
-| JWT | Autenticación y seguridad |
+![Kotlin](https://img.shields.io/badge/Kotlin_1.9-7F52FF?style=flat-square&logo=kotlin&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.3-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)
+![GraphQL](https://img.shields.io/badge/GraphQL_(Netflix_DGS)-E10098?style=flat-square&logo=graphql&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Gradle](https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=gradle&logoColor=white)
+![Java](https://img.shields.io/badge/JDK_21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
+
+---
+
+## ✨ Lo más interesante del proyecto
+
+**Autenticación JWT, sin sesión en el servidor**
+- **Dos tokens.** El *access token* (JWT firmado con HMAC) lleva el rol y el email del usuario y
+  viaja en el header `Authorization`. El *refresh token* va en una cookie `httpOnly` +
+  `SameSite=Strict` y **rota en cada uso**: el anterior queda invalidado.
+- **Filtro JWT propio** (`OncePerRequestFilter`) que responde `401` con
+  `WWW-Authenticate: Bearer error="invalid_token"` y distingue un token **vencido** de uno
+  **inválido**. El frontend usa esa respuesta para saber cuándo renovar el token.
+- **CSRF desactivado a propósito:** el access token no viaja en una cookie y la del refresh es
+  `SameSite=Strict`, así que el navegador no la manda desde otros sitios.
+- **Permisos por rol en cada endpoint**, con una
+  [jerarquía de roles](#seguridad--jerarquía-de-roles-rolehierarchy) para que el admin herede
+  los permisos del resto.
+
+**Persistencia en tres motores**
+- **PostgreSQL** (JPA) para usuarios, reservas y reseñas, con
+  [funciones, un trigger y una vista](#componentes-en-la-base-de-datos) en la propia base.
+- **MongoDB** para el catálogo de libros y los clics.
+- **Redis** para el [ranking de los 10 libros más clickeados](#redis--home-top-10-más-clickeados-redis)
+  y una caché por libro.
+
+**GraphQL (Netflix DGS)**
+- KPIs para el panel de administración. La tasa de conversión, por ejemplo, **cruza los clics de
+  Redis con las reservas de PostgreSQL**.
+- [*Schema stitching* con OpenLibrary](#graphql--schema-stitching-openlibrary): la API externa se
+  consulta solo si el cliente pide ese campo.
+
+**Sharding de MongoDB** (ramas `test/mongo-sharding-hashed` y `test/mongo-sharding-range`)
+- Cluster con 2 shards, cada uno un *replica set* de 3 nodos, más config servers y router.
+- **Hash** sobre `{ bookId: "hashed" }` con 500.024 libros → reparto de 49,99 % / 50,00 %.
+- **Rango** sobre `{ title: 1, bookId: 1 }` con 452.000 libros, pre-split y `moveChunk` manual con
+  el balancer apagado → 49,83 % / 50,16 %, y las búsquedas por título van a **un solo shard**.
+- Cada rama documenta el experimento en `scripts/README.md`.
+
+**Deploy**
+- `Dockerfile` en dos etapas (Gradle + JDK 21 → JRE 21), configuración por variables de entorno
+  (ver `.env.example`) y deploy en Render. Cobertura medida con JaCoCo (badge arriba).
 
 ---
 
